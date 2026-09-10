@@ -1,6 +1,6 @@
 export { default as StudentHeader } from './StudentHeader';
 export { default as StudentMobileDock } from './StudentMobileDock';
-export { default as StudentPortalView } from './StudentPortalView';
+export { StudentLoadingView, StudentErrorView } from './StudentStateView';
 export { default as StudentDossier } from './StudentDossier';
 export { default as StudentProfileForm } from './StudentProfileForm';
 export { default as StudentExamsView } from './StudentExamsView';

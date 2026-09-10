@@ -33,14 +33,19 @@ export default function StudentProfileForm({
   };
 
   return (
-    <div className="bg-slate-100/90 rounded-3xl border border-slate-300 p-4 sm:p-6 space-y-4 shadow-sm max-w-2xl mx-auto">
-      <div className="flex items-center justify-between border-b border-slate-300 pb-3">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-emerald-600 text-white rounded-xl shadow-xs">
+    <div className="bg-gradient-to-br from-slate-100 via-emerald-50/40 to-teal-50/40 rounded-3xl border border-slate-300 p-4 sm:p-6 space-y-4 shadow-sm max-w-2xl mx-auto">
+      <div className="flex items-center justify-between border-b border-slate-300/80 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 bg-emerald-700 text-white rounded-xl shadow-xs">
             <User className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-display font-black text-slate-900 text-base">Edit Student Profile</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-display font-black text-slate-900 text-base">Edit Student Profile</h3>
+              <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-md">
+                SID: {student.sid}
+              </span>
+            </div>
             <p className="text-xs text-slate-500 font-medium">Update contact info and college details</p>
           </div>
         </div>
@@ -48,7 +53,8 @@ export default function StudentProfileForm({
         <button
           type="button"
           onClick={onCancel}
-          className="p-1.5 bg-slate-200/80 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer"
+          className="p-1.5 bg-slate-200/80 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer transition-colors"
+          title="Cancel"
         >
           <X className="w-4 h-4" />
         </button>
@@ -70,7 +76,7 @@ export default function StudentProfileForm({
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
             />
           </div>
 
@@ -81,7 +87,7 @@ export default function StudentProfileForm({
               type="text"
               value={formData.college}
               onChange={(e) => setFormData({ ...formData, college: e.target.value })}
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
             />
           </div>
 
@@ -92,7 +98,7 @@ export default function StudentProfileForm({
               type="tel"
               value={formData.mobile}
               onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:ring-2 focus:ring-emerald-500 transition-colors"
             />
           </div>
 
@@ -103,7 +109,7 @@ export default function StudentProfileForm({
               type="tel"
               value={formData.guardiansPhone}
               onChange={(e) => setFormData({ ...formData, guardiansPhone: e.target.value })}
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:ring-2 focus:ring-emerald-500 transition-colors"
             />
           </div>
 
@@ -114,7 +120,7 @@ export default function StudentProfileForm({
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
             />
           </div>
 
@@ -125,7 +131,7 @@ export default function StudentProfileForm({
               type="text"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
             />
           </div>
         </div>
@@ -134,14 +140,14 @@ export default function StudentProfileForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
+            className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl cursor-pointer transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all active:scale-95"
           >
             <Save className="w-3.5 h-3.5" />
             <span>{saving ? 'Saving...' : 'Save Profile Changes'}</span>

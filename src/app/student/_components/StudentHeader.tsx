@@ -66,10 +66,10 @@ export default function StudentHeader() {
         </div>
 
         {/* User Info, Logout & 3-Line Menu Button */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {user && (
-            <div className="hidden sm:flex flex-col text-right">
-              <span className="text-xs font-bold text-white leading-tight truncate max-w-[140px]">
+            <div className="flex flex-col text-right max-w-[120px] sm:max-w-[160px]">
+              <span className="text-xs font-bold text-white leading-tight truncate">
                 {user.name}
               </span>
               <span className="text-[9px] text-emerald-300 font-mono font-bold">
@@ -81,7 +81,7 @@ export default function StudentHeader() {
           <button
             type="button"
             onClick={logout}
-            className="p-1.5 sm:px-2.5 sm:py-1 bg-rose-950/80 hover:bg-rose-900 text-rose-200 hover:text-white rounded-xl text-xs font-bold border border-rose-800/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+            className="p-1.5 sm:px-2.5 sm:py-1 bg-rose-950/80 hover:bg-rose-900 text-rose-200 hover:text-white rounded-xl text-xs font-bold border border-rose-800/80 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 shrink-0"
             title="Sign Out"
           >
             <LogOut className="w-3.5 h-3.5" />
@@ -92,7 +92,7 @@ export default function StudentHeader() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 text-emerald-200 hover:text-white bg-emerald-900/80 hover:bg-emerald-800 rounded-xl border border-emerald-700/80 transition-all cursor-pointer shadow-2xs"
+            className="md:hidden p-1.5 text-emerald-200 hover:text-white bg-emerald-900/80 hover:bg-emerald-800 rounded-xl border border-emerald-700/80 transition-all cursor-pointer shadow-2xs shrink-0"
             aria-label="Toggle Navigation Menu"
             title="Toggle Menu"
           >
@@ -112,8 +112,19 @@ export default function StudentHeader() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-emerald-800/80 bg-emerald-950 px-3 py-2"
+            className="md:hidden border-t border-emerald-800/80 bg-emerald-950 px-3 py-2.5 space-y-2"
           >
+            {user && (
+              <div className="p-2 bg-emerald-900/50 rounded-xl border border-emerald-800/60 flex items-center justify-between text-xs">
+                <div>
+                  <span className="font-bold text-white block">{user.name}</span>
+                  <span className="text-[10px] text-emerald-300 font-mono font-bold">Student ID: {user.sid}</span>
+                </div>
+                <span className="text-[10px] bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-md font-bold">
+                  Enrolled
+                </span>
+              </div>
+            )}
             <nav className="grid grid-cols-2 gap-1.5">
               {navLinks.map((item) => {
                 const Icon = item.icon;

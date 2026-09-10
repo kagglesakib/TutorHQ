@@ -7,19 +7,6 @@ import dynamic from 'next/dynamic';
 import { LoginForm, PendingApprovalCard } from '../app/_components/auth/LoginForm';
 import { AuthUser } from '../types';
 
-const StudentPortalView = dynamic(
-  () => import('../app/student/_components/StudentPortalView'),
-  {
-    loading: () => (
-      <div className="min-h-[50vh] flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
-        <p className="text-xs font-bold text-slate-500 font-mono">Loading Student Portal...</p>
-      </div>
-    ),
-    ssr: false,
-  }
-);
-
 export type { AuthUser };
 
 interface AuthContextType {
@@ -219,11 +206,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!mounted || isLoading || !isAuthenticated || !user) return;
 
     if (user.userType === 'student') {
-      if (pathname.startsWith('/admin')) {
+      if (pathname.startsWith('/admin') || pathname === '/') {
         router.replace('/student');
       }
     } else if (user.userType === 'admin') {
-      if (pathname === '/') {
+      if (pathname === '/' || pathname.startsWith('/student')) {
         router.replace('/admin');
       }
     }
@@ -249,10 +236,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       return <PendingApprovalCard user={user} />;
     }
 
-    // Approved student view
-    return <StudentPortalView />;
+    // Prevent flashing admin route if pending redirect
+    if (pathname.startsWith('/admin')) {
+      return null;
+    }
+
+    return <>{children}</>;
   }
 
   // 2. Admin View logic (userType === 'admin')
+  if (pathname.startsWith('/student')) {
+    return null;
+  }
+
   return <>{children}</>;
 }

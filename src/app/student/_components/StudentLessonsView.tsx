@@ -20,7 +20,11 @@ export default function StudentLessonsView({ student, activities }: StudentLesso
       (a.comment && a.comment.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const sortedActivities = [...filteredActivities].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const sortedActivities = [...filteredActivities].sort((a, b) => {
+    const timeA = a.date ? new Date(a.date).getTime() : 0;
+    const timeB = b.date ? new Date(b.date).getTime() : 0;
+    return (isNaN(timeB) ? 0 : timeB) - (isNaN(timeA) ? 0 : timeA);
+  });
 
   const presentCount = activities.filter(a => a.status === 'Present').length;
   const attendancePercentage = activities.length > 0 ? Math.round((presentCount / activities.length) * 100) : 100;
@@ -29,13 +33,13 @@ export default function StudentLessonsView({ student, activities }: StudentLesso
     <div className="space-y-4 max-w-6xl mx-auto">
       {/* Top Banner */}
       <div className="bg-slate-100/90 rounded-3xl border border-slate-300 p-4 sm:p-5 space-y-4 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-300 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-300/80 pb-3">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-xs">
+            <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-xs shrink-0">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="font-display font-black text-slate-900 text-base sm:text-lg">
                   Daily Study Logs & Attendance
                 </h2>
@@ -47,8 +51,8 @@ export default function StudentLessonsView({ student, activities }: StudentLesso
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full sm:w-auto justify-between sm:justify-end">
+            <div className="p-2 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center gap-2 shrink-0 shadow-2xs">
               <CheckCircle2 className="w-4 h-4 text-indigo-600" />
               <div>
                 <span className="text-[9px] text-slate-500 font-bold block leading-tight">Attendance</span>
@@ -56,14 +60,14 @@ export default function StudentLessonsView({ student, activities }: StudentLesso
               </div>
             </div>
 
-            <div className="relative bg-white rounded-xl border border-slate-300 p-1 flex items-center focus-within:ring-2 focus-within:ring-indigo-500">
-              <Search className="w-3.5 h-3.5 text-slate-400 ml-1 mr-1.5" />
+            <div className="relative bg-slate-50 hover:bg-white rounded-xl border border-slate-300 p-1 flex items-center focus-within:ring-2 focus-within:ring-indigo-500 flex-1 sm:flex-none transition-colors">
+              <Search className="w-3.5 h-3.5 text-slate-400 ml-1 mr-1.5 shrink-0" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search topic or log..."
-                className="py-0.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden w-36 sm:w-48"
+                className="py-0.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden w-full sm:w-48 bg-transparent"
               />
             </div>
           </div>
@@ -75,17 +79,17 @@ export default function StudentLessonsView({ student, activities }: StudentLesso
             sortedActivities.map((act) => (
               <div
                 key={act.aid}
-                className="p-3 bg-white border border-slate-200 hover:border-indigo-300 rounded-2xl flex items-center justify-between gap-3 text-xs transition-all shadow-2xs"
+                className="p-3 bg-indigo-100/50 hover:bg-indigo-100/80 border border-indigo-200/90 hover:border-indigo-300 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs transition-all shadow-2xs"
               >
                 <div className="flex items-center gap-2.5 flex-wrap min-w-0">
-                  <span className="text-[10px] font-mono font-bold bg-indigo-100 text-indigo-900 border border-indigo-300 px-2 py-0.5 rounded-lg">
+                  <span className="text-[10px] font-mono font-bold bg-indigo-200/80 text-indigo-950 border border-indigo-300 px-2 py-0.5 rounded-lg">
                     {formatAid(act.aid)}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-mono flex items-center gap-1 bg-slate-100 px-1.5 py-0.2 rounded">
-                    <Calendar className="w-3 h-3" />
+                  <span className="text-[10px] text-slate-600 font-mono flex items-center gap-1 bg-white/70 border border-indigo-200 px-1.5 py-0.5 rounded">
+                    <Calendar className="w-3 h-3 text-indigo-600" />
                     {act.date}
                   </span>
-                  <span className="font-bold text-slate-900 text-xs truncate max-w-[240px]">
+                  <span className="font-bold text-slate-900 text-xs truncate max-w-[280px]">
                     {act.subjectTuitioned || 'Study Session'}
                   </span>
                   <span
@@ -98,20 +102,20 @@ export default function StudentLessonsView({ student, activities }: StudentLesso
                     {act.status}
                   </span>
                   {act.comment && (
-                    <span className="text-[10px] text-slate-500 italic truncate max-w-[160px]">
+                    <span className="text-[10px] text-slate-600 italic truncate max-w-[200px]">
                       &ldquo;{act.comment}&rdquo;
                     </span>
                   )}
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
                   {act.hwMarks !== undefined && (
-                    <span className="bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-lg font-mono font-bold text-[11px]">
+                    <span className="bg-amber-100 text-amber-950 border border-amber-300 px-2 py-0.5 rounded-lg font-mono font-bold text-[11px] shadow-2xs">
                       HW: {act.hwMarks}/10
                     </span>
                   )}
                   {act.cwMarks !== undefined && (
-                    <span className="bg-sky-100 text-sky-900 border border-sky-300 px-2 py-0.5 rounded-lg font-mono font-bold text-[11px]">
+                    <span className="bg-sky-100 text-sky-950 border border-sky-300 px-2 py-0.5 rounded-lg font-mono font-bold text-[11px] shadow-2xs">
                       CW: {act.cwMarks}/10
                     </span>
                   )}

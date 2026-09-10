@@ -6,10 +6,9 @@ import { Lock, Eye, EyeOff, Save, CheckCircle2, AlertTriangle, ShieldCheck } fro
 
 interface StudentPasswordFormProps {
   student: Student;
-  onSaveProfile?: (updated: Student) => Promise<void> | void;
 }
 
-export default function StudentPasswordForm({ student, onSaveProfile }: StudentPasswordFormProps) {
+export default function StudentPasswordForm({ student }: StudentPasswordFormProps) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -60,14 +59,19 @@ export default function StudentPasswordForm({ student, onSaveProfile }: StudentP
   };
 
   return (
-    <div className="bg-slate-100/90 rounded-3xl border border-slate-300 p-4 sm:p-6 space-y-4 shadow-sm max-w-xl mx-auto">
-      <div className="flex items-center gap-3 border-b border-slate-300 pb-3">
+    <div className="bg-gradient-to-br from-slate-100 via-emerald-50/40 to-teal-50/40 rounded-3xl border border-slate-300 p-4 sm:p-6 space-y-4 shadow-sm max-w-xl mx-auto">
+      <div className="flex items-center gap-3 border-b border-slate-300/80 pb-3">
         <div className="p-2.5 bg-emerald-700 text-white rounded-2xl shadow-xs">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-display font-black text-slate-900 text-base">Account Security & Password</h3>
-          <p className="text-xs text-slate-500 font-medium">Change your student portal login password</p>
+          <div className="flex items-center gap-2">
+            <h3 className="font-display font-black text-slate-900 text-base">Account Security & Password</h3>
+            <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-md">
+              SID: {student.sid}
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 font-medium">Update your student portal credentials securely</p>
         </div>
       </div>
 
@@ -102,12 +106,13 @@ export default function StudentPasswordForm({ student, onSaveProfile }: StudentP
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Enter current password"
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+              title={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             </button>
@@ -127,7 +132,7 @@ export default function StudentPasswordForm({ student, onSaveProfile }: StudentP
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder="Min 4 characters"
-            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+            className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
           />
         </div>
 
@@ -144,7 +149,7 @@ export default function StudentPasswordForm({ student, onSaveProfile }: StudentP
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Re-enter new password"
-            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500"
+            className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
           />
         </div>
 

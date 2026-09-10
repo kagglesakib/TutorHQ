@@ -11,7 +11,7 @@ export default function StudentLayout({
 }) {
   return (
     <StudentProvider>
-      <div className="space-y-3 pb-20 sm:pb-8 min-h-screen">
+      <div className="space-y-3 pb-24 md:pb-8 min-h-screen">
         {children}
         <StudentMobileDock />
       </div>
