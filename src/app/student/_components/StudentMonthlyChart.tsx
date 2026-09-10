@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Student, Activity, Exam, Payment } from '@/types';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Legend } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Legend, ReferenceLine } from 'recharts';
 import { TrendingUp, Award, BookOpen, CheckCircle, Calendar, Sparkles, ChevronRight, BarChart3, CreditCard, ShieldCheck } from 'lucide-react';
 
 interface StudentMonthlyChartProps {
@@ -145,25 +145,46 @@ export default function StudentMonthlyChart({
   // Chart custom tooltip formatter
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const dataPoint = payload[0]?.payload as MonthlyStat | undefined;
       return (
-        <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700 text-white p-3 rounded-xl shadow-xl text-xs space-y-1.5 min-w-[170px]">
-          <p className="font-extrabold text-indigo-300 font-mono border-b border-slate-700/80 pb-1 flex items-center justify-between">
-            <span>{label}</span>
-            <span className="text-[10px] text-slate-400 font-normal">Monthly Ledger</span>
-          </p>
-          {payload.map((entry: any, index: number) => (
-            <div key={`item-${index}`} className="flex items-center justify-between gap-3 text-[11px]">
-              <span className="flex items-center gap-1.5" style={{ color: entry.color }}>
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-                <span className="font-medium text-slate-300">{entry.name}:</span>
-              </span>
-              <span className="font-mono font-black text-white">
-                {entry.value !== null && entry.value !== undefined
-                  ? `${entry.value}${entry.unit || ''}`
-                  : 'N/A'}
-              </span>
+        <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700 text-white p-3 rounded-xl shadow-xl text-xs space-y-2 min-w-[200px]">
+          <div className="border-b border-slate-700/80 pb-1 flex items-center justify-between">
+            <span className="font-extrabold text-indigo-300 font-mono">{dataPoint?.displayMonth || label}</span>
+            <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono font-bold">Monthly Ledger</span>
+          </div>
+          
+          <div className="space-y-1">
+            {payload.map((entry: any, index: number) => (
+              <div key={`item-${index}`} className="flex items-center justify-between gap-3 text-[11px]">
+                <span className="flex items-center gap-1.5" style={{ color: entry.color }}>
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                  <span className="font-medium text-slate-300">{entry.name}:</span>
+                </span>
+                <span className="font-mono font-black text-white">
+                  {entry.value !== null && entry.value !== undefined
+                    ? `${entry.value}${entry.unit || ''}`
+                    : 'N/A'}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {dataPoint && (
+            <div className="pt-1.5 border-t border-slate-800 text-[10px] space-y-0.5 text-slate-300 font-mono">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Lessons Attended:</span>
+                <span className="font-bold text-emerald-400">{dataPoint.attendedLessons} / {dataPoint.totalLessons}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Total Exams:</span>
+                <span className="font-bold text-purple-300">{dataPoint.examCount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Fees Paid:</span>
+                <span className="font-bold text-amber-300">৳{dataPoint.feesPaid}</span>
+              </div>
             </div>
-          ))}
+          )}
         </div>
       );
     }
@@ -324,10 +345,10 @@ export default function StudentMonthlyChart({
 
       {/* Main Responsive Recharts Container */}
       <div className="bg-gradient-to-br from-white/90 via-indigo-50/40 to-emerald-50/40 p-2 sm:p-3 rounded-xl border border-indigo-200/80 shadow-2xs">
-        <div className="h-56 sm:h-64 w-full">
+        <div className="h-60 sm:h-68 w-full">
           <ResponsiveContainer width="100%" height="100%">
             {metric === 'all' || metric === 'attendance' ? (
-              <AreaChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={monthlyData} margin={{ top: 15, right: 15, left: 0, bottom: 5 }}>
                 <defs>
                   <linearGradient id="attendanceGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
@@ -348,20 +369,23 @@ export default function StudentMonthlyChart({
                   tickLine={false} 
                   stroke="#64748b" 
                   fontSize={10} 
-                  fontWeight={600} 
+                  fontWeight={700} 
                 />
                 <YAxis 
+                  width={42}
                   domain={[0, 100]} 
+                  ticks={[0, 20, 40, 60, 80, 100]}
                   tickLine={false} 
                   stroke="#64748b" 
                   fontSize={10} 
-                  fontWeight={600}
+                  fontWeight={700}
                   tickFormatter={(v) => `${v}%`}
                 />
+                <ReferenceLine y={80} stroke="#10b981" strokeDasharray="3 3" label={{ value: 'Target 80%', fill: '#047857', fontSize: 9, fontWeight: 'bold', position: 'insideTopRight' }} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend 
                   verticalAlign="top" 
-                  height={30} 
+                  height={32} 
                   iconType="circle"
                   wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} 
                 />
@@ -376,6 +400,8 @@ export default function StudentMonthlyChart({
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#attendanceGradient)"
+                    dot={{ fill: '#059669', r: 3.5, strokeWidth: 1.5, stroke: '#ffffff' }}
+                    activeDot={{ r: 5, stroke: '#059669', strokeWidth: 2 }}
                   />
                 )}
 
@@ -386,25 +412,28 @@ export default function StudentMonthlyChart({
                     name="Avg Exam Mark"
                     unit="%"
                     stroke="#4f46e5"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#examGradient)"
+                    dot={{ fill: '#4f46e5', r: 3.5, strokeWidth: 1.5, stroke: '#ffffff' }}
+                    activeDot={{ r: 5, stroke: '#4f46e5', strokeWidth: 2 }}
                   />
                 )}
               </AreaChart>
             ) : metric === 'exams' ? (
-              <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={monthlyData} margin={{ top: 15, right: 15, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="shortMonth" tickLine={false} stroke="#64748b" fontSize={10} fontWeight={600} />
-                <YAxis domain={[0, 100]} tickLine={false} stroke="#64748b" fontSize={10} fontWeight={600} tickFormatter={(v) => `${v}%`} />
+                <XAxis dataKey="shortMonth" tickLine={false} stroke="#64748b" fontSize={10} fontWeight={700} />
+                <YAxis width={42} domain={[0, 100]} ticks={[0, 20, 40, 60, 80, 100]} tickLine={false} stroke="#64748b" fontSize={10} fontWeight={700} tickFormatter={(v) => `${v}%`} />
+                <ReferenceLine y={80} stroke="#10b981" strokeDasharray="3 3" label={{ value: 'Target 80%', fill: '#047857', fontSize: 9, fontWeight: 'bold', position: 'insideTopRight' }} />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="top" height={30} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} />
+                <Legend verticalAlign="top" height={32} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} />
                 <Bar dataKey="avgExamPct" name="Average Exam Mark" unit="%" fill="#6366f1" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="bestExamPct" name="Top Exam Mark" unit="%" fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
             ) : (
               /* HW / CW Chart */
-              <AreaChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={monthlyData} margin={{ top: 15, right: 15, left: 0, bottom: 5 }}>
                 <defs>
                   <linearGradient id="hwArea" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4} />
@@ -416,12 +445,13 @@ export default function StudentMonthlyChart({
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="shortMonth" tickLine={false} stroke="#64748b" fontSize={10} fontWeight={600} />
-                <YAxis domain={[0, 10]} tickLine={false} stroke="#64748b" fontSize={10} fontWeight={600} />
+                <XAxis dataKey="shortMonth" tickLine={false} stroke="#64748b" fontSize={10} fontWeight={700} />
+                <YAxis width={35} domain={[0, 10]} ticks={[0, 2, 4, 6, 8, 10]} tickLine={false} stroke="#64748b" fontSize={10} fontWeight={700} />
+                <ReferenceLine y={8} stroke="#d97706" strokeDasharray="3 3" label={{ value: 'Pass 8/10', fill: '#b45309', fontSize: 9, fontWeight: 'bold', position: 'insideTopRight' }} />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="top" height={30} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} />
-                <Area type="monotone" dataKey="avgHwScore" name="Avg Homework (10)" stroke="#d97706" strokeWidth={2} fillOpacity={1} fill="url(#hwArea)" />
-                <Area type="monotone" dataKey="avgCwScore" name="Avg Classwork (10)" stroke="#0891b2" strokeWidth={2} fillOpacity={1} fill="url(#cwArea)" />
+                <Legend verticalAlign="top" height={32} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} />
+                <Area type="monotone" dataKey="avgHwScore" name="Avg Homework (10)" stroke="#d97706" strokeWidth={2.5} fillOpacity={1} fill="url(#hwArea)" dot={{ fill: '#d97706', r: 3.5, strokeWidth: 1.5, stroke: '#fff' }} />
+                <Area type="monotone" dataKey="avgCwScore" name="Avg Classwork (10)" stroke="#0891b2" strokeWidth={2.5} fillOpacity={1} fill="url(#cwArea)" dot={{ fill: '#0891b2', r: 3.5, strokeWidth: 1.5, stroke: '#fff' }} />
               </AreaChart>
             )}
           </ResponsiveContainer>

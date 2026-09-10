@@ -11,7 +11,8 @@ import {
   CartesianGrid,
   BarChart,
   Bar,
-  Legend
+  Legend,
+  ReferenceLine,
 } from 'recharts';
 import { TrendingUp, BarChart3, Calendar, Award, CheckCircle2 } from 'lucide-react';
 import { Exam, Activity } from '@/types';
@@ -229,7 +230,7 @@ export default function StudentAnalytics({ exams, activities }: StudentAnalytics
           examChartData.length > 0 ? (
             <div className="h-64 sm:h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={examChartData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                <AreaChart data={examChartData} margin={{ top: 15, right: 15, left: 0, bottom: 5 }}>
                   <defs>
                     <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#d97706" stopOpacity={0.4} />
@@ -239,28 +240,41 @@ export default function StudentAnalytics({ exams, activities }: StudentAnalytics
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis
                     dataKey="shortName"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
                     tickLine={false}
                     axisLine={{ stroke: '#cbd5e1' }}
                   />
                   <YAxis
+                    width={42}
                     domain={[0, 100]}
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    ticks={[0, 20, 40, 60, 80, 100]}
+                    tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
                     tickFormatter={(val) => `${val}%`}
                     tickLine={false}
                     axisLine={{ stroke: '#cbd5e1' }}
                   />
+                  <ReferenceLine y={80} stroke="#10b981" strokeDasharray="3 3" label={{ value: 'Target 80%', fill: '#047857', fontSize: 9, fontWeight: 'bold', position: 'insideTopRight' }} />
+                  <ReferenceLine y={40} stroke="#f43f5e" strokeDasharray="2 2" label={{ value: 'Pass 40%', fill: '#be123c', fontSize: 9, fontWeight: 'bold', position: 'insideBottomRight' }} />
                   <Tooltip
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
+                        const isDistinction = data.score >= 80;
+                        const isPass = data.score >= 40;
                         return (
-                          <div className="bg-slate-900 text-white p-3 rounded-xl shadow-lg text-xs space-y-1 border border-slate-700">
-                            <p className="font-bold text-amber-300">{data.topic}</p>
+                          <div className="bg-slate-900 text-white p-3 rounded-xl shadow-lg text-xs space-y-1.5 border border-slate-700 min-w-[180px]">
+                            <div className="flex items-center justify-between gap-2 border-b border-slate-700 pb-1">
+                              <span className="font-bold text-amber-300">{data.topic}</span>
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-black ${
+                                isDistinction ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : isPass ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                              }`}>
+                                {isDistinction ? 'Excellence' : isPass ? 'Pass' : 'Needs Work'}
+                              </span>
+                            </div>
                             <p className="text-[10px] text-slate-300 font-mono">Date: {data.date}</p>
-                            <div className="pt-1 border-t border-slate-700 flex items-center justify-between gap-4">
+                            <div className="pt-1 border-t border-slate-700 flex items-center justify-between gap-4 font-mono">
                               <span className="text-slate-400">Score:</span>
-                              <span className="font-mono font-bold text-amber-400">{data.obtained} / {data.total} ({data.score}%)</span>
+                              <span className="font-bold text-amber-400">{data.obtained} / {data.total} ({data.score}%)</span>
                             </div>
                           </div>
                         );
@@ -275,7 +289,7 @@ export default function StudentAnalytics({ exams, activities }: StudentAnalytics
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#scoreGradient)"
-                    dot={{ fill: '#b45309', r: 4, strokeWidth: 2, stroke: '#ffffff' }}
+                    dot={{ fill: '#b45309', r: 4, strokeWidth: 1.5, stroke: '#ffffff' }}
                     activeDot={{ r: 6, stroke: '#d97706', strokeWidth: 2 }}
                   />
                 </AreaChart>
@@ -292,29 +306,32 @@ export default function StudentAnalytics({ exams, activities }: StudentAnalytics
           attendanceChartData.length > 0 ? (
             <div className="h-64 sm:h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={attendanceChartData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                <BarChart data={attendanceChartData} margin={{ top: 15, right: 15, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis
                     dataKey="month"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
                     tickLine={false}
                     axisLine={{ stroke: '#cbd5e1' }}
                   />
                   <YAxis
+                    width={42}
                     domain={[0, 100]}
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    ticks={[0, 20, 40, 60, 80, 100]}
+                    tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
                     tickFormatter={(val) => `${val}%`}
                     tickLine={false}
                     axisLine={{ stroke: '#cbd5e1' }}
                   />
+                  <ReferenceLine y={80} stroke="#10b981" strokeDasharray="3 3" label={{ value: '80% Benchmark', fill: '#047857', fontSize: 9, fontWeight: 'bold', position: 'insideTopRight' }} />
                   <Tooltip
                     content={({ active, payload }) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-slate-900 text-white p-3 rounded-xl shadow-lg text-xs space-y-1 border border-slate-700">
-                            <p className="font-bold text-indigo-300">Month: {data.month}</p>
-                            <div className="pt-1 border-t border-slate-700 space-y-0.5">
+                          <div className="bg-slate-900 text-white p-3 rounded-xl shadow-lg text-xs space-y-1.5 border border-slate-700 min-w-[180px]">
+                            <p className="font-bold text-indigo-300 font-mono">Month: {data.month}</p>
+                            <div className="pt-1 border-t border-slate-700 space-y-1 font-mono">
                               <div className="flex items-center justify-between gap-4">
                                 <span className="text-slate-400">Attendance:</span>
                                 <span className="font-mono font-bold text-emerald-400">{data.attendanceRate}%</span>
@@ -336,7 +353,7 @@ export default function StudentAnalytics({ exams, activities }: StudentAnalytics
                       return null;
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px', fontWeight: 'bold' }} />
                   <Bar
                     dataKey="attendanceRate"
                     name="Attendance %"

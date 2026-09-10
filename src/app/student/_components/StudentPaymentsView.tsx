@@ -88,16 +88,16 @@ export default function StudentPaymentsView({
         <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-tr from-sky-200/40 via-teal-200/30 to-transparent rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-200/80 pb-3 sm:pb-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 sm:p-2.5 bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-700 text-white rounded-2xl shadow-md shadow-emerald-600/20 shrink-0 border border-white/40">
               <Banknote className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div className="space-y-0.5">
+            <div className="space-y-0.5 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="font-display font-black text-slate-900 text-base sm:text-lg tracking-tight">
                   Tuition Payment Ledger
                 </h1>
-                <span className="text-[10px] bg-emerald-200/90 text-emerald-950 font-mono font-black px-2 py-0.5 rounded-md border border-emerald-300 shadow-2xs">
+                <span className="text-[10px] bg-emerald-200/90 text-emerald-950 font-mono font-black px-2 py-0.5 rounded-md border border-emerald-300 shadow-2xs shrink-0">
                   Verified Invoices
                 </span>
               </div>
@@ -108,7 +108,7 @@ export default function StudentPaymentsView({
           </div>
 
           {/* Aggregate Paid Pill */}
-          <div className="flex items-center gap-2 self-start sm:self-auto bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-3.5 py-1.5 rounded-xl shadow-md shadow-emerald-600/20 border border-emerald-400/40">
+          <div className="flex items-center gap-2 self-start sm:self-auto bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-3.5 py-1.5 rounded-xl shadow-md shadow-emerald-600/20 border border-emerald-400/40 shrink-0">
             <div className="p-1 bg-white/20 rounded-md shrink-0">
               <CreditCard className="w-3.5 h-3.5" />
             </div>

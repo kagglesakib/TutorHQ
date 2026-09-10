@@ -73,8 +73,8 @@ export default function StudentHeader() {
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 ml-4 bg-emerald-900/60 p-1 rounded-xl border border-emerald-800/80">
+          {/* Desktop Navigation Links (Shown on Desktop screens lg: 1024px+) */}
+          <nav className="hidden lg:flex items-center gap-1 ml-2 xl:ml-4 bg-emerald-900/60 p-1 rounded-xl border border-emerald-800/80">
             {navLinks.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -82,7 +82,7 @@ export default function StudentHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  className={`px-2.5 xl:px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                     isActive
                       ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-xs'
                       : 'text-emerald-200 hover:text-white hover:bg-emerald-800/60'
@@ -99,11 +99,11 @@ export default function StudentHeader() {
         {/* User Info, Logout & 3-Line Menu Button */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {user && (
-            <div className="flex flex-col text-right max-w-[120px] sm:max-w-[160px]">
-              <span className="text-xs font-bold text-white leading-tight truncate">
+            <div className="flex flex-col text-right min-w-0 max-w-[100px] sm:max-w-[140px] md:max-w-[160px] lg:max-w-[180px]">
+              <span className="text-xs font-bold text-white leading-tight truncate" title={user.name}>
                 {user.name}
               </span>
-              <span className="text-[9px] text-emerald-300 font-mono font-bold">
+              <span className="text-[9px] text-emerald-300 font-mono font-bold truncate">
                 SID: {user.sid}
               </span>
             </div>
@@ -119,11 +119,11 @@ export default function StudentHeader() {
             <span className="hidden sm:inline">Logout</span>
           </button>
 
-          {/* 3-Line Mobile Menu Button */}
+          {/* 3-Line Mobile/Tablet Menu Button */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 text-emerald-200 hover:text-white bg-emerald-900/80 hover:bg-emerald-800 rounded-xl border border-emerald-700/80 transition-all cursor-pointer shadow-2xs shrink-0"
+            className="lg:hidden p-1.5 text-emerald-200 hover:text-white bg-emerald-900/80 hover:bg-emerald-800 rounded-xl border border-emerald-700/80 transition-all cursor-pointer shadow-2xs shrink-0"
             aria-label="Toggle Navigation Menu"
             title="Toggle Menu"
           >
@@ -136,16 +136,16 @@ export default function StudentHeader() {
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile & Tablet Drawer Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-emerald-800/80 bg-emerald-950 px-3 py-2.5 space-y-2"
+            className="lg:hidden border-t border-emerald-800/80 bg-emerald-950 px-3 py-2.5 space-y-2"
           >
-            <nav className="grid grid-cols-2 gap-1.5">
+            <nav className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
               {navLinks.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
@@ -154,8 +154,8 @@ export default function StudentHeader() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`px-3 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 border ${
-                      item.isFullWidth ? 'col-span-2 justify-center py-2.5' : ''
+                    className={`px-3 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 border ${
+                      item.isFullWidth ? 'col-span-2 sm:col-span-1 py-2.5' : ''
                     } ${
                       isActive ? item.activeStyle : item.inactiveStyle
                     }`}

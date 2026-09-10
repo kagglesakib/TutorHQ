@@ -9,7 +9,8 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  Legend
+  Legend,
+  ReferenceLine,
 } from 'recharts';
 import { Activity } from '@/types';
 import { BarChart3, CheckCircle2 } from 'lucide-react';
@@ -90,31 +91,34 @@ export default function AttendanceProgressChart({ activities }: AttendanceProgre
         </div>
       </div>
 
-      <div className="h-48 sm:h-56 w-full bg-white/70 p-2 rounded-xl border border-indigo-100">
+      <div className="h-52 sm:h-60 w-full bg-white/70 p-2 rounded-xl border border-indigo-100">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 8, right: 10, left: -25, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ top: 12, right: 15, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" vertical={false} />
             <XAxis
               dataKey="month"
-              tick={{ fontSize: 10, fill: '#3730a3' }}
+              tick={{ fontSize: 10, fill: '#3730a3', fontWeight: 600 }}
               tickLine={false}
               axisLine={{ stroke: '#c7d2fe' }}
             />
             <YAxis
+              width={42}
               domain={[0, 100]}
-              tick={{ fontSize: 10, fill: '#3730a3' }}
+              ticks={[0, 20, 40, 60, 80, 100]}
+              tick={{ fontSize: 10, fill: '#3730a3', fontWeight: 600 }}
               tickFormatter={(val) => `${val}%`}
               tickLine={false}
               axisLine={{ stroke: '#c7d2fe' }}
             />
+            <ReferenceLine y={80} stroke="#10b981" strokeDasharray="3 3" label={{ value: '80% Benchmark', fill: '#047857', fontSize: 9, fontWeight: 'bold', position: 'insideTopRight' }} />
             <Tooltip
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-slate-900 text-white p-2.5 rounded-xl shadow-lg text-xs space-y-1 border border-slate-700">
-                      <p className="font-bold text-indigo-300">Month: {data.month}</p>
-                      <div className="pt-1 border-t border-slate-700 space-y-0.5">
+                    <div className="bg-slate-900 text-white p-3 rounded-xl shadow-lg text-xs space-y-1.5 border border-slate-700 min-w-[180px]">
+                      <p className="font-bold text-indigo-300 font-mono">Month: {data.month}</p>
+                      <div className="pt-1 border-t border-slate-700 space-y-1 font-mono">
                         <div className="flex items-center justify-between gap-4">
                           <span className="text-slate-400">Attendance:</span>
                           <span className="font-mono font-bold text-emerald-400">{data.attendanceRate}%</span>
@@ -136,7 +140,7 @@ export default function AttendanceProgressChart({ activities }: AttendanceProgre
                 return null;
               }}
             />
-            <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '4px' }} />
+            <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '4px', fontWeight: 'bold' }} />
             <Bar
               dataKey="attendanceRate"
               name="Attendance %"
