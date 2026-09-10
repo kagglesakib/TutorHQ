@@ -22,6 +22,19 @@ export default function StudentPasswordForm({
   const { user } = useAuth();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
+  const handleToggleEditProfile = () => {
+    const nextState = !isEditingProfile;
+    setIsEditingProfile(nextState);
+    if (nextState) {
+      setTimeout(() => {
+        const el = document.getElementById('student-personal-profile-card');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
+    }
+  };
+
   // Profile editable fields (initialized from student prop or auth user)
   const [college, setCollege] = useState(student?.college || '');
   const [email, setEmail] = useState(student?.email || user?.email || '');
@@ -194,7 +207,7 @@ export default function StudentPasswordForm({
 
           <button
             type="button"
-            onClick={() => setIsEditingProfile(!isEditingProfile)}
+            onClick={handleToggleEditProfile}
             className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-98 self-start sm:self-center ${
               isEditingProfile
                 ? 'bg-slate-200 hover:bg-slate-300 text-slate-800 border border-slate-300'
@@ -303,7 +316,7 @@ export default function StudentPasswordForm({
       </div>
 
       {/* 3. Personal & Contact Information Section */}
-      <div className="bg-gradient-to-br from-amber-50/95 via-orange-50/80 to-yellow-50/90 rounded-2xl p-3.5 sm:p-4 border-2 border-amber-200/90 shadow-md space-y-3">
+      <div id="student-personal-profile-card" className="bg-gradient-to-br from-amber-50/95 via-orange-50/80 to-yellow-50/90 rounded-2xl p-3.5 sm:p-4 border-2 border-amber-200/90 shadow-md space-y-3 scroll-mt-20">
         <div className="flex items-center justify-between border-b border-amber-200/80 pb-2">
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-amber-200/80 text-amber-900 rounded-xl border border-amber-300 shadow-2xs shrink-0">

@@ -16,11 +16,42 @@ export default function StudentHeader() {
   const { user, logout } = useAuth();
 
   const navLinks = [
-    { href: '/student', label: 'Overview', icon: LayoutDashboard },
-    { href: '/student/lessons', label: 'Lessons', icon: BookOpen },
-    { href: '/student/exams', label: 'Exams', icon: ClipboardList },
-    { href: '/student/payments', label: 'Payments', icon: Banknote },
-    { href: '/student/profile', label: 'Profile', icon: User },
+    {
+      href: '/student',
+      label: 'Overview',
+      icon: LayoutDashboard,
+      activeStyle: 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-emerald-400/50 shadow-xs',
+      inactiveStyle: 'bg-emerald-900/70 text-emerald-100 border-emerald-800/70 hover:bg-emerald-800 hover:text-white',
+    },
+    {
+      href: '/student/lessons',
+      label: 'Lessons',
+      icon: BookOpen,
+      activeStyle: 'bg-gradient-to-r from-sky-500 to-cyan-500 text-white border-sky-400/50 shadow-xs',
+      inactiveStyle: 'bg-sky-950/70 text-sky-100 border-sky-800/70 hover:bg-sky-900 hover:text-white',
+    },
+    {
+      href: '/student/exams',
+      label: 'Exams',
+      icon: ClipboardList,
+      activeStyle: 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white border-indigo-400/50 shadow-xs',
+      inactiveStyle: 'bg-indigo-950/70 text-indigo-100 border-indigo-800/70 hover:bg-indigo-900 hover:text-white',
+    },
+    {
+      href: '/student/payments',
+      label: 'Payments',
+      icon: Banknote,
+      activeStyle: 'bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-500 text-slate-950 font-black border-amber-400/50 shadow-xs',
+      inactiveStyle: 'bg-amber-950/70 text-amber-100 border-amber-800/70 hover:bg-amber-900 hover:text-white',
+    },
+    {
+      href: '/student/profile',
+      label: 'Profile',
+      icon: User,
+      isFullWidth: true,
+      activeStyle: 'bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 text-white border-teal-400/50 shadow-xs',
+      inactiveStyle: 'bg-teal-950/80 text-teal-100 border-teal-800/80 hover:bg-teal-900 hover:text-white',
+    },
   ];
 
   return (
@@ -114,17 +145,6 @@ export default function StudentHeader() {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden border-t border-emerald-800/80 bg-emerald-950 px-3 py-2.5 space-y-2"
           >
-            {user && (
-              <div className="p-2 bg-emerald-900/50 rounded-xl border border-emerald-800/60 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-white block">{user.name}</span>
-                  <span className="text-[10px] text-emerald-300 font-mono font-bold">Student ID: {user.sid}</span>
-                </div>
-                <span className="text-[10px] bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-md font-bold">
-                  Enrolled
-                </span>
-              </div>
-            )}
             <nav className="grid grid-cols-2 gap-1.5">
               {navLinks.map((item) => {
                 const Icon = item.icon;
@@ -134,13 +154,13 @@ export default function StudentHeader() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
-                      isActive
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400/50 shadow-xs'
-                        : 'bg-emerald-900/60 text-emerald-200 border-emerald-800/60 hover:bg-emerald-800'
+                    className={`px-3 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 border ${
+                      item.isFullWidth ? 'col-span-2 justify-center py-2.5' : ''
+                    } ${
+                      isActive ? item.activeStyle : item.inactiveStyle
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-4 h-4 shrink-0" />
                     <span>{item.label}</span>
                   </Link>
                 );

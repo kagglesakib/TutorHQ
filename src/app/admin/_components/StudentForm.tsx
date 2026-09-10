@@ -34,6 +34,13 @@ export default function StudentForm({
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    const el = document.getElementById('admin-student-edit-form');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -62,7 +69,7 @@ export default function StudentForm({
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-100 via-indigo-50/70 to-teal-50/70 p-4 sm:p-6 rounded-3xl border border-slate-300 shadow-sm space-y-4">
+    <div id="admin-student-edit-form" className="bg-gradient-to-br from-slate-100 via-indigo-50/70 to-teal-50/70 p-4 sm:p-6 rounded-3xl border border-slate-300 shadow-sm space-y-4 scroll-mt-20">
       <div className="flex items-center justify-between border-b border-slate-300 pb-3">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-gradient-to-tr from-indigo-600 to-teal-600 text-white rounded-xl shadow-xs">

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Student } from '@/types';
 import { X, Save, Lock, CheckCircle2, User, Building, Mail, Phone, Home } from 'lucide-react';
 import { formatBatch } from '@/utils/formatBatch';
@@ -23,6 +23,13 @@ export default function StudentProfileForm({
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const el = document.getElementById('student-profile-form-container');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
