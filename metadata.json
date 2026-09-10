@@ -1,0 +1,8 @@
+{
+  "name": "TutorHQ",
+  "description": "Academic Management Portal for tracking students, daily tuition logs, exams, and payment receipts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
