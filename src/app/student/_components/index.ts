@@ -7,3 +7,7 @@ export { default as StudentExamsView } from './StudentExamsView';
 export { default as StudentLessonsView } from './StudentLessonsView';
 export { default as StudentPaymentsView } from './StudentPaymentsView';
 export { default as StudentPasswordForm } from './StudentPasswordForm';
+export { default as StudentAnalytics } from './StudentAnalytics';
+export { default as StudentMonthlyChart } from './StudentMonthlyChart';
+export { default as ExamProgressChart } from './ExamProgressChart';
+export { default as AttendanceProgressChart } from './AttendanceProgressChart';

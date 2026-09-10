@@ -1,11 +1,9 @@
 'use client';
 
 import React from 'react';
-import dynamic from 'next/dynamic';
 import { useAuth } from '@/context/AuthContext';
-
-const StudentHeader = dynamic(() => import('@/app/student/_components/StudentHeader'), { ssr: false });
-const AdminHeader = dynamic(() => import('@/app/admin/_components/AdminHeader'), { ssr: false });
+import StudentHeader from '@/app/student/_components/StudentHeader';
+import AdminHeader from '@/app/admin/_components/AdminHeader';
 
 export default function NavigationHeader() {
   const { user, isAuthenticated } = useAuth();
@@ -21,4 +19,3 @@ export default function NavigationHeader() {
 
   return <AdminHeader />;
 }
-

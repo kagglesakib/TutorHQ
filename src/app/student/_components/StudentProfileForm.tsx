@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import { Student } from '@/types';
-import { User, Phone, Mail, Building, BookOpen, MapPin, Save, X } from 'lucide-react';
+import { X, Save, Lock, CheckCircle2, User, Building, Mail, Phone, Home } from 'lucide-react';
+import { formatBatch } from '@/utils/formatBatch';
 
 interface StudentProfileFormProps {
   student: Student;
-  onSave: (updated: Student) => Promise<void> | void;
+  onSave: (updatedStudent: Student) => void | Promise<void>;
   onCancel: () => void;
 }
 
@@ -15,142 +16,199 @@ export default function StudentProfileForm({
   onSave,
   onCancel,
 }: StudentProfileFormProps) {
-  const [formData, setFormData] = useState<Student>({ ...student });
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [college, setCollege] = useState(student.college || '');
+  const [email, setEmail] = useState(student.email || '');
+  const [mobile, setMobile] = useState(student.mobile || '');
+  const [address, setAddress] = useState(student.address || '');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-    setError(null);
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    if (email && !/\S+@\S+\.\S+/.test(email)) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+
+    const updated: Student = {
+      ...student,
+      college: college.trim(),
+      email: email.trim(),
+      mobile: mobile.trim(),
+      address: address.trim(),
+    };
+
+    setIsSaving(true);
     try {
-      await onSave(formData);
+      await onSave(updated);
+      setSuccessMsg('Profile updated successfully!');
     } catch (err: any) {
-      setError(err?.message || 'Failed to update profile');
+      setErrorMsg(err?.message || 'Failed to update profile.');
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-100 via-emerald-50/40 to-teal-50/40 rounded-3xl border border-slate-300 p-4 sm:p-6 space-y-4 shadow-sm max-w-2xl mx-auto">
-      <div className="flex items-center justify-between border-b border-slate-300/80 pb-3">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-emerald-700 text-white rounded-xl shadow-xs">
-            <User className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-display font-black text-slate-900 text-base">Edit Student Profile</h3>
-              <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-md">
-                SID: {student.sid}
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 font-medium">Update contact info and college details</p>
-          </div>
+    <div className="bg-emerald-50/90 p-5 sm:p-6 rounded-3xl border border-indigo-100 shadow-xl space-y-5 animate-scaleUp max-w-3xl mx-auto" id="student-profile-form-container">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-slate-200/80 pb-3 sm:pb-4">
+        <div>
+          <h3 className="font-display font-black text-slate-900 text-base flex items-center gap-2">
+            <User className="w-5 h-5 text-indigo-600" />
+            Edit Student Profile Details
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            You can edit your College, Email, Mobile Phone, and Residential Address. Academic credentials are managed by administration.
+          </p>
         </div>
 
         <button
           type="button"
           onClick={onCancel}
-          className="p-1.5 bg-slate-200/80 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer transition-colors"
-          title="Cancel"
+          className="p-2 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
-      {error && (
-        <div className="p-3 bg-rose-100 border border-rose-300 text-rose-900 rounded-xl text-xs font-semibold">
-          {error}
+      {errorMsg && (
+        <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold rounded-2xl flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+          {errorMsg}
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-2xl flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          {successMsg}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Name */}
+        {/* Read-Only Academic Lock Banner */}
+        <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-700">Full Name *</label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
-            />
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Lock className="w-3 h-3 text-slate-400" /> Student ID (SID)
+            </span>
+            <p className="font-mono font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+              {student.sid}
+            </p>
           </div>
 
+          <div className="space-y-1">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Lock className="w-3 h-3 text-slate-400" /> Full Name
+            </span>
+            <p className="font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+              {student.name}
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Lock className="w-3 h-3 text-slate-400" /> HSC Batch & Group
+            </span>
+            <p className="font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+              {formatBatch(student.hscBatch, 'No Batch')} • {student.group}
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <Lock className="w-3 h-3 text-slate-400" /> Tuitioned Subject
+            </span>
+            <p className="font-mono font-bold text-indigo-800 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+              {student.subject}
+            </p>
+          </div>
+        </div>
+
+        {/* Editable Student Fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
           {/* College */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-700">College / Institute</label>
+          <div className="space-y-1 bg-indigo-50/60 p-3.5 rounded-2xl border border-indigo-100">
+            <label className="text-[10px] font-black text-indigo-900 uppercase tracking-wider flex items-center justify-between">
+              <span className="flex items-center gap-1"><Building className="w-3.5 h-3.5 text-indigo-600" /> College / Institution</span>
+              <span className="text-[10px] text-indigo-600 font-bold">✓ Editable</span>
+            </label>
             <input
               type="text"
-              value={formData.college}
-              onChange={(e) => setFormData({ ...formData, college: e.target.value })}
-              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
-            />
-          </div>
-
-          {/* Mobile */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-700">Mobile Phone</label>
-            <input
-              type="tel"
-              value={formData.mobile}
-              onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:ring-2 focus:ring-emerald-500 transition-colors"
-            />
-          </div>
-
-          {/* Guardian Phone */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-700">Guardian Phone</label>
-            <input
-              type="tel"
-              value={formData.guardiansPhone}
-              onChange={(e) => setFormData({ ...formData, guardiansPhone: e.target.value })}
-              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 font-mono focus:ring-2 focus:ring-emerald-500 transition-colors"
+              value={college}
+              onChange={(e) => setCollege(e.target.value)}
+              placeholder="e.g. Notre Dame College"
+              className="w-full px-3.5 py-2.5 bg-emerald-100/50 border border-indigo-200 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-indigo-300 focus:outline-hidden"
             />
           </div>
 
           {/* Email */}
-          <div className="space-y-1 sm:col-span-2">
-            <label className="text-[11px] font-bold text-slate-700">Email Address</label>
+          <div className="space-y-1 bg-purple-50/60 p-3.5 rounded-2xl border border-purple-100">
+            <label className="text-[10px] font-black text-purple-900 uppercase tracking-wider flex items-center justify-between">
+              <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5 text-purple-600" /> Email Address</span>
+              <span className="text-[10px] text-purple-600 font-bold">✓ Editable</span>
+            </label>
             <input
               type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. student@gmail.com"
+              className="w-full px-3.5 py-2.5 bg-emerald-100/50 border border-purple-200 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-purple-300 focus:outline-hidden"
+            />
+          </div>
+
+          {/* Student Mobile */}
+          <div className="space-y-1 bg-emerald-50/60 p-3.5 rounded-2xl border border-emerald-100">
+            <label className="text-[10px] font-black text-emerald-900 uppercase tracking-wider flex items-center justify-between">
+              <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-emerald-600" /> Student Mobile Phone</span>
+              <span className="text-[10px] text-emerald-600 font-bold">✓ Editable</span>
+            </label>
+            <input
+              type="text"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              placeholder="e.g. 01700000000"
+              className="w-full px-3.5 py-2.5 bg-emerald-100/50 border border-emerald-200 rounded-xl text-xs font-bold font-mono text-slate-900 focus:ring-2 focus:ring-emerald-300 focus:outline-hidden"
             />
           </div>
 
           {/* Address */}
-          <div className="space-y-1 sm:col-span-2">
-            <label className="text-[11px] font-bold text-slate-700">Address</label>
+          <div className="space-y-1 bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
+            <label className="text-[10px] font-black text-amber-900 uppercase tracking-wider flex items-center justify-between">
+              <span className="flex items-center gap-1"><Home className="w-3.5 h-3.5 text-amber-600" /> Residential Address</span>
+              <span className="text-[10px] text-amber-600 font-bold">✓ Editable</span>
+            </label>
             <input
               type="text"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full px-3 py-2 bg-emerald-50/60 hover:bg-emerald-50/80 focus:bg-white border border-emerald-300/80 rounded-xl text-xs font-semibold text-slate-900 focus:ring-2 focus:ring-emerald-500 transition-colors"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="e.g. House 12, Road 4, Dhanmondi, Dhaka"
+              className="w-full px-3.5 py-2.5 bg-emerald-100/50 border border-amber-200 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-amber-300 focus:outline-hidden"
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-300">
+        {/* Action Buttons */}
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200/80">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl cursor-pointer transition-colors"
+            className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-black rounded-xl transition-all cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="submit"
-            disabled={saving}
-            className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all active:scale-95"
+            disabled={isSaving}
+            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-black rounded-xl transition-all cursor-pointer shadow-md flex items-center gap-1.5"
           >
-            <Save className="w-3.5 h-3.5" />
-            <span>{saving ? 'Saving...' : 'Save Profile Changes'}</span>
+            <Save className="w-4 h-4" />
+            {isSaving ? 'Saving...' : 'Save Profile Changes'}
           </button>
         </div>
       </form>

@@ -70,6 +70,8 @@ export interface Payment {
   date: string; // format YYYY-MM-DD
   amount: number; // in taka
   paymentMonth: string; // format YYYY-MM (e.g., "2026-07")
+  method?: string;
+  status?: string;
   comment?: string;
   createdAt?: string;
 }
