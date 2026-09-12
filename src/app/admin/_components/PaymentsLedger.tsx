@@ -242,7 +242,7 @@ export default function PaymentsLedger({
                   {/* Top Badge Row */}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-[9.5px] font-mono font-black bg-emerald-200 text-emerald-950 border border-emerald-400 px-1.5 py-0.5 rounded shadow-2xs shrink-0">
-                      PID : {formatPid(pay.pid)}
+                      {formatPid(pay.pid)}
                     </span>
                     <span className="text-[9.5px] font-semibold text-slate-800 bg-slate-200/80 border border-slate-300 px-1.5 py-0.5 rounded flex items-center gap-1 shrink-0">
                       <Calendar className="w-2.5 h-2.5 text-slate-600" />
