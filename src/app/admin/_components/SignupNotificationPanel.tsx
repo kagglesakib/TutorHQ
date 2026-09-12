@@ -17,7 +17,13 @@ export default function SignupNotificationPanel() {
       if (!res.ok) return;
       const data = await res.json();
       const list = Array.isArray(data) ? data : data.users || [];
-      setPendingUsers(list.filter((u: UserLogItem) => u.isApproved !== 'yes'));
+      // STRICT FILTER: Only show users whose approval status is explicitly 'pending' or not yet set
+      setPendingUsers(
+        list.filter(
+          (u: UserLogItem) =>
+            u.userType !== 'admin' && (!u.isApproved || u.isApproved.toLowerCase() === 'pending')
+        )
+      );
     } catch {
       // transient ignore
     }
@@ -29,14 +35,32 @@ export default function SignupNotificationPanel() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleApprove = async (sid: string) => {
+  const handleApprove = async (user: UserLogItem) => {
+    let targetSid = (user.sid || '').trim();
+
+    // If student has no SID assigned yet, ask admin for SID
+    if (!targetSid) {
+      const enteredSid = window.prompt(
+        `Assign a Student ID (SID) to approve ${user.name || user.email}:\n(e.g., S101, S102)`,
+        'S101'
+      );
+      if (!enteredSid || !enteredSid.trim()) {
+        return; // User canceled
+      }
+      targetSid = enteredSid.trim().toUpperCase();
+    }
+
     setLoading(true);
     try {
-      await fetch('/api/auth/userlogdatas', {
+      const res = await fetch('/api/auth/userlogdatas', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sid, isApproved: 'yes' }),
+        body: JSON.stringify({ email: user.email, sid: targetSid, isApproved: 'yes' }),
       });
+      const d = await res.json();
+      if (!res.ok) {
+        alert(d.error || 'Failed to approve user');
+      }
       await fetchPending();
     } catch (err) {
       console.error(err);
@@ -45,14 +69,22 @@ export default function SignupNotificationPanel() {
     }
   };
 
-  const handleReject = async (sid: string) => {
+  const handleReject = async (user: UserLogItem) => {
+    if (!window.confirm(`Disapprove / reject registration for ${user.name || user.email}?`)) {
+      return;
+    }
+
     setLoading(true);
     try {
-      await fetch('/api/auth/userlogdatas', {
+      const res = await fetch('/api/auth/userlogdatas', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sid, isApproved: 'no' }),
+        body: JSON.stringify({ email: user.email, sid: user.sid || '', isApproved: 'no' }),
       });
+      const d = await res.json();
+      if (!res.ok) {
+        alert(d.error || 'Failed to reject user');
+      }
       await fetchPending();
     } catch (err) {
       console.error(err);
@@ -81,77 +113,100 @@ export default function SignupNotificationPanel() {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 5, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 5, scale: 0.96 }}
-            className="absolute right-0 mt-2 w-80 bg-slate-900/95 backdrop-blur-xl border border-emerald-700/80 rounded-2xl shadow-2xl z-50 text-white overflow-hidden"
-          >
-            <div className="p-3 bg-gradient-to-r from-emerald-900 to-teal-900 border-b border-emerald-700 flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <ShieldAlert className="w-4 h-4 text-emerald-300" />
-                <span className="text-xs font-black">Registration Approvals</span>
-              </div>
-              <span className="text-[9px] font-mono font-bold bg-emerald-950 px-1.5 py-0.5 rounded text-emerald-300 border border-emerald-700">
-                {count} Pending
-              </span>
-            </div>
+          <>
+            {/* Click-outside backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 z-40 bg-black/40 sm:bg-transparent backdrop-blur-[2px] sm:backdrop-blur-none"
+            />
 
-            <div className="max-h-64 overflow-y-auto p-2 space-y-1.5">
-              {count > 0 ? (
-                pendingUsers.map((u) => (
-                  <div
-                    key={u.sid || u.email}
-                    className="p-2 bg-slate-800/80 border border-slate-700 rounded-xl text-xs space-y-1.5 hover:border-emerald-500/60 transition-all"
-                  >
-                    <div className="flex items-start justify-between gap-1">
-                      <div className="min-w-0">
-                        <p className="font-bold text-white truncate text-[11px]">{u.name}</p>
-                        <p className="text-[9px] text-emerald-300/80 font-mono truncate">{u.email}</p>
-                        <p className="text-[9px] text-slate-400 font-mono">SID: {u.sid}</p>
-                      </div>
-                      <span className="text-[8px] bg-amber-950/80 text-amber-300 border border-amber-700 px-1 py-0.2 rounded font-mono font-bold">
-                        Pending
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-1 pt-1 border-t border-slate-700/80">
-                      <button
-                        onClick={() => handleApprove(u.sid)}
-                        disabled={loading}
-                        className="flex-1 py-1 px-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[9px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all"
-                      >
-                        <Check className="w-2.5 h-2.5" /> Approve
-                      </button>
-                      <button
-                        onClick={() => handleReject(u.sid)}
-                        disabled={loading}
-                        className="flex-1 py-1 px-1.5 bg-rose-700 hover:bg-rose-600 text-white rounded-lg text-[9px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all"
-                      >
-                        <X className="w-2.5 h-2.5" /> Reject
-                      </button>
-                    </div>
+            {/* Notification window - perfectly responsive for mobile & desktop */}
+            <motion.div
+              initial={{ opacity: 0, y: -6, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.96 }}
+              transition={{ duration: 0.15 }}
+              className="fixed left-3 right-3 top-14 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-88 max-w-sm mx-auto sm:mx-0 bg-slate-900/98 backdrop-blur-2xl border border-emerald-600/70 rounded-2xl shadow-2xl z-50 text-white overflow-hidden ring-1 ring-emerald-500/30"
+            >
+              <div className="p-3 bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950 border-b border-emerald-800/80 flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-1 bg-emerald-800/80 text-emerald-300 rounded-lg border border-emerald-700/80 shrink-0">
+                    <ShieldAlert className="w-3.5 h-3.5" />
                   </div>
-                ))
-              ) : (
-                <div className="py-6 text-center text-slate-400 space-y-1">
-                  <p className="text-xs font-bold text-slate-300">All caught up!</p>
-                  <p className="text-[10px] text-slate-400">No pending student registration requests</p>
+                  <div className="min-w-0">
+                    <span className="text-xs font-black tracking-tight block truncate">Registration Approvals</span>
+                    <span className="text-[9px] text-emerald-400 font-mono font-bold">{count} Pending</span>
+                  </div>
                 </div>
-              )}
-            </div>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shrink-0 ml-2"
+                  title="Close notification window"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-            <div className="p-2 bg-slate-950 border-t border-slate-800 text-center">
-              <Link
-                href="/admin/approvals"
-                onClick={() => setIsOpen(false)}
-                className="text-[10px] font-bold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1"
-              >
-                <span>View All Requests & Accounts</span>
-                <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-          </motion.div>
+              <div className="max-h-72 overflow-y-auto p-2 space-y-2 no-scrollbar">
+                {count > 0 ? (
+                  pendingUsers.map((u) => (
+                    <div
+                      key={u.sid || u.email}
+                      className="p-2.5 bg-slate-800/90 border border-slate-700/90 rounded-xl text-xs space-y-2 hover:border-emerald-500/60 transition-all shadow-2xs"
+                    >
+                      <div className="flex items-start justify-between gap-1.5">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-bold text-white truncate text-[11px]">{u.name}</p>
+                          <p className="text-[9.5px] text-emerald-300 font-mono truncate">{u.email}</p>
+                          <p className="text-[9px] text-slate-400 font-mono">SID: {u.sid || 'N/A'}</p>
+                        </div>
+                        <span className="text-[8px] bg-amber-950/90 text-amber-300 border border-amber-600/80 px-1.5 py-0.5 rounded font-mono font-bold shrink-0">
+                          Pending
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 pt-1.5 border-t border-slate-700/80">
+                        <button
+                          onClick={() => handleApprove(u)}
+                          disabled={loading}
+                          className="flex-1 py-1.5 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[9.5px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all shadow-xs active:scale-98 disabled:opacity-50"
+                        >
+                          <Check className="w-3 h-3" /> Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(u)}
+                          disabled={loading}
+                          className="flex-1 py-1.5 px-2 bg-rose-700 hover:bg-rose-600 text-white rounded-lg text-[9.5px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-all shadow-xs active:scale-98 disabled:opacity-50"
+                        >
+                          <X className="w-3 h-3" /> Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-6 text-center text-slate-400 space-y-1">
+                    <p className="text-xs font-bold text-slate-300">All caught up!</p>
+                    <p className="text-[10px] text-slate-400">No pending student registration requests</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-2.5 bg-slate-950 border-t border-slate-800 text-center">
+                <Link
+                  href="/admin/approvals"
+                  onClick={() => setIsOpen(false)}
+                  className="text-[10px] font-bold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 hover:underline"
+                >
+                  <span>View All Requests & Accounts</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

@@ -1,8 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Student, Exam } from '@/types';
-import { ClipboardList, Plus, Trash2, Edit2, Check, X, Calendar, Award } from 'lucide-react';
+import {
+  ClipboardList,
+  Plus,
+  Trash2,
+  Edit2,
+  Check,
+  X,
+  Calendar,
+  Award,
+  Trophy,
+  ShieldCheck,
+  Search,
+  Sparkles,
+  ArrowUpDown,
+  CheckCircle2,
+  XCircle,
+} from 'lucide-react';
 import { generateExamId, formatEid } from '@/utils/id';
 
 interface ExamsLedgerProps {
@@ -22,6 +38,10 @@ export default function ExamsLedger({
 }: ExamsLedgerProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [editingEid, setEditingEid] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'All' | 'Present' | 'Absent'>('All');
+  const [sortBy, setSortBy] = useState<'date' | 'marks' | 'pct'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const [newExam, setNewExam] = useState<Partial<Exam>>({
     date: new Date().toISOString().slice(0, 10),
@@ -35,18 +55,95 @@ export default function ExamsLedger({
 
   const [editFormData, setEditFormData] = useState<Exam | null>(null);
 
+  // Student specific telemetry
+  const totalLogs = exams.length;
+  const evaluatedExams = useMemo(
+    () => exams.filter((e) => e.status !== 'Absent' && e.totalMarks > 0),
+    [exams]
+  );
+  const presentCount = evaluatedExams.length;
+  const absentCount = useMemo(() => exams.filter((e) => e.status === 'Absent').length, [exams]);
+
+  const totalObtained = useMemo(
+    () => evaluatedExams.reduce((acc, curr) => acc + (curr.obtainedMarks ?? 0), 0),
+    [evaluatedExams]
+  );
+  const totalPossible = useMemo(
+    () => evaluatedExams.reduce((acc, curr) => acc + curr.totalMarks, 0),
+    [evaluatedExams]
+  );
+  const avgExamPct = totalPossible > 0 ? Math.round((totalObtained / totalPossible) * 100) : null;
+
+  const highestPct = useMemo(() => {
+    if (evaluatedExams.length === 0) return null;
+    const pcts = evaluatedExams.map((e) =>
+      Math.round(((e.obtainedMarks ?? 0) / e.totalMarks) * 100)
+    );
+    return Math.max(...pcts);
+  }, [evaluatedExams]);
+
+  // Filter & sort
+  const filteredExams = useMemo(() => {
+    return exams.filter((e) => {
+      const term = searchTerm.toLowerCase();
+      const matchesSearch =
+        !searchTerm ||
+        e.subjectAndTopic?.toLowerCase().includes(term) ||
+        e.eid?.toLowerCase().includes(term) ||
+        e.remarks?.toLowerCase().includes(term) ||
+        e.comment?.toLowerCase().includes(term);
+
+      const matchesStatus =
+        filterStatus === 'All' ||
+        (filterStatus === 'Present' && e.status !== 'Absent') ||
+        (filterStatus === 'Absent' && e.status === 'Absent');
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [exams, searchTerm, filterStatus]);
+
+  const sortedExams = useMemo(() => {
+    return [...filteredExams].sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === 'date') {
+        const timeA = a.date ? new Date(a.date).getTime() : 0;
+        const timeB = b.date ? new Date(b.date).getTime() : 0;
+        comparison = timeA - timeB;
+      } else if (sortBy === 'marks') {
+        const marksA = a.obtainedMarks ?? -1;
+        const marksB = b.obtainedMarks ?? -1;
+        comparison = marksA - marksB;
+      } else if (sortBy === 'pct') {
+        const pctA =
+          a.totalMarks > 0 && a.obtainedMarks !== undefined && a.obtainedMarks !== null
+            ? (a.obtainedMarks / a.totalMarks) * 100
+            : -1;
+        const pctB =
+          b.totalMarks > 0 && b.obtainedMarks !== undefined && b.obtainedMarks !== null
+            ? (b.obtainedMarks / b.totalMarks) * 100
+            : -1;
+        comparison = pctA - pctB;
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }, [filteredExams, sortBy, sortOrder]);
+
   const handleCreateExam = (e: React.FormEvent) => {
     e.preventDefault();
     const exam: Exam = {
       eid: generateExamId(),
       studentSid: student.sid,
       date: newExam.date || new Date().toISOString().slice(0, 10),
-      subjectAndTopic: newExam.subjectAndTopic || 'Monthly Assessment',
+      subjectAndTopic: newExam.subjectAndTopic?.trim() || 'General Assessment',
       status: newExam.status || 'Present',
       totalMarks: Number(newExam.totalMarks) || 50,
-      obtainedMarks: newExam.obtainedMarks !== undefined ? Number(newExam.obtainedMarks) : undefined,
-      remarks: newExam.remarks || '',
-      comment: newExam.comment || '',
+      obtainedMarks:
+        newExam.status === 'Present' && newExam.obtainedMarks !== undefined && !isNaN(Number(newExam.obtainedMarks))
+          ? Number(newExam.obtainedMarks)
+          : undefined,
+      remarks: newExam.remarks?.trim() || '',
+      comment: newExam.comment?.trim() || '',
     };
     onAddExam(exam);
     setIsAdding(false);
@@ -74,103 +171,207 @@ export default function ExamsLedger({
     }
   };
 
-  const sortedExams = [...exams].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
   return (
-    <div className="bg-slate-100/95 rounded-2xl border border-slate-300 p-2 sm:p-3 space-y-2.5 shadow-2xs">
-      <div className="flex items-center justify-between gap-2 border-b border-slate-300/90 pb-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="p-1.5 bg-amber-600 text-white rounded-lg shadow-2xs shrink-0">
-            <ClipboardList className="w-4 h-4" />
+    <div className="space-y-3 sm:space-y-4 animate-fadeIn" id="student-detail-exams-ledger">
+      {/* 1. Header Card (Exact Student Portal Match) */}
+      <div className="bg-gradient-to-br from-indigo-100/95 via-sky-100/80 to-purple-100/90 rounded-2xl p-3.5 sm:p-4 border-2 border-indigo-200/90 shadow-md relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-56 h-56 bg-gradient-to-bl from-purple-200/40 via-indigo-200/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-200/80 pb-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 bg-gradient-to-tr from-purple-600 via-indigo-600 to-indigo-700 text-white rounded-xl shadow-md shadow-indigo-600/20 shrink-0 border border-white/40">
+              <Trophy className="w-5 h-5" />
+            </div>
+            <div className="space-y-0.5 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-display font-black text-slate-900 text-sm sm:text-base tracking-tight">
+                  Examinations & Evaluation Scorecards
+                </h3>
+                <span className="text-[10px] bg-purple-200/90 text-purple-950 font-mono font-black px-2 py-0.5 rounded-md border border-purple-300 shadow-2xs shrink-0">
+                  {student.name}
+                </span>
+              </div>
+              <p className="text-xs text-indigo-900/80 font-medium">
+                Chapter assessments, syllabus tests, and historical score evaluations.
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h3 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight whitespace-nowrap">Exams & Assessment Scorecards</h3>
-            <p className="text-[9.5px] sm:text-[10px] text-slate-500 font-medium truncate">Record chapter tests, model tests, and marks</p>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {/* Average Performance Pill */}
+            <div className="flex items-center gap-2 bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-700 text-white px-3 py-1.5 rounded-xl shadow-md shadow-purple-600/20 border border-purple-400/40 shrink-0">
+              <Award className="w-3.5 h-3.5 text-purple-200" />
+              <div>
+                <span className="text-[8px] uppercase tracking-wider text-purple-200 font-mono block leading-none">
+                  Avg
+                </span>
+                <span className="text-xs sm:text-sm font-black font-mono leading-tight">
+                  {avgExamPct !== null ? `${avgExamPct}%` : 'N/A'}
+                </span>
+              </div>
+            </div>
+
+            {/* Log Exam button */}
+            <button
+              type="button"
+              onClick={() => setIsAdding(!isAdding)}
+              className="px-3 py-1.5 bg-gradient-to-r from-purple-700 via-indigo-600 to-teal-600 hover:from-purple-800 hover:to-teal-700 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer border border-white/40 shrink-0"
+            >
+              {isAdding ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+              <span>{isAdding ? 'Cancel' : 'Log Exam'}</span>
+            </button>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsAdding(!isAdding)}
-          className="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95"
-        >
-          {isAdding ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-          <span className="whitespace-nowrap">{isAdding ? 'Cancel' : 'Log Exam'}</span>
-        </button>
+        {/* Telemetry Cards */}
+        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2.5">
+          <div className="bg-indigo-100/90 p-2 rounded-xl border border-indigo-300/90 shadow-2xs">
+            <span className="text-[8.5px] font-mono font-bold text-indigo-900 uppercase tracking-wider block">
+              Evaluated Tests
+            </span>
+            <span className="text-xs sm:text-sm font-black font-mono text-indigo-950 block mt-0.5">
+              {presentCount} Completed
+            </span>
+          </div>
+
+          <div className="bg-purple-100/90 p-2 rounded-xl border border-purple-300/90 shadow-2xs">
+            <span className="text-[8.5px] font-mono font-bold text-purple-900 uppercase tracking-wider block">
+              Student Average
+            </span>
+            <span className="text-xs sm:text-sm font-black font-mono text-purple-950 block mt-0.5">
+              {avgExamPct !== null ? `${avgExamPct}%` : '—'}
+            </span>
+          </div>
+
+          <div className="bg-emerald-100/90 p-2 rounded-xl border border-emerald-300/90 shadow-2xs">
+            <span className="text-[8.5px] font-mono font-bold text-emerald-900 uppercase tracking-wider block">
+              Highest Benchmark
+            </span>
+            <span className="text-xs sm:text-sm font-black font-mono text-emerald-950 block mt-0.5">
+              {highestPct !== null ? `${highestPct}%` : '—'}
+            </span>
+          </div>
+
+          <div className="bg-rose-100/90 p-2 rounded-xl border border-rose-300/90 shadow-2xs">
+            <span className="text-[8.5px] font-mono font-bold text-rose-900 uppercase tracking-wider block">
+              Missed / Absent
+            </span>
+            <span className="text-xs sm:text-sm font-black font-mono text-rose-950 block mt-0.5">
+              {absentCount} Tests
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Add Form */}
+      {/* Add Exam Form */}
       {isAdding && (
-        <form onSubmit={handleCreateExam} className="p-3 bg-amber-100/90 border border-amber-300 rounded-2xl space-y-2.5 shadow-2xs">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <form
+          onSubmit={handleCreateExam}
+          className="p-3.5 bg-gradient-to-r from-purple-100/90 via-indigo-100/90 to-teal-100/90 border border-purple-300/90 rounded-xl space-y-3 shadow-2xs animate-fadeIn"
+        >
+          <div className="flex items-center gap-2 border-b border-purple-200/80 pb-1.5">
+            <ClipboardList className="w-3.5 h-3.5 text-purple-700" />
+            <h4 className="text-xs font-black text-purple-950">Record New Exam Result</h4>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div>
-              <label className="text-[10px] font-bold text-amber-950">Exam Date *</label>
+              <label className="text-[10px] font-bold text-purple-950 font-mono">Exam Date *</label>
               <input
                 type="date"
                 required
                 value={newExam.date}
                 onChange={(e) => setNewExam({ ...newExam, date: e.target.value })}
-                className="w-full px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg text-xs font-semibold text-amber-950"
+                className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-semibold text-slate-900"
               />
             </div>
-            <div>
-              <label className="text-[10px] font-bold text-amber-950">Subject & Topic *</label>
+            <div className="sm:col-span-2">
+              <label className="text-[10px] font-bold text-purple-950 font-mono">Subject & Topic *</label>
               <input
                 type="text"
                 required
                 value={newExam.subjectAndTopic}
                 onChange={(e) => setNewExam({ ...newExam, subjectAndTopic: e.target.value })}
                 placeholder="e.g. Physics - Dynamics Model Test"
-                className="w-full px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg text-xs font-semibold text-amber-950 placeholder-amber-600/70"
+                className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-semibold text-slate-900 placeholder:text-slate-400"
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold text-amber-950">Status</label>
+              <label className="text-[10px] font-bold text-purple-950 font-mono">Attendance Status</label>
               <select
                 value={newExam.status}
-                onChange={(e) => setNewExam({ ...newExam, status: e.target.value })}
-                className="w-full px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg text-xs font-semibold text-amber-950"
+                onChange={(e) =>
+                  setNewExam({
+                    ...newExam,
+                    status: e.target.value as 'Present' | 'Absent',
+                  })
+                }
+                className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-bold text-slate-900"
               >
                 <option value="Present">Present</option>
                 <option value="Absent">Absent</option>
               </select>
             </div>
             <div>
-              <label className="text-[10px] font-bold text-amber-950">Total Marks *</label>
+              <label className="text-[10px] font-bold text-purple-950 font-mono">Total Marks *</label>
               <input
                 type="number"
                 required
                 min={1}
                 value={newExam.totalMarks ?? 50}
                 onChange={(e) => setNewExam({ ...newExam, totalMarks: Number(e.target.value) })}
-                className="w-full px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg text-xs font-semibold text-amber-950 font-mono"
+                className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-slate-900"
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold text-amber-950">Obtained Marks</label>
+              <label className="text-[10px] font-bold text-purple-950 font-mono">Obtained Marks</label>
               <input
                 type="number"
                 min={0}
                 value={newExam.obtainedMarks ?? ''}
-                onChange={(e) => setNewExam({ ...newExam, obtainedMarks: e.target.value ? Number(e.target.value) : undefined })}
-                className="w-full px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg text-xs font-semibold text-amber-950 font-mono"
+                onChange={(e) =>
+                  setNewExam({
+                    ...newExam,
+                    obtainedMarks: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+                disabled={newExam.status === 'Absent'}
+                className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-slate-900 disabled:bg-slate-100"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-[10px] font-bold text-purple-950 font-mono">Remarks Tag</label>
+              <input
+                type="text"
+                value={newExam.remarks || ''}
+                onChange={(e) => setNewExam({ ...newExam, remarks: e.target.value })}
+                placeholder="e.g. Excellent / Good / Needs Focus"
+                className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900 placeholder:text-slate-400"
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold text-amber-950">Remarks / Grade</label>
+              <label className="text-[10px] font-bold text-purple-950 font-mono">Feedback Comment</label>
               <input
                 type="text"
-                value={newExam.remarks}
-                onChange={(e) => setNewExam({ ...newExam, remarks: e.target.value })}
-                placeholder="e.g. Excellent / A+"
-                className="w-full px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg text-xs font-semibold text-amber-950 placeholder-amber-600/70"
+                value={newExam.comment || ''}
+                onChange={(e) => setNewExam({ ...newExam, comment: e.target.value })}
+                placeholder="e.g. Needs revision on Chapter 4"
+                className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900 placeholder:text-slate-400"
               />
             </div>
           </div>
+
           <div className="flex justify-end gap-2 pt-1">
             <button
+              type="button"
+              onClick={() => setIsAdding(false)}
+              className="px-3 py-1.5 bg-white border border-purple-200 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-50 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
               type="submit"
-              className="px-4 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-black shadow-xs cursor-pointer active:scale-95 transition-all"
+              className="px-4 py-1.5 bg-gradient-to-r from-purple-700 via-indigo-600 to-teal-600 hover:from-purple-800 text-white rounded-lg text-xs font-black shadow-xs cursor-pointer active:scale-95 transition-all"
             >
               Save Exam Result
             </button>
@@ -178,146 +379,405 @@ export default function ExamsLedger({
         </form>
       )}
 
-      {/* Exam List */}
-      <div className="space-y-1.5 max-h-96 overflow-y-auto">
-        {sortedExams.length > 0 ? (
-          sortedExams.map((exam) => {
-            const isEditingThis = editingEid === exam.eid;
+      {/* 2. Filter & Search Toolbar (Exact Student Portal Match) */}
+      <div className="bg-gradient-to-r from-purple-100/90 via-indigo-100/90 to-teal-100/90 border border-purple-300/90 rounded-xl p-2.5 sm:p-3 shadow-2xs space-y-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {/* Topic & Subject Search */}
+          <div className="relative flex items-center bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border border-purple-300/90 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-purple-500/40 focus-within:border-purple-500 shadow-2xs transition-all">
+            <div className="p-1 bg-purple-700 text-white rounded-md shrink-0 mr-2 shadow-2xs">
+              <Search className="w-2.5 h-2.5" />
+            </div>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search topic or syllabus..."
+              className="w-full bg-transparent text-xs font-semibold text-purple-950 placeholder:text-purple-700/60 focus:outline-hidden"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="ml-1 text-[10px] font-black bg-purple-200 hover:bg-purple-300 text-purple-900 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
 
-            if (isEditingThis && editFormData) {
+          {/* Attendance Status Filter Pills */}
+          <div className="flex items-center bg-purple-100 p-0.5 rounded-lg border border-purple-300 shadow-2xs justify-between">
+            <button
+              type="button"
+              onClick={() => setFilterStatus('All')}
+              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                filterStatus === 'All'
+                  ? 'bg-purple-700 text-white shadow-2xs'
+                  : 'text-purple-950 hover:bg-purple-200/80'
+              }`}
+            >
+              All ({totalLogs})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('Present')}
+              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                filterStatus === 'Present'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'text-emerald-950 hover:bg-emerald-200/80'
+              }`}
+            >
+              Present ({presentCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('Absent')}
+              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                filterStatus === 'Absent'
+                  ? 'bg-rose-600 text-white shadow-2xs'
+                  : 'text-rose-950 hover:bg-rose-200/80'
+              }`}
+            >
+              Absent ({absentCount})
+            </button>
+          </div>
+        </div>
+
+        {/* Sort controls bar (Exact Student Portal Match) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-purple-200/70 text-xs">
+          <span className="text-[10px] font-bold text-purple-950 font-mono bg-purple-200/90 border border-purple-300 px-2 py-0.5 rounded-md shadow-2xs self-start sm:self-auto">
+            Showing {sortedExams.length} of {totalLogs} exam records
+          </span>
+
+          <div className="flex items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto">
+            <div className="flex items-center gap-1 flex-1 sm:flex-initial min-w-0">
+              <label className="text-[10px] font-bold text-purple-950 mr-0.5 font-mono shrink-0">Sort by:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="h-8 px-2 bg-purple-100 hover:bg-purple-200/90 border border-purple-400/90 rounded-lg text-xs font-bold text-purple-950 focus:outline-hidden cursor-pointer shadow-2xs transition-colors flex-1 sm:flex-initial"
+              >
+                <option value="date">Date</option>
+                <option value="marks">Marks</option>
+                <option value="pct">Percentage</option>
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
+              className="h-8 px-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border border-purple-500 rounded-lg text-xs font-black flex items-center gap-1 shadow-2xs transition-all cursor-pointer active:scale-98 shrink-0"
+              title="Toggle sort order"
+            >
+              <ArrowUpDown className="w-3 h-3" />
+              <span>{sortOrder === 'asc' ? 'Asc' : 'Desc'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Exam Scorecards List (Exact Student Portal Match) */}
+      <div className="space-y-2">
+        {sortedExams.length > 0 ? (
+          sortedExams.map((exam, index) => {
+            const isAbsent = exam.status === 'Absent';
+            const isEditing = editingEid === exam.eid;
+
+            // In-line Edit Form
+            if (isEditing && editFormData) {
               return (
-                <div key={exam.eid} className="p-2.5 bg-amber-100/90 border border-amber-300 rounded-xl space-y-2 shadow-2xs">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <input
-                      type="date"
-                      value={editFormData.date}
-                      onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
-                      className="px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-medium text-amber-950"
-                    />
-                    <input
-                      type="text"
-                      value={editFormData.subjectAndTopic}
-                      onChange={(e) => setEditFormData({ ...editFormData, subjectAndTopic: e.target.value })}
-                      className="px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-medium text-amber-950"
-                    />
-                    <select
-                      value={editFormData.status}
-                      onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
-                      className="px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-medium text-amber-950"
-                    >
-                      <option value="Present">Present</option>
-                      <option value="Absent">Absent</option>
-                    </select>
-                    <input
-                      type="number"
-                      placeholder="Total Marks"
-                      value={editFormData.totalMarks}
-                      onChange={(e) => setEditFormData({ ...editFormData, totalMarks: Number(e.target.value) })}
-                      className="px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-medium text-amber-950"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Obtained Marks"
-                      value={editFormData.obtainedMarks ?? ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, obtainedMarks: Number(e.target.value) })}
-                      className="px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-medium text-amber-950"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Remarks"
-                      value={editFormData.remarks || ''}
-                      onChange={(e) => setEditFormData({ ...editFormData, remarks: e.target.value })}
-                      className="px-2 py-1 bg-amber-50 border border-amber-300 rounded text-xs font-medium text-amber-950"
-                    />
+                <div
+                  key={exam.eid}
+                  className="border-2 border-purple-400 bg-gradient-to-r from-purple-100/90 via-indigo-100/80 to-purple-50 rounded-xl p-3 sm:p-4 space-y-3 shadow-md animate-fadeIn"
+                >
+                  <div className="flex items-center justify-between border-b border-purple-300 pb-2">
+                    <span className="text-xs font-black font-mono text-purple-950">
+                      Editing Exam: {formatEid(exam.eid)}
+                    </span>
                   </div>
-                  <div className="flex justify-end gap-1.5">
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div>
+                      <label className="text-[10px] font-bold text-purple-950 font-mono">Date</label>
+                      <input
+                        type="date"
+                        value={editFormData.date}
+                        onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-bold text-purple-950 font-mono">Subject & Topic</label>
+                      <input
+                        type="text"
+                        value={editFormData.subjectAndTopic}
+                        onChange={(e) =>
+                          setEditFormData({ ...editFormData, subjectAndTopic: e.target.value })
+                        }
+                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-purple-950 font-mono">Status</label>
+                      <select
+                        value={editFormData.status}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            status: e.target.value as 'Present' | 'Absent',
+                          })
+                        }
+                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900"
+                      >
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-purple-950 font-mono">Total Marks</label>
+                      <input
+                        type="number"
+                        value={editFormData.totalMarks}
+                        onChange={(e) =>
+                          setEditFormData({ ...editFormData, totalMarks: Number(e.target.value) })
+                        }
+                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-slate-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-purple-950 font-mono">Obtained Marks</label>
+                      <input
+                        type="number"
+                        value={editFormData.obtainedMarks ?? ''}
+                        onChange={(e) =>
+                          setEditFormData({
+                            ...editFormData,
+                            obtainedMarks: e.target.value ? Number(e.target.value) : undefined,
+                          })
+                        }
+                        disabled={editFormData.status === 'Absent'}
+                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-slate-900 disabled:bg-slate-100"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] font-bold text-purple-950 font-mono">Remarks</label>
+                      <input
+                        type="text"
+                        value={editFormData.remarks || ''}
+                        onChange={(e) => setEditFormData({ ...editFormData, remarks: e.target.value })}
+                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-1">
                     <button
                       type="button"
                       onClick={() => setEditingEid(null)}
-                      className="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-[11px] font-bold cursor-pointer"
+                      className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={handleSaveEdit}
-                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[11px] font-bold flex items-center gap-1 cursor-pointer shadow-2xs"
+                      className="px-3.5 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs"
                     >
-                      <Check className="w-3 h-3" /> Save
+                      <Check className="w-3.5 h-3.5" /> Save Changes
                     </button>
                   </div>
                 </div>
               );
             }
 
-            const percentage = exam.obtainedMarks !== undefined && exam.totalMarks > 0
-              ? Math.round((exam.obtainedMarks / exam.totalMarks) * 100)
-              : null;
+            const pct =
+              !isAbsent &&
+              exam.totalMarks > 0 &&
+              exam.obtainedMarks !== undefined &&
+              exam.obtainedMarks !== null
+                ? Math.round((exam.obtainedMarks / exam.totalMarks) * 100)
+                : null;
+
+            let badgeColor = 'bg-slate-100 text-slate-800 border-slate-300';
+            let barColor = 'from-slate-400 to-slate-500';
+            let gradeLabel = 'Not Graded';
+
+            if (pct !== null) {
+              if (pct >= 80) {
+                badgeColor = 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-2xs';
+                barColor = 'from-emerald-500 to-teal-400';
+                gradeLabel = 'A+ (Excellent)';
+              } else if (pct >= 60) {
+                badgeColor = 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-2xs';
+                barColor = 'from-indigo-500 to-purple-400';
+                gradeLabel = 'B (Good)';
+              } else if (pct >= 40) {
+                badgeColor = 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-2xs';
+                barColor = 'from-amber-500 to-orange-400';
+                gradeLabel = 'C (Average)';
+              } else {
+                badgeColor = 'bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-2xs';
+                barColor = 'from-rose-500 to-red-400';
+                gradeLabel = 'Needs Work';
+              }
+            }
 
             return (
               <div
-                key={exam.eid}
-                className="p-2.5 bg-amber-100/50 hover:bg-amber-100/80 border border-amber-200/90 hover:border-amber-400 rounded-xl flex items-center justify-between gap-2 text-xs transition-all shadow-2xs"
+                key={exam.eid ? `${exam.eid}-${index}` : `exam-${index}`}
+                className={`border rounded-xl p-2.5 sm:p-3 transition-all space-y-2 shadow-2xs hover:shadow-xs ${
+                  isAbsent
+                    ? 'bg-gradient-to-r from-rose-100/70 via-orange-50/80 to-rose-50 border-rose-300'
+                    : 'bg-gradient-to-r from-purple-50 via-indigo-50/90 to-teal-50 border-purple-200 hover:border-purple-300'
+                }`}
               >
-                <div className="flex items-center gap-2 flex-wrap min-w-0">
-                  <span className="text-[10px] font-mono font-black bg-amber-200 text-amber-950 border border-amber-400 px-1.5 py-0.5 rounded shadow-2xs">
-                    {formatEid(exam.eid)}
-                  </span>
-                  <span className="text-[10px] font-semibold text-slate-800 bg-slate-200/80 border border-slate-300 px-1.5 py-0.5 rounded flex items-center gap-1">
-                    <Calendar className="w-2.5 h-2.5 text-slate-600" />
-                    {exam.date}
-                  </span>
-                  <span className="font-bold text-orange-950 bg-orange-100/90 border border-orange-300 px-1.5 py-0.5 rounded text-[11px] truncate max-w-[200px]">
-                    {exam.subjectAndTopic}
-                  </span>
-                  <span
-                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
-                      exam.status === 'Present'
-                        ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
-                        : 'bg-rose-100 text-rose-950 border-rose-300'
-                    }`}
-                  >
-                    {exam.status}
-                  </span>
-                  {exam.obtainedMarks !== undefined && (
-                    <div className="flex items-center gap-1">
-                      <span className="bg-yellow-200 text-yellow-950 border border-yellow-400 px-1.5 py-0.5 rounded font-mono font-black text-[10px] shadow-2xs">
-                        {exam.obtainedMarks} / {exam.totalMarks} ({percentage}%)
-                      </span>
-                    </div>
-                  )}
-                  {exam.remarks && (
-                    <span className="bg-sky-100 text-sky-950 border border-sky-300 px-1.5 py-0.5 rounded font-semibold text-[10px]">
-                      {exam.remarks}
+                {/* Header bar: ID & Date on left, Grade & Attendance Status & Actions on right */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-purple-200/70 pb-1.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-mono font-bold text-purple-950 bg-purple-100/90 px-1.5 py-0.5 rounded-md border border-purple-300 shadow-2xs flex items-center gap-1 shrink-0">
+                      <ShieldCheck className="w-2.5 h-2.5 text-purple-700 shrink-0" />
+                      {formatEid(exam.eid)}
                     </span>
+                    <span className="text-[10px] font-bold text-slate-800 font-mono flex items-center gap-1 bg-indigo-100/90 px-1.5 py-0.5 rounded-md border border-indigo-200 shadow-2xs shrink-0">
+                      <Calendar className="w-2.5 h-2.5 text-indigo-700 shrink-0" />
+                      {exam.date}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
+                    {pct !== null && (
+                      <span
+                        className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-2xs ${badgeColor}`}
+                      >
+                        {gradeLabel}
+                      </span>
+                    )}
+                    <span
+                      className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border shadow-2xs flex items-center gap-1 ${
+                        isAbsent
+                          ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white border-rose-400'
+                          : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400'
+                      }`}
+                    >
+                      {isAbsent ? (
+                        <XCircle className="w-3 h-3 text-rose-200" />
+                      ) : (
+                        <CheckCircle2 className="w-3 h-3 text-emerald-200" />
+                      )}
+                      {exam.status}
+                    </span>
+
+                    {/* Actions */}
+                    <button
+                      type="button"
+                      onClick={() => handleStartEdit(exam)}
+                      className="p-1 bg-purple-100 hover:bg-purple-200/90 text-purple-900 border border-purple-300 rounded-md shadow-2xs transition-colors cursor-pointer"
+                      title="Edit Record"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (confirm(`Delete exam record ${formatEid(exam.eid)}?`)) {
+                          onDeleteExam(exam.eid);
+                        }
+                      }}
+                      className="p-1 bg-rose-100 hover:bg-rose-200/90 text-rose-900 border border-rose-300 rounded-md shadow-2xs transition-colors cursor-pointer"
+                      title="Delete Record"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Compact Details & Score Row */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1.5">
+                  <div className="flex-1 min-w-0 bg-gradient-to-r from-indigo-100/90 via-purple-100/60 to-teal-100/80 border border-indigo-200/90 px-2.5 py-1.5 rounded-lg shadow-2xs flex items-center gap-2">
+                    <div className="p-1 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded shrink-0 shadow-2xs">
+                      <ClipboardList className="w-3 h-3" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[8px] font-bold text-indigo-900 uppercase tracking-wider font-mono block">
+                        Topic / Syllabus
+                      </span>
+                      <h4 className="font-extrabold text-slate-900 text-xs leading-snug truncate sm:whitespace-normal">
+                        {isAbsent ? (
+                          <span className="text-slate-500 italic font-normal">No Exam (Absent)</span>
+                        ) : (
+                          exam.subjectAndTopic
+                        )}
+                      </h4>
+                    </div>
+                  </div>
+
+                  {/* Score Box */}
+                  {!isAbsent ? (
+                    <div className="w-full md:w-auto flex items-center justify-between md:justify-start gap-2.5 bg-gradient-to-br from-purple-700 via-indigo-700 to-indigo-800 px-2.5 py-1.5 rounded-lg border border-purple-400/40 text-white shadow-xs">
+                      <div className="flex items-center gap-1 shrink-0">
+                        <span className="text-[9px] font-bold text-purple-200 uppercase font-mono">Score:</span>
+                        <span className="text-xs sm:text-sm font-black font-mono text-white">
+                          {exam.obtainedMarks ?? 0}
+                          <span className="text-[10px] text-purple-200 font-sans font-bold">
+                            {' '}
+                            / {exam.totalMarks}
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-1 md:flex-initial justify-end">
+                        {pct !== null && (
+                          <span className="text-[10px] font-black font-mono px-1.5 py-0.5 rounded bg-white text-purple-950 shadow-2xs shrink-0">
+                            {pct}%
+                          </span>
+                        )}
+
+                        {pct !== null && (
+                          <div className="w-24 sm:w-20 bg-purple-950/70 rounded-full h-1.5 overflow-hidden p-px border border-purple-400/40 shrink-0">
+                            <div
+                              className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-500`}
+                              style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full md:w-auto px-2.5 py-1.5 bg-gradient-to-r from-rose-200/90 to-red-100 border border-rose-300 rounded-lg text-[10px] text-rose-950 font-black italic shadow-2xs shrink-0 text-center md:text-left">
+                      Absent (No Marks)
+                    </div>
                   )}
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => handleStartEdit(exam)}
-                    className="p-1.5 bg-amber-200/80 hover:bg-amber-300 text-amber-950 border border-amber-300 rounded-lg cursor-pointer transition-all shadow-2xs"
-                    title="Edit Record"
-                  >
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDeleteExam(exam.eid)}
-                    className="p-1.5 bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300 rounded-lg cursor-pointer transition-all shadow-2xs"
-                    title="Delete Record"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                {/* Feedback & remarks */}
+                {(exam.remarks || exam.comment) && (
+                  <div className="pt-1 border-t border-purple-200/60 flex flex-wrap items-center gap-1.5 text-[11px]">
+                    {exam.remarks && (
+                      <span className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-950 rounded-md text-[10px] font-bold border border-purple-300 shadow-2xs font-mono shrink-0">
+                        <Sparkles className="w-2.5 h-2.5 text-purple-700 mr-1 shrink-0" />
+                        Tag: {exam.remarks}
+                      </span>
+                    )}
+                    {exam.comment && (
+                      <p className="text-[11px] text-amber-950 font-semibold italic bg-gradient-to-r from-amber-50 to-amber-100/60 px-2 py-0.5 rounded-md border border-amber-200/90 inline-flex items-center gap-1.5 shadow-2xs flex-1 min-w-[140px]">
+                        <Sparkles className="w-2.5 h-2.5 text-amber-600 shrink-0" />
+                        <span className="truncate">&ldquo;{exam.comment}&rdquo;</span>
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })
         ) : (
-          <div className="p-6 text-center text-amber-900/60 space-y-1">
-            <p className="text-xs font-bold text-amber-950">No exam records logged yet</p>
-            <p className="text-[10px] text-amber-800/80">Click &ldquo;Log Exam&rdquo; to add test marks and scorecards</p>
+          <div className="py-8 text-center text-slate-500 border-2 border-dashed border-purple-300 rounded-2xl bg-gradient-to-br from-purple-100/60 via-indigo-50 to-teal-100/60 shadow-2xs space-y-2">
+            <div className="p-2.5 bg-purple-200 text-purple-800 rounded-xl w-10 h-10 mx-auto flex items-center justify-center border border-purple-300 shadow-2xs">
+              <Trophy className="w-5 h-5" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-xs font-extrabold text-slate-900">No Exam Logs Found</p>
+              <p className="text-[11px] text-slate-600 font-medium">No evaluation entries match your filter.</p>
+            </div>
           </div>
         )}
       </div>

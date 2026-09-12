@@ -42,6 +42,17 @@ export default function AdminExamsPage() {
     );
   }
 
+  const handleAddExam = async (newExam: Exam) => {
+    const res = await fetch('/api/exams', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newExam),
+    });
+    if (!res.ok) throw new Error('Failed to create exam record');
+    const created = await res.json();
+    setExams(prev => [created || newExam, ...prev]);
+  };
+
   const handleUpdateExam = async (updated: Exam) => {
     const res = await fetch(`/api/exams/${updated.eid}`, {
       method: 'PUT',
@@ -75,6 +86,7 @@ export default function AdminExamsPage() {
         exams={exams}
         students={students}
         onSelectStudent={(sid) => router.push(`/admin/students?sid=${sid}`)}
+        onAddExam={handleAddExam}
         onUpdateExam={handleUpdateExam}
         onDeleteExam={handleDeleteExam}
       />

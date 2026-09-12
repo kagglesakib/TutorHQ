@@ -37,6 +37,8 @@ export interface Student {
   address: string;
   email?: string;
   createdAt?: string;
+  isApproved?: 'yes' | 'no' | 'pending' | string;
+  status?: 'active' | 'revoked' | 'pending' | string;
 }
 
 export interface Activity {

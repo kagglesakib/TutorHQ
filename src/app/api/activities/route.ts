@@ -3,9 +3,10 @@ import { getActivities, createActivity } from '../../../services/activityService
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const list = await getActivities();
+    const includeRevoked = request.nextUrl.searchParams.get('includeRevoked') === 'true';
+    const list = await getActivities({ includeRevoked });
     return NextResponse.json(list);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -21,11 +21,18 @@ export default function StudentList({
 }: StudentListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [batchFilter, setBatchFilter] = useState<string>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'REVOKED'>('ACTIVE');
 
   const uniqueBatches = Array.from(new Set(students.map(s => s.hscBatch).filter(Boolean))).sort();
+  const revokedCount = students.filter(s => s.isApproved === 'no' || s.status === 'revoked').length;
+  const activeCount = students.length - revokedCount;
 
-  // Filter students based on search term & batch
+  // Filter students based on search term, batch & status
   const filteredStudents = students.filter(student => {
+    const isRevoked = student.isApproved === 'no' || student.status === 'revoked';
+    if (statusFilter === 'ACTIVE' && isRevoked) return false;
+    if (statusFilter === 'REVOKED' && !isRevoked) return false;
+
     const term = searchTerm.toLowerCase();
     const matchesSearch = 
       student.name.toLowerCase().includes(term) ||
@@ -87,18 +94,54 @@ export default function StudentList({
           )}
         </div>
 
+        {/* Status Filter Chips (Active / All / Revoked) */}
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pt-0.5">
+          <button
+            onClick={() => setStatusFilter('ACTIVE')}
+            className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+              statusFilter === 'ACTIVE'
+                ? 'bg-emerald-700 text-white font-black shadow-xs'
+                : 'bg-emerald-100/90 text-emerald-800 border border-emerald-300 hover:bg-emerald-200'
+            }`}
+          >
+            Active ({activeCount})
+          </button>
+          <button
+            onClick={() => setStatusFilter('ALL')}
+            className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+              statusFilter === 'ALL'
+                ? 'bg-slate-700 text-white font-black shadow-xs'
+                : 'bg-slate-200/90 text-slate-700 hover:bg-slate-300 border border-slate-300'
+            }`}
+          >
+            All ({students.length})
+          </button>
+          {revokedCount > 0 && (
+            <button
+              onClick={() => setStatusFilter('REVOKED')}
+              className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
+                statusFilter === 'REVOKED'
+                  ? 'bg-rose-700 text-white font-black shadow-xs'
+                  : 'bg-rose-100 text-rose-800 border border-rose-300 hover:bg-rose-200'
+              }`}
+            >
+              Revoked ({revokedCount})
+            </button>
+          )}
+        </div>
+
         {/* Batch Filter Chips */}
         {uniqueBatches.length > 0 && (
-          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pt-0.5">
+          <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pt-0.5 border-t border-slate-200/60">
             <button
               onClick={() => setBatchFilter('ALL')}
               className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
                 batchFilter === 'ALL'
-                  ? 'bg-emerald-600 text-white font-black shadow-xs'
+                  ? 'bg-indigo-600 text-white font-black shadow-xs'
                   : 'bg-slate-200/90 text-slate-700 hover:bg-slate-300 border border-slate-300'
               }`}
             >
-              All
+              All Batches
             </button>
             {uniqueBatches.map(batch => (
               <button
@@ -106,8 +149,8 @@ export default function StudentList({
                 onClick={() => setBatchFilter(batch)}
                 className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
                   batchFilter === batch
-                    ? 'bg-emerald-600 text-white font-black shadow-xs'
-                    : 'bg-emerald-100/90 text-emerald-800 border border-emerald-300/80 hover:bg-emerald-200'
+                    ? 'bg-indigo-600 text-white font-black shadow-xs'
+                    : 'bg-indigo-100/90 text-indigo-800 border border-indigo-300/80 hover:bg-indigo-200'
                 }`}
               >
                 {formatBatch(batch, 'HSC')}
@@ -123,6 +166,9 @@ export default function StudentList({
           filteredStudents.map((student, index) => {
             const isSelected = student.sid === selectedStudentId;
             const uniqueKey = student.sid ? `${student.sid}-${index}` : `student-${index}`;
+            const isStudentRevoked = student.isApproved === 'no' || student.status === 'revoked';
+            const isStudentPending = student.isApproved === 'pending';
+
             return (
               <div
                 key={uniqueKey}
@@ -130,6 +176,8 @@ export default function StudentList({
                 className={`p-2 rounded-xl cursor-pointer text-left transition-all border relative ${
                   isSelected
                     ? 'bg-gradient-to-r from-indigo-100/95 via-sky-100/90 to-indigo-100/90 border-indigo-400 shadow-xs text-indigo-950 ring-1 ring-indigo-400'
+                    : isStudentRevoked
+                    ? 'bg-rose-50/70 border-rose-200 hover:bg-rose-100/70 hover:border-rose-300 text-slate-800 shadow-2xs'
                     : 'bg-slate-50/90 border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-800 shadow-2xs'
                 }`}
               >
@@ -147,9 +195,21 @@ export default function StudentList({
                         {student.name}
                       </h4>
                     </div>
-                    <span className="text-[9px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2 rounded font-mono shrink-0">
-                      {formatBatch(student.hscBatch, 'N/A')}
-                    </span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {isStudentRevoked && (
+                        <span className="text-[8.5px] font-black text-rose-800 bg-rose-100 border border-rose-300 px-1.5 py-0.2 rounded font-mono">
+                          Revoked
+                        </span>
+                      )}
+                      {isStudentPending && (
+                        <span className="text-[8.5px] font-black text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.2 rounded font-mono">
+                          Pending
+                        </span>
+                      )}
+                      <span className="text-[9px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2 rounded font-mono">
+                        {formatBatch(student.hscBatch, 'N/A')}
+                      </span>
+                    </div>
                   </div>
 
                   {/* College, Subject, Group Tags with Rich Elementwise Coloring */}

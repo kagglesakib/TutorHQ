@@ -96,6 +96,10 @@ export async function GET() {
   }
 }
 
+function escapeRegex(str: string) {
+  return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
@@ -115,26 +119,63 @@ export async function PUT(req: NextRequest) {
       address,
     } = body;
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email parameter is required.' }, { status: 400 });
-    }
+    const cleanEmail = email ? String(email).trim().toLowerCase() : '';
+    const cleanSid = sid !== undefined && sid !== null && String(sid).trim() !== '' 
+      ? String(sid).trim().toUpperCase() 
+      : undefined;
 
-    const cleanEmail = String(email).trim().toLowerCase();
-    const cleanSid = sid !== undefined ? String(sid).trim().toUpperCase() : undefined;
+    if (!cleanEmail && !cleanSid) {
+      return NextResponse.json({ error: 'Either email or sid identifier is required.' }, { status: 400 });
+    }
 
     const db = await getMongoDb();
     const userlogCollection = db.collection('userlogdatas');
     const studentsCollection = db.collection('students');
 
-    // 1. Find target user record
-    const targetUser = await userlogCollection.findOne({ email: cleanEmail });
+    // 1. Find target user record by email or by SID
+    const searchClauses: any[] = [];
+    if (cleanEmail) {
+      searchClauses.push({ email: cleanEmail });
+    }
+    if (cleanSid) {
+      searchClauses.push({ sid: cleanSid });
+      searchClauses.push({ sid: { $regex: new RegExp(`^${escapeRegex(cleanSid)}$`, 'i') } });
+    }
+
+    let targetUser = await userlogCollection.findOne({ $or: searchClauses });
+
+    // Fallback: If not in userlogdatas by SID, check if student exists with this SID and find by that email
+    if (!targetUser && cleanSid) {
+      const studentDoc = await studentsCollection.findOne({
+        $or: [{ sid: cleanSid }, { sid: { $regex: new RegExp(`^${escapeRegex(cleanSid)}$`, 'i') } }]
+      });
+      if (studentDoc && studentDoc.email) {
+        targetUser = await userlogCollection.findOne({ email: String(studentDoc.email).toLowerCase() });
+      }
+    }
+
     if (!targetUser) {
       return NextResponse.json({ error: 'User record not found in database.' }, { status: 404 });
     }
 
+    const finalEmail = (targetUser.email || cleanEmail).toLowerCase();
     const finalUserType = userType || targetUser.userType || 'student';
-    const finalIsApproved = isApproved !== undefined ? (isApproved === 'disapproved' ? 'no' : isApproved) : (targetUser.isApproved || 'pending');
-    const finalSid = cleanSid !== undefined ? cleanSid : targetUser.sid || '';
+    
+    // Normalize isApproved value
+    let finalIsApproved = targetUser.isApproved || 'pending';
+    if (isApproved !== undefined) {
+      if (isApproved === 'disapproved' || isApproved === 'no') {
+        finalIsApproved = 'no';
+      } else if (isApproved === 'yes') {
+        finalIsApproved = 'yes';
+      } else if (isApproved === 'pending') {
+        finalIsApproved = 'pending';
+      } else {
+        finalIsApproved = isApproved;
+      }
+    }
+
+    const finalSid = cleanSid !== undefined ? cleanSid : (targetUser.sid || '');
 
     // 2. Validate Approval Constraint: Admin MUST assign an SID when approving a student
     if (finalIsApproved === 'yes' && finalUserType === 'student' && !finalSid) {
@@ -144,17 +185,17 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // 3. Validate SID Uniqueness if SID is provided
-    if (finalSid) {
+    // 3. Validate SID Uniqueness if SID is provided and modified
+    if (finalSid && cleanSid && cleanSid !== targetUser.sid) {
       // Check in userlogdatas (excluding current user)
       const existingUserWithSid = await userlogCollection.findOne({
-        email: { $ne: cleanEmail },
+        _id: { $ne: targetUser._id },
         sid: finalSid,
       });
 
       // Check in students (excluding current user's email)
       const existingStudentWithSid = await studentsCollection.findOne({
-        email: { $ne: cleanEmail },
+        email: { $ne: finalEmail },
         sid: finalSid,
       });
 
@@ -170,7 +211,7 @@ export async function PUT(req: NextRequest) {
     // 4. Update userlogdatas
     const updateFields: any = { updatedAt: new Date().toISOString() };
     if (cleanSid !== undefined) updateFields.sid = cleanSid;
-    if (isApproved !== undefined) updateFields.isApproved = isApproved;
+    if (isApproved !== undefined) updateFields.isApproved = finalIsApproved;
     if (userType !== undefined) updateFields.userType = userType;
     if (password !== undefined) updateFields.password = password;
     if (name !== undefined) updateFields.name = String(name).trim();
@@ -182,7 +223,7 @@ export async function PUT(req: NextRequest) {
     if (guardiansPhone !== undefined) updateFields.guardiansPhone = String(guardiansPhone).trim();
     if (address !== undefined) updateFields.address = String(address).trim();
 
-    await userlogCollection.updateOne({ email: cleanEmail }, { $set: updateFields });
+    await userlogCollection.updateOne({ _id: targetUser._id }, { $set: updateFields });
 
     // 5. If approved as a student, create/update student record in 'students' collection
     if (finalIsApproved === 'yes' && finalUserType === 'student' && finalSid) {
@@ -196,23 +237,39 @@ export async function PUT(req: NextRequest) {
         mobile: updateFields.mobile !== undefined ? updateFields.mobile : targetUser.mobile || targetUser.phone || '',
         guardiansPhone: updateFields.guardiansPhone !== undefined ? updateFields.guardiansPhone : targetUser.guardiansPhone || '',
         address: updateFields.address !== undefined ? updateFields.address : targetUser.address || '',
-        email: cleanEmail,
+        email: finalEmail,
+        isApproved: 'yes',
+        status: 'active',
         updatedAt: new Date().toISOString(),
       };
 
       await studentsCollection.updateOne(
-        { $or: [{ sid: finalSid }, { email: cleanEmail }] },
+        { $or: [{ sid: finalSid }, { email: finalEmail }] },
         {
           $set: studentDoc,
           $setOnInsert: { createdAt: new Date().toISOString() },
         },
         { upsert: true }
       );
+    } else if (finalIsApproved === 'no') {
+      // If revoked, mark student record as revoked in students collection
+      const searchCriteria: any[] = [];
+      if (finalSid) searchCriteria.push({ sid: finalSid });
+      if (finalEmail) searchCriteria.push({ email: finalEmail });
+      if (targetUser.sid) searchCriteria.push({ sid: targetUser.sid });
+      if (targetUser.email) searchCriteria.push({ email: targetUser.email.toLowerCase() });
+
+      if (searchCriteria.length > 0) {
+        await studentsCollection.updateMany(
+          { $or: searchCriteria },
+          { $set: { isApproved: 'no', status: 'revoked', updatedAt: new Date().toISOString() } }
+        );
+      }
     }
 
     return NextResponse.json({
       success: true,
-      message: `User record updated successfully. (SID: ${finalSid || 'N/A'}, Approved: ${finalIsApproved})`,
+      message: `User record updated successfully. (SID: ${finalSid || 'N/A'}, Status: ${finalIsApproved})`,
       sid: finalSid,
       isApproved: finalIsApproved,
       userType: finalUserType,
@@ -227,31 +284,47 @@ export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get('email');
+    const sid = searchParams.get('sid');
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email parameter is required.' }, { status: 400 });
+    if (!email && !sid) {
+      return NextResponse.json({ error: 'Either email or sid parameter is required.' }, { status: 400 });
     }
 
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail = email ? email.trim().toLowerCase() : '';
+    const cleanSid = sid ? sid.trim().toUpperCase() : '';
 
     const db = await getMongoDb();
-    const userDoc = await db.collection('userlogdatas').findOne({ email: cleanEmail });
-    const studentDoc = await db.collection('students').findOne({ email: cleanEmail });
-
-    const targetSid = userDoc?.sid || studentDoc?.sid;
-
-    if (targetSid) {
-      const cleanSid = String(targetSid).trim();
-      const upperSid = cleanSid.toUpperCase();
-      await db.collection('activities').deleteMany({ $or: [{ studentSid: cleanSid }, { studentSid: upperSid }] });
-      await db.collection('exams').deleteMany({ $or: [{ studentSid: cleanSid }, { studentSid: upperSid }] });
-      await db.collection('payments').deleteMany({ $or: [{ studentSid: cleanSid }, { studentSid: upperSid }] });
-      await db.collection('students').deleteOne({ $or: [{ sid: cleanSid }, { sid: upperSid }, { email: cleanEmail }] });
-    } else {
-      await db.collection('students').deleteOne({ email: cleanEmail });
+    const clauses: any[] = [];
+    if (cleanEmail) clauses.push({ email: cleanEmail });
+    if (cleanSid) {
+      clauses.push({ sid: cleanSid });
+      clauses.push({ sid: { $regex: new RegExp(`^${escapeRegex(cleanSid)}$`, 'i') } });
     }
 
-    await db.collection('userlogdatas').deleteOne({ email: cleanEmail });
+    const userDoc = await db.collection('userlogdatas').findOne({ $or: clauses });
+    const studentDoc = await db.collection('students').findOne({ $or: clauses });
+
+    const targetSid = userDoc?.sid || studentDoc?.sid || cleanSid;
+    const targetEmail = userDoc?.email || studentDoc?.email || cleanEmail;
+
+    if (targetSid) {
+      const upperSid = targetSid.toUpperCase();
+      await db.collection('activities').deleteMany({ $or: [{ studentSid: targetSid }, { studentSid: upperSid }] });
+      await db.collection('exams').deleteMany({ $or: [{ studentSid: targetSid }, { studentSid: upperSid }] });
+      await db.collection('payments').deleteMany({ $or: [{ studentSid: targetSid }, { studentSid: upperSid }] });
+      await db.collection('students').deleteOne({ $or: [{ sid: targetSid }, { sid: upperSid }] });
+    }
+
+    if (targetEmail) {
+      await db.collection('students').deleteOne({ email: targetEmail });
+      await db.collection('userlogdatas').deleteOne({ email: targetEmail });
+    }
+    if (targetSid) {
+      await db.collection('userlogdatas').deleteOne({ sid: targetSid });
+    }
+    if (userDoc?._id) {
+      await db.collection('userlogdatas').deleteOne({ _id: userDoc._id });
+    }
 
     return NextResponse.json({ success: true, message: 'User account and student records deleted.' });
   } catch (err: any) {

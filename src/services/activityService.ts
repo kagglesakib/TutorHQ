@@ -1,6 +1,7 @@
 import { getMongoDb } from './db';
 import { Activity } from '../types';
 import { generateActivityId } from '../utils/id';
+import { getRevokedStudentSids } from './revocationService';
 
 const parseActivityMark = (value: unknown) => {
   if (value === undefined || value === null || value === '') {
@@ -10,12 +11,26 @@ const parseActivityMark = (value: unknown) => {
   return Number.isFinite(numericValue) ? numericValue : null;
 };
 
-export async function getActivities(): Promise<Activity[]> {
+export async function getActivities(options?: { includeRevoked?: boolean }): Promise<Activity[]> {
   const mongoDb = await getMongoDb();
-  return await mongoDb.collection<Activity>('activities')
+  const activities = await mongoDb.collection<Activity>('activities')
     .find({}, { projection: { _id: 0 } })
     .sort({ date: -1 })
     .toArray();
+
+  if (options?.includeRevoked) {
+    return activities;
+  }
+
+  const revokedSids = await getRevokedStudentSids();
+  if (revokedSids.size === 0) {
+    return activities;
+  }
+
+  return activities.filter((a) => {
+    const sidKey = String(a.studentSid || '').trim().toUpperCase();
+    return !revokedSids.has(sidKey);
+  });
 }
 
 export async function createActivity(data: Activity): Promise<Activity> {

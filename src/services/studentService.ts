@@ -18,11 +18,17 @@ export async function getStudents(): Promise<Student[]> {
     }
   });
 
-  // Enrich students with email & contact info from userlogdatas if missing
+  // Enrich students with email, approval status, & contact info from userlogdatas if missing
   const enrichedStudents: Student[] = students.map((s) => {
     const sSid = String(s.sid || '').trim().toUpperCase();
     const sEmail = String(s.email || '').trim().toLowerCase();
     const matchedLog = userlogMapBySid.get(sSid) || userlogMapByEmail.get(sEmail);
+
+    const logApproval = matchedLog?.isApproved;
+    const isApproved = (logApproval === 'disapproved' || logApproval === 'no' || (s as any).isApproved === 'no')
+      ? 'no'
+      : (logApproval || (s as any).isApproved || 'yes');
+    const status = isApproved === 'no' ? 'revoked' : (isApproved === 'pending' ? 'pending' : 'active');
 
     return {
       ...s,
@@ -30,15 +36,21 @@ export async function getStudents(): Promise<Student[]> {
       mobile: s.mobile || matchedLog?.mobile || matchedLog?.phone || '',
       college: s.college || matchedLog?.college || '',
       address: s.address || matchedLog?.address || '',
+      isApproved,
+      status,
     };
   });
 
-  // Include approved student accounts from userlogdatas if not present in students collection
+  // Include approved/registered student accounts from userlogdatas if not present in students collection
   userlogs.forEach((u) => {
     if (u.sid && u.userType === 'student') {
       const uSid = String(u.sid).trim().toUpperCase();
       const exists = enrichedStudents.some((es) => String(es.sid).trim().toUpperCase() === uSid);
       if (!exists) {
+        const logApproval = u.isApproved;
+        const isApproved = (logApproval === 'disapproved' || logApproval === 'no') ? 'no' : (logApproval || 'pending');
+        const status = isApproved === 'no' ? 'revoked' : (isApproved === 'pending' ? 'pending' : 'active');
+
         enrichedStudents.push({
           sid: u.sid,
           name: u.name || 'Student',
@@ -51,6 +63,8 @@ export async function getStudents(): Promise<Student[]> {
           guardiansPhone: u.guardiansPhone || '',
           address: u.address || '',
           createdAt: u.createdAt || new Date().toISOString(),
+          isApproved,
+          status,
         });
       }
     }

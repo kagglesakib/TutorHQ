@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Student, Activity, Exam, Payment } from '@/types';
 import {
-  Edit, Trash2, BookOpen, ClipboardList, Banknote, ArrowLeft
+  Edit, Trash2, BookOpen, ClipboardList, Banknote, ArrowLeft, ShieldAlert, CheckCircle2, ArrowRight
 } from 'lucide-react';
 import AdminStudentDossier from './AdminStudentDossier';
 import LessonsTracker from './LessonsTracker';
@@ -91,6 +92,15 @@ export default function StudentDetail({
                 ID : {student.sid}
               </span>
               <h2 className="text-base sm:text-lg font-display font-black text-slate-900 tracking-tight truncate">{student.name}</h2>
+              {(student.isApproved === 'no' || student.status === 'revoked') ? (
+                <span className="text-[9px] font-black text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded-lg uppercase tracking-wider font-mono">
+                  🚫 Access Revoked
+                </span>
+              ) : (
+                <span className="text-[9px] font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-lg uppercase tracking-wider font-mono">
+                  ✓ Active Account
+                </span>
+              )}
             </div>
             <p className="text-[11px] text-slate-600 font-semibold mt-0.5 flex items-center gap-1.5 flex-wrap">
               <span className="text-sky-800 font-bold bg-sky-100 border border-sky-300 px-1.5 py-0.2 rounded text-[10px]">{student.college || 'No college specified'}</span>
@@ -136,6 +146,25 @@ export default function StudentDetail({
 
         {/* Dynamic Detail Workspace (col-span-8) */}
         <div className="lg:col-span-8 space-y-3 min-w-0">
+          {(student.isApproved === 'no' || student.status === 'revoked') && (
+            <div className="p-3 bg-rose-50 border border-rose-300 rounded-xl text-rose-900 flex items-start gap-2.5 shadow-2xs">
+              <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+              <div className="text-xs space-y-1">
+                <p className="font-bold">Student Account Access Revoked</p>
+                <p className="text-[11px] text-rose-800 leading-relaxed">
+                  This student&apos;s records are currently hidden from active tracking and examination ledgers across the admin portal. You can restore access at any time from the Approvals manager.
+                </p>
+                <Link
+                  href="/admin/approvals"
+                  className="inline-flex items-center gap-1 text-[11px] font-black text-rose-700 hover:text-rose-950 underline mt-0.5"
+                >
+                  <span>Go to Approvals Manager</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Sub-navigation tab selectors with Element-Wise Vibrant Aesthetic Background Colors */}
           <div className="grid grid-cols-3 bg-slate-200/90 p-1 rounded-xl border border-slate-300 gap-1 shadow-2xs">
             <button

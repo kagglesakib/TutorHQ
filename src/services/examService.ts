@@ -1,13 +1,28 @@
 import { getMongoDb } from './db';
 import { generateExamId } from '../utils/id';
 import { Exam } from '../types';
+import { getRevokedStudentSids } from './revocationService';
 
-export async function getExams(): Promise<Exam[]> {
+export async function getExams(options?: { includeRevoked?: boolean }): Promise<Exam[]> {
   const mongoDb = await getMongoDb();
-  return await mongoDb.collection<Exam>('exams')
+  const exams = await mongoDb.collection<Exam>('exams')
     .find({}, { projection: { _id: 0 } })
     .sort({ date: -1 })
     .toArray();
+
+  if (options?.includeRevoked) {
+    return exams;
+  }
+
+  const revokedSids = await getRevokedStudentSids();
+  if (revokedSids.size === 0) {
+    return exams;
+  }
+
+  return exams.filter((e) => {
+    const sidKey = String(e.studentSid || '').trim().toUpperCase();
+    return !revokedSids.has(sidKey);
+  });
 }
 
 export async function createExam(data: Exam): Promise<Exam> {
