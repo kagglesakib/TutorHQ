@@ -42,6 +42,17 @@ export default function AdminPaymentsPage() {
     );
   }
 
+  const handleAddPayment = async (newPay: Payment) => {
+    const res = await fetch('/api/payments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newPay),
+    });
+    if (!res.ok) throw new Error('Failed to record payment transaction');
+    const created = await res.json();
+    setPayments(prev => [created || newPay, ...prev]);
+  };
+
   const handleUpdatePayment = async (updated: Payment) => {
     const res = await fetch(`/api/payments/${updated.pid}`, {
       method: 'PUT',
@@ -75,6 +86,7 @@ export default function AdminPaymentsPage() {
         payments={payments}
         students={students}
         onSelectStudent={(sid) => router.push(`/admin/students?sid=${sid}`)}
+        onAddPayment={handleAddPayment}
         onUpdatePayment={handleUpdatePayment}
         onDeletePayment={handleDeletePayment}
       />

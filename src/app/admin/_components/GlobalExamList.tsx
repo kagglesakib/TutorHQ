@@ -3,19 +3,6 @@
 import React, { useState, useMemo } from 'react';
 import { Student, Exam } from '@/types';
 import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ReferenceLine,
-  Cell,
-} from 'recharts';
-import {
   Trophy,
   Award,
   Calendar,
@@ -26,18 +13,15 @@ import {
   Filter,
   ShieldCheck,
   ArrowUpDown,
-  ChevronDown,
-  ChevronUp,
   Check,
-  TrendingUp,
-  BarChart3,
   ClipboardList,
   User,
   Plus,
   Edit2,
   Trash2,
   X,
-  Users,
+  LayoutGrid,
+  LayoutList,
 } from 'lucide-react';
 import { formatEid, generateExamId } from '@/utils/id';
 
@@ -49,8 +33,6 @@ interface GlobalExamListProps {
   onUpdateExam: (exam: Exam) => Promise<void> | void;
   onDeleteExam: (eid: string) => Promise<void> | void;
 }
-
-type ChartViewMode = 'trend' | 'grades' | 'students';
 
 export default function GlobalExamList({
   exams,
@@ -66,8 +48,7 @@ export default function GlobalExamList({
   const [filterStatus, setFilterStatus] = useState<'All' | 'Present' | 'Absent'>('All');
   const [sortBy, setSortBy] = useState<'date' | 'marks' | 'pct'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [showChart, setShowChart] = useState(true);
-  const [chartMode, setChartMode] = useState<ChartViewMode>('trend');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
   // Edit Mode State
   const [editingEid, setEditingEid] = useState<string | null>(null);
@@ -180,102 +161,6 @@ export default function GlobalExamList({
     });
   }, [filteredExams, sortBy, sortOrder]);
 
-  // Chart Data: 1. Continuous Trajectory Curve
-  const trajectoryChartData = useMemo(() => {
-    const list = [...evaluatedExams];
-    const scopedList =
-      selectedStudentFilter === 'All' ? list : list.filter((e) => e.studentSid === selectedStudentFilter);
-
-    return scopedList
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .map((e, index) => {
-        const percentage = Math.round(((e.obtainedMarks || 0) / e.totalMarks) * 100);
-        const dateLabel = e.date ? e.date.substring(5) : `#${index + 1}`;
-        const student = studentMap.get(e.studentSid);
-        return {
-          id: e.eid,
-          name: dateLabel,
-          topic: e.subjectAndTopic,
-          date: e.date,
-          score: percentage,
-          obtained: e.obtainedMarks,
-          total: e.totalMarks,
-          studentName: student?.name || e.studentSid,
-        };
-      });
-  }, [evaluatedExams, selectedStudentFilter, studentMap]);
-
-  // Chart Data: 2. Academic Grade Distribution Bands
-  const gradeDistributionData = useMemo(() => {
-    const bands = [
-      { band: '90-100% (A+)', count: 0, color: '#059669' }, // Emerald
-      { band: '80-89% (A)', count: 0, color: '#0284c7' },   // Sky
-      { band: '70-79% (B)', count: 0, color: '#4f46e5' },   // Indigo
-      { band: '60-69% (C)', count: 0, color: '#7c3aed' },   // Purple
-      { band: '40-59% (Pass)', count: 0, color: '#d97706' },// Amber
-      { band: '<40% (Needs Work)', count: 0, color: '#e11d48' }, // Rose
-    ];
-
-    const source =
-      selectedStudentFilter === 'All'
-        ? evaluatedExams
-        : evaluatedExams.filter((e) => e.studentSid === selectedStudentFilter);
-
-    source.forEach((e) => {
-      const pct = Math.round(((e.obtainedMarks || 0) / e.totalMarks) * 100);
-      if (pct >= 90) bands[0].count++;
-      else if (pct >= 80) bands[1].count++;
-      else if (pct >= 70) bands[2].count++;
-      else if (pct >= 60) bands[3].count++;
-      else if (pct >= 40) bands[4].count++;
-      else bands[5].count++;
-    });
-
-    return bands;
-  }, [evaluatedExams, selectedStudentFilter]);
-
-  // Chart Data: 3. Cross-Student Performance Standings
-  const studentComparisonData = useMemo(() => {
-    const stats: Record<
-      string,
-      { sid: string; name: string; sumScores: number; count: number; peak: number }
-    > = {};
-
-    students.forEach((s) => {
-      stats[s.sid] = { sid: s.sid, name: s.name, sumScores: 0, count: 0, peak: 0 };
-    });
-
-    evaluatedExams.forEach((e) => {
-      if (!stats[e.studentSid]) {
-        stats[e.studentSid] = {
-          sid: e.studentSid,
-          name: studentMap.get(e.studentSid)?.name || e.studentSid,
-          sumScores: 0,
-          count: 0,
-          peak: 0,
-        };
-      }
-      const score = Math.round(((e.obtainedMarks || 0) / e.totalMarks) * 100);
-      stats[e.studentSid].sumScores += score;
-      stats[e.studentSid].count += 1;
-      if (score > stats[e.studentSid].peak) {
-        stats[e.studentSid].peak = score;
-      }
-    });
-
-    return Object.values(stats)
-      .filter((s) => s.count > 0)
-      .map((s) => ({
-        sid: s.sid,
-        name: s.name.split(' ')[0] || s.sid,
-        fullName: s.name,
-        average: Math.round(s.sumScores / s.count),
-        peak: s.peak,
-        examCount: s.count,
-      }))
-      .sort((a, b) => b.average - a.average);
-  }, [students, evaluatedExams, studentMap]);
-
   // Handlers
   const handleStartEdit = (exam: Exam) => {
     setEditingEid(exam.eid);
@@ -386,18 +271,6 @@ export default function GlobalExamList({
               </div>
             </div>
 
-            {/* Toggle Graph Button */}
-            <button
-              type="button"
-              onClick={() => setShowChart(!showChart)}
-              className="px-3 py-1.5 bg-white/90 hover:bg-white text-indigo-950 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-indigo-300 shadow-2xs transition-all cursor-pointer active:scale-95 shrink-0"
-              title="Toggle Analytics Graph"
-            >
-              <BarChart3 className="w-3.5 h-3.5 text-indigo-600" />
-              <span className="hidden sm:inline">{showChart ? 'Hide Graph' : 'Show Graph'}</span>
-              {showChart ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-            </button>
-
             {/* Log Exam Modal Trigger */}
             <button
               type="button"
@@ -454,270 +327,7 @@ export default function GlobalExamList({
         </div>
       </div>
 
-      {/* 2. Iconic Level Performance Graph (Matching the purple-indigo-teal palette) */}
-      {showChart && (
-        <div className="bg-gradient-to-r from-purple-100/80 via-indigo-100/80 to-teal-100/70 border border-purple-300/90 rounded-2xl p-3 sm:p-4 space-y-3 shadow-2xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-200/80 pb-2.5">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-lg shadow-2xs">
-                <TrendingUp className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-xs sm:text-sm font-black text-purple-950">
-                  {chartMode === 'trend' && 'Exam Performance Trajectory & Benchmark Curve'}
-                  {chartMode === 'grades' && 'Academic Grade Tier Distribution'}
-                  {chartMode === 'students' && 'Cross-Student Assessment Standings'}
-                </h3>
-                <p className="text-[10px] text-purple-800 font-medium">
-                  {chartMode === 'trend' && 'Score progression over historical assessments with Target 80% & Pass 40% lines'}
-                  {chartMode === 'grades' && 'Assessment breakdown across standard academic score tiers'}
-                  {chartMode === 'students' && 'Student average marks comparison across all graded test sessions'}
-                </p>
-              </div>
-            </div>
-
-            {/* Segment Tab Controls */}
-            <div className="flex items-center bg-purple-100/90 p-0.5 rounded-lg border border-purple-300 shadow-2xs self-start sm:self-auto">
-              <button
-                type="button"
-                onClick={() => setChartMode('trend')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                  chartMode === 'trend'
-                    ? 'bg-purple-700 text-white shadow-2xs'
-                    : 'text-purple-950 hover:bg-purple-200/80'
-                }`}
-              >
-                <TrendingUp className="w-3 h-3" />
-                <span>Trajectory</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setChartMode('grades')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                  chartMode === 'grades'
-                    ? 'bg-purple-700 text-white shadow-2xs'
-                    : 'text-purple-950 hover:bg-purple-200/80'
-                }`}
-              >
-                <BarChart3 className="w-3 h-3" />
-                <span>Grade Bands</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setChartMode('students')}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                  chartMode === 'students'
-                    ? 'bg-purple-700 text-white shadow-2xs'
-                    : 'text-purple-950 hover:bg-purple-200/80'
-                }`}
-              >
-                <Users className="w-3 h-3" />
-                <span>By Student</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Chart Canvas */}
-          <div className="h-56 sm:h-64 w-full bg-white/80 p-2 sm:p-3 rounded-xl border border-purple-200 shadow-2xs">
-            {chartMode === 'trend' && (
-              trajectoryChartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trajectoryChartData} margin={{ top: 12, right: 15, left: -5, bottom: 5 }}>
-                    <defs>
-                      <linearGradient id="purpleIndigoScoreGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 10, fill: '#4338ca', fontWeight: 600 }}
-                      tickLine={false}
-                      axisLine={{ stroke: '#c7d2fe' }}
-                    />
-                    <YAxis
-                      width={38}
-                      domain={[0, 100]}
-                      ticks={[0, 20, 40, 60, 80, 100]}
-                      tick={{ fontSize: 10, fill: '#4338ca', fontWeight: 600 }}
-                      tickFormatter={(val) => `${val}%`}
-                      tickLine={false}
-                      axisLine={{ stroke: '#c7d2fe' }}
-                    />
-                    <ReferenceLine
-                      y={80}
-                      stroke="#059669"
-                      strokeDasharray="3 3"
-                      strokeWidth={1.5}
-                      label={{
-                        value: 'Target 80%',
-                        fill: '#047857',
-                        fontSize: 9,
-                        fontWeight: 'bold',
-                        position: 'insideTopRight',
-                      }}
-                    />
-                    <ReferenceLine
-                      y={40}
-                      stroke="#e11d48"
-                      strokeDasharray="2 2"
-                      strokeWidth={1.5}
-                      label={{
-                        value: 'Pass 40%',
-                        fill: '#be123c',
-                        fontSize: 9,
-                        fontWeight: 'bold',
-                        position: 'insideBottomRight',
-                      }}
-                    />
-                    <Tooltip
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const d = payload[0].payload;
-                          const isPass = d.score >= 40;
-                          const isDistinction = d.score >= 80;
-                          return (
-                            <div className="bg-slate-900 text-white p-3 rounded-xl shadow-lg text-xs space-y-1.5 border border-slate-700 min-w-[190px]">
-                              <div className="flex items-center justify-between gap-2 border-b border-slate-700 pb-1">
-                                <span className="font-bold text-indigo-300 truncate max-w-[130px]">{d.studentName}</span>
-                                <span
-                                  className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-black ${
-                                    isDistinction
-                                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                      : isPass
-                                      ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
-                                      : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                                  }`}
-                                >
-                                  {isDistinction ? 'Excellence' : isPass ? 'Pass' : 'Needs Work'}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-white font-medium truncate">{d.topic}</p>
-                              <p className="text-[10px] text-slate-300 font-mono">Date: {d.date}</p>
-                              <div className="pt-1 border-t border-slate-700 flex items-center justify-between gap-4 font-mono">
-                                <span className="text-slate-400">Score:</span>
-                                <span className="font-bold text-amber-400">
-                                  {d.obtained} / {d.total} ({d.score}%)
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="score"
-                      stroke="#4f46e5"
-                      strokeWidth={2.5}
-                      fillOpacity={1}
-                      fill="url(#purpleIndigoScoreGrad)"
-                      dot={{ fill: '#4338ca', r: 4, strokeWidth: 1.5, stroke: '#ffffff' }}
-                      activeDot={{ r: 6, stroke: '#4f46e5', strokeWidth: 2 }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-xs text-purple-900/60 font-medium">
-                  No evaluated exam scores recorded for this filter.
-                </div>
-              )
-            )}
-
-            {chartMode === 'grades' && (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={gradeDistributionData} margin={{ top: 12, right: 15, left: -10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" vertical={false} />
-                  <XAxis
-                    dataKey="band"
-                    tick={{ fontSize: 9.5, fill: '#4338ca', fontWeight: 600 }}
-                    tickLine={false}
-                    axisLine={{ stroke: '#c7d2fe' }}
-                  />
-                  <YAxis
-                    allowDecimals={false}
-                    tick={{ fontSize: 10, fill: '#4338ca', fontWeight: 600 }}
-                    tickLine={false}
-                    axisLine={{ stroke: '#c7d2fe' }}
-                  />
-                  <Tooltip
-                    cursor={{ fill: '#f5f3ff' }}
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const d = payload[0].payload;
-                        return (
-                          <div className="bg-slate-900 text-white p-2 rounded-lg border border-slate-700 text-xs font-medium">
-                            <p className="font-bold text-slate-200">{d.band}</p>
-                            <p className="font-mono text-amber-400 text-sm">{d.count} Tests</p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                    {gradeDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-
-            {chartMode === 'students' && (
-              studentComparisonData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={studentComparisonData} margin={{ top: 12, right: 15, left: -10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e7ff" vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 10, fill: '#4338ca', fontWeight: 600 }}
-                      tickLine={false}
-                      axisLine={{ stroke: '#c7d2fe' }}
-                    />
-                    <YAxis
-                      domain={[0, 100]}
-                      ticks={[0, 25, 50, 75, 100]}
-                      tick={{ fontSize: 10, fill: '#4338ca', fontWeight: 600 }}
-                      tickFormatter={(val) => `${val}%`}
-                      tickLine={false}
-                      axisLine={{ stroke: '#c7d2fe' }}
-                    />
-                    <Tooltip
-                      cursor={{ fill: '#f5f3ff' }}
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const d = payload[0].payload;
-                          return (
-                            <div className="bg-slate-900 text-white p-2.5 rounded-xl border border-slate-700 text-xs space-y-1">
-                              <p className="font-bold text-white text-xs">{d.fullName} ({d.sid})</p>
-                              <div className="flex items-center gap-3 pt-0.5 font-mono text-[11px]">
-                                <span className="text-emerald-400">Avg: {d.average}%</span>
-                                <span className="text-amber-400">Peak: {d.peak}%</span>
-                                <span className="text-slate-400">({d.examCount} tests)</span>
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Bar dataKey="average" fill="#6366f1" radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-xs text-purple-900/60 font-medium">
-                  No student scores recorded yet.
-                </div>
-              )
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* 3. Filter & Search Toolbar (Exact Student Portal Match + Student Filter) */}
+      {/* 2. Filter & Search Toolbar (Exact Student Portal Match + Student Filter) */}
       <div className="bg-gradient-to-r from-purple-100/90 via-indigo-100/90 to-teal-100/90 border border-purple-300/90 rounded-xl p-2.5 sm:p-3 shadow-2xs space-y-2.5">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
           {/* Topic & Subject Search */}
@@ -828,7 +438,37 @@ export default function GlobalExamList({
             Showing {sortedExams.length} of {totalLogs} exam records
           </span>
 
-          <div className="flex items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto">
+          <div className="flex items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto flex-wrap">
+            {/* View Mode Toggle: Cards vs Table */}
+            <div className="flex items-center bg-purple-100 p-0.5 rounded-lg border border-purple-300">
+              <button
+                type="button"
+                onClick={() => setViewMode('cards')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-black transition-all cursor-pointer ${
+                  viewMode === 'cards'
+                    ? 'bg-purple-700 text-white shadow-2xs'
+                    : 'text-purple-900 hover:text-purple-950'
+                }`}
+                title="Card Grid View"
+              >
+                <LayoutGrid className="w-3 h-3" />
+                <span>Cards</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-black transition-all cursor-pointer ${
+                  viewMode === 'table'
+                    ? 'bg-purple-700 text-white shadow-2xs'
+                    : 'text-purple-900 hover:text-purple-950'
+                }`}
+                title="Table View"
+              >
+                <LayoutList className="w-3 h-3" />
+                <span>Table</span>
+              </button>
+            </div>
+
             <div className="flex items-center gap-1 flex-1 sm:flex-initial min-w-0">
               <label className="text-[10px] font-bold text-purple-950 mr-0.5 font-mono shrink-0">Sort by:</label>
               <select
@@ -855,9 +495,10 @@ export default function GlobalExamList({
         </div>
       </div>
 
-      {/* 4. Exam Scorecards List (Exact Student Portal Match + Admin Controls) */}
+      {/* 4. Exam Scorecards List: Responsive Card Grid or Table */}
       {sortedExams.length > 0 ? (
-        <div className="space-y-2">
+        viewMode === 'cards' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
           {sortedExams.map((exam, index) => {
             const student = studentMap.get(exam.studentSid);
             const isAbsent = exam.status === 'Absent';
@@ -1008,41 +649,71 @@ export default function GlobalExamList({
             return (
               <div
                 key={exam.eid ? `${exam.eid}-${index}` : `exam-${index}`}
-                className={`border rounded-xl p-2.5 sm:p-3 transition-all space-y-2 shadow-2xs hover:shadow-xs ${
+                className={`border rounded-2xl p-3.5 transition-all flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md hover:border-purple-300 ${
                   isAbsent
-                    ? 'bg-gradient-to-r from-rose-100/70 via-orange-50/80 to-rose-50 border-rose-300'
-                    : 'bg-gradient-to-r from-purple-50 via-indigo-50/90 to-teal-50 border-purple-200 hover:border-purple-300'
+                    ? 'bg-gradient-to-br from-rose-50/90 via-orange-50/50 to-white border-rose-200'
+                    : 'bg-gradient-to-br from-white via-purple-50/40 to-indigo-50/50 border-purple-200/90'
                 }`}
               >
-                {/* Header bar: ID, Student, Date on left, Grade, Attendance Status, and Actions on right */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-purple-200/70 pb-1.5">
-                  {/* Identifier, Student Chip & Date */}
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] font-mono font-bold text-purple-950 bg-purple-100/90 px-1.5 py-0.5 rounded-md border border-purple-300 shadow-2xs flex items-center gap-1 shrink-0">
-                      <ShieldCheck className="w-2.5 h-2.5 text-purple-700 shrink-0" />
-                      {formatEid(exam.eid)}
+                {/* 1. TOP ROW: Exam ID & Date (Left) | Edit & Delete Actions (Right) */}
+                <div className="flex items-center justify-between gap-2 border-b border-purple-100 pb-2.5">
+                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                    <span className="text-[10px] font-mono font-bold text-purple-950 bg-purple-100/90 px-2 py-0.5 rounded-md border border-purple-300/80 shadow-2xs flex items-center gap-1 shrink-0">
+                      <ShieldCheck className="w-3 h-3 text-purple-700 shrink-0" />
+                      <span>{formatEid(exam.eid)}</span>
                     </span>
-
-                    {/* Student chip linking directly to student detail in Admin */}
-                    <button
-                      type="button"
-                      onClick={() => onSelectStudent(exam.studentSid)}
-                      className="text-[10px] font-bold text-indigo-950 bg-indigo-100/90 hover:bg-indigo-200/90 px-2 py-0.5 rounded-md border border-indigo-300 shadow-2xs flex items-center gap-1 shrink-0 cursor-pointer transition-colors"
-                      title="View Student Profile"
-                    >
-                      <User className="w-2.5 h-2.5 text-indigo-700 shrink-0" />
-                      <span>{student?.name || exam.studentSid}</span>
-                      <span className="text-[9px] font-mono text-indigo-600">({exam.studentSid})</span>
-                    </button>
-
-                    <span className="text-[10px] font-bold text-slate-800 font-mono flex items-center gap-1 bg-indigo-100/90 px-1.5 py-0.5 rounded-md border border-indigo-200 shadow-2xs shrink-0">
-                      <Calendar className="w-2.5 h-2.5 text-indigo-700 shrink-0" />
-                      {exam.date}
+                    <span className="text-[10px] font-bold text-slate-700 font-mono flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 shrink-0">
+                      <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
+                      <span>{exam.date}</span>
                     </span>
                   </div>
 
-                  {/* Badges: Grade + Attendance Status paired neatly together + Action buttons */}
-                  <div className="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleStartEdit(exam)}
+                      className="p-1.5 text-purple-700 hover:text-purple-950 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
+                      title="Edit Exam Record"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (confirm(`Delete exam record ${formatEid(exam.eid)}?`)) {
+                          onDeleteExam(exam.eid);
+                        }
+                      }}
+                      className="p-1.5 text-rose-700 hover:text-rose-950 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
+                      title="Delete Exam Record"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. STUDENT & STATUS ROW */}
+                <div className="flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onSelectStudent(exam.studentSid)}
+                    className="text-left group flex items-center gap-2 p-1 -ml-1 rounded-lg hover:bg-purple-100/60 transition-colors cursor-pointer min-w-0"
+                    title="View Student Profile"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-700 to-indigo-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-2xs">
+                      {(student?.name || exam.studentSid).charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-slate-900 group-hover:text-purple-700 truncate transition-colors">
+                        {student?.name || exam.studentSid}
+                      </div>
+                      <div className="text-[10px] font-mono text-purple-700 font-bold">
+                        SID: {exam.studentSid}
+                      </div>
+                    </div>
+                  </button>
+
+                  <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                     {pct !== null && (
                       <span
                         className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-2xs ${badgeColor}`}
@@ -1054,115 +725,86 @@ export default function GlobalExamList({
                     <span
                       className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border shadow-2xs flex items-center gap-1 ${
                         isAbsent
-                          ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white border-rose-400'
-                          : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400'
+                          ? 'bg-rose-100 text-rose-900 border-rose-300'
+                          : 'bg-emerald-100 text-emerald-900 border-emerald-300'
                       }`}
                     >
                       {isAbsent ? (
-                        <XCircle className="w-3 h-3 text-rose-200" />
+                        <XCircle className="w-3 h-3 text-rose-600 shrink-0" />
                       ) : (
-                        <CheckCircle2 className="w-3 h-3 text-emerald-200" />
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
                       )}
-                      {exam.status}
+                      <span>{exam.status}</span>
                     </span>
-
-                    {/* Admin Actions: Edit & Delete */}
-                    <button
-                      type="button"
-                      onClick={() => handleStartEdit(exam)}
-                      className="p-1 bg-purple-100 hover:bg-purple-200/90 text-purple-900 border border-purple-300 rounded-md shadow-2xs transition-colors cursor-pointer"
-                      title="Edit Exam"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm(`Delete exam record ${formatEid(exam.eid)}?`)) {
-                          onDeleteExam(exam.eid);
-                        }
-                      }}
-                      className="p-1 bg-rose-100 hover:bg-rose-200/90 text-rose-900 border border-rose-300 rounded-md shadow-2xs transition-colors cursor-pointer"
-                      title="Delete Exam"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
                   </div>
                 </div>
 
-                {/* Compact Details & Score Row (Exact Student Portal Match) */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1.5">
-                  {/* Topic & Syllabus */}
-                  <div className="flex-1 min-w-0 bg-gradient-to-r from-indigo-100/90 via-purple-100/60 to-teal-100/80 border border-indigo-200/90 px-2.5 py-1.5 rounded-lg shadow-2xs flex items-center gap-2">
-                    <div className="p-1 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded shrink-0 shadow-2xs">
-                      <ClipboardList className="w-3 h-3" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[8px] font-bold text-indigo-900 uppercase tracking-wider font-mono block">
-                        Topic / Syllabus
-                      </span>
-                      <h4 className="font-extrabold text-slate-900 text-xs leading-snug truncate sm:whitespace-normal">
-                        {isAbsent ? (
-                          <span className="text-slate-500 italic font-normal">No Exam (Absent)</span>
-                        ) : (
-                          exam.subjectAndTopic
-                        )}
-                      </h4>
-                    </div>
+                {/* 3. FULL-WIDTH TOPIC & SYLLABUS BOX */}
+                <div className="bg-purple-50/80 border border-purple-200/80 rounded-xl p-2.5 space-y-1">
+                  <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold text-purple-800 uppercase tracking-wider">
+                    <ClipboardList className="w-3 h-3 text-purple-600 shrink-0" />
+                    <span>Topic / Syllabus</span>
                   </div>
+                  <div className="text-xs font-bold text-slate-900 leading-snug break-words">
+                    {isAbsent ? (
+                      <span className="text-slate-400 italic font-normal">No Exam Taken (Absent)</span>
+                    ) : (
+                      exam.subjectAndTopic
+                    )}
+                  </div>
+                </div>
 
-                  {/* Score Box */}
-                  {!isAbsent ? (
-                    <div className="w-full md:w-auto flex items-center justify-between md:justify-start gap-2.5 bg-gradient-to-br from-purple-700 via-indigo-700 to-indigo-800 px-2.5 py-1.5 rounded-lg border border-purple-400/40 text-white shadow-xs">
-                      <div className="flex items-center gap-1 shrink-0">
+                {/* 4. SCORE & PROGRESS BAR */}
+                {!isAbsent ? (
+                  <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 p-2.5 rounded-xl border border-purple-800/40 text-white shadow-2xs space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-baseline gap-1.5">
                         <span className="text-[9px] font-bold text-purple-200 uppercase font-mono">Score:</span>
-                        <span className="text-xs sm:text-sm font-black font-mono text-white">
+                        <span className="text-sm font-black font-mono text-white">
                           {exam.obtainedMarks ?? 0}
-                          <span className="text-[10px] text-purple-200 font-sans font-bold">
-                            {' '}
-                            / {exam.totalMarks}
-                          </span>
+                          <span className="text-[11px] text-purple-300 font-bold"> / {exam.totalMarks}</span>
                         </span>
                       </div>
+                      {pct !== null && (
+                        <span className="text-[10px] font-black font-mono px-2 py-0.5 rounded bg-white text-purple-950 shadow-2xs">
+                          {pct}%
+                        </span>
+                      )}
+                    </div>
 
-                      <div className="flex items-center gap-2 flex-1 md:flex-initial justify-end">
-                        {pct !== null && (
-                          <span className="text-[10px] font-black font-mono px-1.5 py-0.5 rounded bg-white text-purple-950 shadow-2xs shrink-0">
-                            {pct}%
-                          </span>
-                        )}
-
-                        {pct !== null && (
-                          <div className="w-24 sm:w-20 bg-purple-950/70 rounded-full h-1.5 overflow-hidden p-px border border-purple-400/40 shrink-0">
-                            <div
-                              className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-500`}
-                              style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
-                            />
-                          </div>
-                        )}
+                    {pct !== null && (
+                      <div className="w-full bg-purple-950/90 rounded-full h-2 overflow-hidden p-0.5 border border-purple-700/50">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-500`}
+                          style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+                        />
                       </div>
-                    </div>
-                  ) : (
-                    <div className="w-full md:w-auto px-2.5 py-1.5 bg-gradient-to-r from-rose-200/90 to-red-100 border border-rose-300 rounded-lg text-[10px] text-rose-950 font-black italic shadow-2xs shrink-0 text-center md:text-left">
-                      Absent (No Marks)
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="px-3 py-2 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-800 font-bold italic flex items-center justify-center gap-1.5">
+                    <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span>Absent — No Marks Recorded</span>
+                  </div>
+                )}
 
-                {/* Feedback & remarks - Compact inline flow */}
+                {/* 5. REMARKS & COMMENTS */}
                 {(exam.remarks || exam.comment) && (
-                  <div className="pt-1 border-t border-purple-200/60 flex flex-wrap items-center gap-1.5 text-[11px]">
+                  <div className="space-y-1.5 pt-1 border-t border-purple-100 text-[11px]">
                     {exam.remarks && (
-                      <span className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-950 rounded-md text-[10px] font-bold border border-purple-300 shadow-2xs font-mono shrink-0">
-                        <Sparkles className="w-2.5 h-2.5 text-purple-700 mr-1 shrink-0" />
-                        Tag: {exam.remarks}
-                      </span>
+                      <div className="flex items-center gap-1 text-[10px] text-purple-900 font-bold">
+                        <span className="px-2 py-0.5 bg-purple-100 border border-purple-200 rounded-md font-mono flex items-center gap-1 shadow-2xs">
+                          <Sparkles className="w-2.5 h-2.5 text-purple-600 shrink-0" />
+                          <span>Tag: {exam.remarks}</span>
+                        </span>
+                      </div>
                     )}
                     {exam.comment && (
-                      <p className="text-[11px] text-amber-950 font-semibold italic bg-gradient-to-r from-amber-50 to-amber-100/60 px-2 py-0.5 rounded-md border border-amber-200/90 inline-flex items-center gap-1.5 shadow-2xs flex-1 min-w-[140px]">
-                        <Sparkles className="w-2.5 h-2.5 text-amber-600 shrink-0" />
-                        <span className="truncate">&ldquo;{exam.comment}&rdquo;</span>
-                      </p>
+                      <div className="text-[11px] text-amber-950 font-medium italic bg-amber-50/90 px-2.5 py-1.5 rounded-lg border border-amber-200/90 flex items-start gap-1.5 leading-tight shadow-2xs">
+                        <span className="text-amber-600 font-serif text-sm leading-none shrink-0">&ldquo;</span>
+                        <span className="break-words flex-1">{exam.comment}</span>
+                        <span className="text-amber-600 font-serif text-sm leading-none shrink-0">&rdquo;</span>
+                      </div>
                     )}
                   </div>
                 )}
@@ -1170,6 +812,121 @@ export default function GlobalExamList({
             );
           })}
         </div>
+      ) : (
+        /* ========================================================= */
+        /* TABLE VIEW OPTION                                         */
+        /* ========================================================= */
+        <div className="overflow-x-auto bg-white rounded-2xl border border-purple-200 shadow-2xs">
+          <table className="w-full text-left text-xs text-slate-800">
+            <thead className="bg-purple-100/90 border-b border-purple-200 text-[11px] font-black text-purple-950 uppercase tracking-wider">
+              <tr>
+                <th className="py-2.5 px-3">Exam / Date</th>
+                <th className="py-2.5 px-3">Student Profile</th>
+                <th className="py-2.5 px-3">Topic / Syllabus</th>
+                <th className="py-2.5 px-3">Score & Percentage</th>
+                <th className="py-2.5 px-3">Grade / Status</th>
+                <th className="py-2.5 px-3">Remarks</th>
+                <th className="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-purple-100/60">
+              {sortedExams.map((exam, index) => {
+                const student = studentMap.get(exam.studentSid);
+                const isAbsent = exam.status === 'Absent';
+                const pct =
+                  !isAbsent &&
+                  exam.totalMarks > 0 &&
+                  exam.obtainedMarks !== undefined &&
+                  exam.obtainedMarks !== null
+                    ? Math.round((exam.obtainedMarks / exam.totalMarks) * 100)
+                    : null;
+
+                return (
+                  <tr key={exam.eid || index} className="hover:bg-purple-50/50 transition-colors">
+                    <td className="py-2.5 px-3">
+                      <div className="space-y-0.5">
+                        <span className="font-mono font-bold text-purple-900 bg-purple-100 border border-purple-300 px-1.5 py-0.5 rounded text-[10px]">
+                          {formatEid(exam.eid)}
+                        </span>
+                        <div className="text-[10px] text-slate-500 font-mono">{exam.date}</div>
+                      </div>
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <button
+                        type="button"
+                        onClick={() => onSelectStudent(exam.studentSid)}
+                        className="text-left font-bold text-slate-900 hover:text-indigo-800 cursor-pointer"
+                      >
+                        <div className="text-xs">{student?.name || exam.studentSid}</div>
+                        <div className="text-[10px] font-mono text-indigo-700">
+                          SID: {exam.studentSid}
+                        </div>
+                      </button>
+                    </td>
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 max-w-[180px] truncate">
+                      {isAbsent ? <span className="text-rose-600 italic">Absent</span> : exam.subjectAndTopic}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      {!isAbsent ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-slate-900">
+                            {exam.obtainedMarks ?? 0}/{exam.totalMarks}
+                          </span>
+                          {pct !== null && (
+                            <span className="font-mono font-bold text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 rounded">
+                              {pct}%
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-rose-600 font-bold text-[10px]">Absent</span>
+                      )}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-bold border ${
+                          isAbsent
+                            ? 'bg-rose-100 text-rose-950 border-rose-300'
+                            : 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                        }`}
+                      >
+                        {exam.status}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-slate-700 italic text-[11px] max-w-[150px] truncate">
+                      {exam.remarks || exam.comment || '—'}
+                    </td>
+                    <td className="py-2.5 px-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEdit(exam)}
+                          className="p-1.5 text-purple-800 hover:bg-purple-100 rounded-lg cursor-pointer"
+                          title="Edit Exam"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`Delete exam ${formatEid(exam.eid)}?`)) {
+                              onDeleteExam(exam.eid);
+                            }
+                          }}
+                          className="p-1.5 text-rose-800 hover:bg-rose-100 rounded-lg cursor-pointer"
+                          title="Delete Exam"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        )
       ) : (
         <div className="py-8 text-center text-slate-500 border-2 border-dashed border-purple-300 rounded-2xl bg-gradient-to-br from-purple-100/60 via-indigo-50 to-teal-100/60 shadow-2xs space-y-2">
           <div className="p-2.5 bg-purple-200 text-purple-800 rounded-xl w-10 h-10 mx-auto flex items-center justify-center border border-purple-300 shadow-2xs">

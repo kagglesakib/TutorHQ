@@ -625,26 +625,26 @@ export default function ExamsLedger({
             return (
               <div
                 key={exam.eid ? `${exam.eid}-${index}` : `exam-${index}`}
-                className={`border rounded-xl p-2.5 sm:p-3 transition-all space-y-2 shadow-2xs hover:shadow-xs ${
+                className={`border rounded-2xl p-3.5 transition-all flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md hover:border-purple-300 ${
                   isAbsent
-                    ? 'bg-gradient-to-r from-rose-100/70 via-orange-50/80 to-rose-50 border-rose-300'
-                    : 'bg-gradient-to-r from-purple-50 via-indigo-50/90 to-teal-50 border-purple-200 hover:border-purple-300'
+                    ? 'bg-gradient-to-br from-rose-50/90 via-orange-50/50 to-white border-rose-200'
+                    : 'bg-gradient-to-br from-white via-purple-50/40 to-indigo-50/50 border-purple-200/90'
                 }`}
               >
                 {/* Header bar: ID & Date on left, Grade & Attendance Status & Actions on right */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-purple-200/70 pb-1.5">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] font-mono font-bold text-purple-950 bg-purple-100/90 px-1.5 py-0.5 rounded-md border border-purple-300 shadow-2xs flex items-center gap-1 shrink-0">
-                      <ShieldCheck className="w-2.5 h-2.5 text-purple-700 shrink-0" />
-                      {formatEid(exam.eid)}
+                <div className="flex items-center justify-between gap-2 border-b border-purple-100 pb-2.5">
+                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                    <span className="text-[10px] font-mono font-bold text-purple-950 bg-purple-100/90 px-2 py-0.5 rounded-md border border-purple-300/80 shadow-2xs flex items-center gap-1 shrink-0">
+                      <ShieldCheck className="w-3 h-3 text-purple-700 shrink-0" />
+                      <span>{formatEid(exam.eid)}</span>
                     </span>
-                    <span className="text-[10px] font-bold text-slate-800 font-mono flex items-center gap-1 bg-indigo-100/90 px-1.5 py-0.5 rounded-md border border-indigo-200 shadow-2xs shrink-0">
-                      <Calendar className="w-2.5 h-2.5 text-indigo-700 shrink-0" />
-                      {exam.date}
+                    <span className="text-[10px] font-bold text-slate-700 font-mono flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 shrink-0">
+                      <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
+                      <span>{exam.date}</span>
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
+                  <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                     {pct !== null && (
                       <span
                         className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-2xs ${badgeColor}`}
@@ -655,23 +655,23 @@ export default function ExamsLedger({
                     <span
                       className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border shadow-2xs flex items-center gap-1 ${
                         isAbsent
-                          ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white border-rose-400'
-                          : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400'
+                          ? 'bg-rose-100 text-rose-900 border-rose-300'
+                          : 'bg-emerald-100 text-emerald-900 border-emerald-300'
                       }`}
                     >
                       {isAbsent ? (
-                        <XCircle className="w-3 h-3 text-rose-200" />
+                        <XCircle className="w-3 h-3 text-rose-600 shrink-0" />
                       ) : (
-                        <CheckCircle2 className="w-3 h-3 text-emerald-200" />
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
                       )}
-                      {exam.status}
+                      <span>{exam.status}</span>
                     </span>
 
                     {/* Actions */}
                     <button
                       type="button"
                       onClick={() => handleStartEdit(exam)}
-                      className="p-1 bg-purple-100 hover:bg-purple-200/90 text-purple-900 border border-purple-300 rounded-md shadow-2xs transition-colors cursor-pointer"
+                      className="p-1.5 text-purple-700 hover:text-purple-950 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
                       title="Edit Record"
                     >
                       <Edit2 className="w-3 h-3" />
@@ -683,7 +683,7 @@ export default function ExamsLedger({
                           onDeleteExam(exam.eid);
                         }
                       }}
-                      className="p-1 bg-rose-100 hover:bg-rose-200/90 text-rose-900 border border-rose-300 rounded-md shadow-2xs transition-colors cursor-pointer"
+                      className="p-1.5 text-rose-700 hover:text-rose-950 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
                       title="Delete Record"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -691,78 +691,72 @@ export default function ExamsLedger({
                   </div>
                 </div>
 
-                {/* Compact Details & Score Row */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1.5">
-                  <div className="flex-1 min-w-0 bg-gradient-to-r from-indigo-100/90 via-purple-100/60 to-teal-100/80 border border-indigo-200/90 px-2.5 py-1.5 rounded-lg shadow-2xs flex items-center gap-2">
-                    <div className="p-1 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded shrink-0 shadow-2xs">
-                      <ClipboardList className="w-3 h-3" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[8px] font-bold text-indigo-900 uppercase tracking-wider font-mono block">
-                        Topic / Syllabus
-                      </span>
-                      <h4 className="font-extrabold text-slate-900 text-xs leading-snug truncate sm:whitespace-normal">
-                        {isAbsent ? (
-                          <span className="text-slate-500 italic font-normal">No Exam (Absent)</span>
-                        ) : (
-                          exam.subjectAndTopic
-                        )}
-                      </h4>
-                    </div>
+                {/* Full-width Topic & Syllabus */}
+                <div className="bg-purple-50/80 border border-purple-200/80 rounded-xl p-2.5 space-y-1">
+                  <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold text-purple-800 uppercase tracking-wider">
+                    <ClipboardList className="w-3 h-3 text-purple-600 shrink-0" />
+                    <span>Topic / Syllabus</span>
                   </div>
+                  <div className="text-xs font-bold text-slate-900 leading-snug break-words">
+                    {isAbsent ? (
+                      <span className="text-slate-400 italic font-normal">No Exam Taken (Absent)</span>
+                    ) : (
+                      exam.subjectAndTopic
+                    )}
+                  </div>
+                </div>
 
-                  {/* Score Box */}
-                  {!isAbsent ? (
-                    <div className="w-full md:w-auto flex items-center justify-between md:justify-start gap-2.5 bg-gradient-to-br from-purple-700 via-indigo-700 to-indigo-800 px-2.5 py-1.5 rounded-lg border border-purple-400/40 text-white shadow-xs">
-                      <div className="flex items-center gap-1 shrink-0">
+                {/* Score & Progress Bar */}
+                {!isAbsent ? (
+                  <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 p-2.5 rounded-xl border border-purple-800/40 text-white shadow-2xs space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-baseline gap-1.5">
                         <span className="text-[9px] font-bold text-purple-200 uppercase font-mono">Score:</span>
-                        <span className="text-xs sm:text-sm font-black font-mono text-white">
+                        <span className="text-sm font-black font-mono text-white">
                           {exam.obtainedMarks ?? 0}
-                          <span className="text-[10px] text-purple-200 font-sans font-bold">
-                            {' '}
-                            / {exam.totalMarks}
-                          </span>
+                          <span className="text-[11px] text-purple-300 font-bold"> / {exam.totalMarks}</span>
                         </span>
                       </div>
+                      {pct !== null && (
+                        <span className="text-[10px] font-black font-mono px-2 py-0.5 rounded bg-white text-purple-950 shadow-2xs">
+                          {pct}%
+                        </span>
+                      )}
+                    </div>
 
-                      <div className="flex items-center gap-2 flex-1 md:flex-initial justify-end">
-                        {pct !== null && (
-                          <span className="text-[10px] font-black font-mono px-1.5 py-0.5 rounded bg-white text-purple-950 shadow-2xs shrink-0">
-                            {pct}%
-                          </span>
-                        )}
-
-                        {pct !== null && (
-                          <div className="w-24 sm:w-20 bg-purple-950/70 rounded-full h-1.5 overflow-hidden p-px border border-purple-400/40 shrink-0">
-                            <div
-                              className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-500`}
-                              style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
-                            />
-                          </div>
-                        )}
+                    {pct !== null && (
+                      <div className="w-full bg-purple-950/90 rounded-full h-2 overflow-hidden p-0.5 border border-purple-700/50">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${barColor} transition-all duration-500`}
+                          style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
+                        />
                       </div>
-                    </div>
-                  ) : (
-                    <div className="w-full md:w-auto px-2.5 py-1.5 bg-gradient-to-r from-rose-200/90 to-red-100 border border-rose-300 rounded-lg text-[10px] text-rose-950 font-black italic shadow-2xs shrink-0 text-center md:text-left">
-                      Absent (No Marks)
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="px-3 py-2 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-800 font-bold italic flex items-center justify-center gap-1.5">
+                    <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                    <span>Absent — No Marks Recorded</span>
+                  </div>
+                )}
 
                 {/* Feedback & remarks */}
                 {(exam.remarks || exam.comment) && (
-                  <div className="pt-1 border-t border-purple-200/60 flex flex-wrap items-center gap-1.5 text-[11px]">
+                  <div className="space-y-1.5 pt-1 border-t border-purple-100 text-[11px]">
                     {exam.remarks && (
-                      <span className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-950 rounded-md text-[10px] font-bold border border-purple-300 shadow-2xs font-mono shrink-0">
-                        <Sparkles className="w-2.5 h-2.5 text-purple-700 mr-1 shrink-0" />
-                        Tag: {exam.remarks}
-                      </span>
+                      <div className="flex items-center gap-1 text-[10px] text-purple-900 font-bold">
+                        <span className="px-2 py-0.5 bg-purple-100 border border-purple-200 rounded-md font-mono flex items-center gap-1 shadow-2xs">
+                          <Sparkles className="w-2.5 h-2.5 text-purple-600 shrink-0" />
+                          <span>Tag: {exam.remarks}</span>
+                        </span>
+                      </div>
                     )}
                     {exam.comment && (
-                      <p className="text-[11px] text-amber-950 font-semibold italic bg-gradient-to-r from-amber-50 to-amber-100/60 px-2 py-0.5 rounded-md border border-amber-200/90 inline-flex items-center gap-1.5 shadow-2xs flex-1 min-w-[140px]">
-                        <Sparkles className="w-2.5 h-2.5 text-amber-600 shrink-0" />
-                        <span className="truncate">&ldquo;{exam.comment}&rdquo;</span>
-                      </p>
+                      <div className="text-[11px] text-amber-950 font-medium italic bg-amber-50/90 px-2.5 py-1.5 rounded-lg border border-amber-200/90 flex items-start gap-1.5 leading-tight shadow-2xs">
+                        <span className="text-amber-600 font-serif text-sm leading-none shrink-0">&ldquo;</span>
+                        <span className="break-words flex-1">{exam.comment}</span>
+                        <span className="text-amber-600 font-serif text-sm leading-none shrink-0">&rdquo;</span>
+                      </div>
                     )}
                   </div>
                 )}

@@ -18,12 +18,9 @@ import {
   Edit3,
   X,
   Check,
-  Eye,
-  EyeOff,
   GraduationCap,
   BookOpen,
   MapPin,
-  Key,
   Users,
   Sparkles,
   ChevronDown,
@@ -48,13 +45,10 @@ export default function UserLogDatasManager() {
 
   // Modal for editing user account
   const [editingUser, setEditingUser] = useState<UserLogItem | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [visiblePasswordCards, setVisiblePasswordCards] = useState<Set<string>>(new Set());
   const [editFormData, setEditFormData] = useState({
     name: '',
     sid: '',
     email: '',
-    password: '',
     mobile: '',
     guardiansPhone: '',
     college: '',
@@ -102,15 +96,6 @@ export default function UserLogDatasManager() {
   useEffect(() => {
     fetchUsers();
   }, []);
-
-  const togglePasswordVisibility = (key: string) => {
-    setVisiblePasswordCards((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
 
   // Approval status updater: supports 'yes', 'no' (revoked), or 'pending'
   const handleUpdateApproval = async (
@@ -234,12 +219,10 @@ export default function UserLogDatasManager() {
   // Open Edit Dialog
   const openEditModal = (user: UserLogItem) => {
     setEditingUser(user);
-    setShowPassword(false);
     setEditFormData({
       name: user.name || '',
       sid: user.sid || '',
       email: user.email || '',
-      password: user.password || '',
       mobile: user.mobile || '',
       guardiansPhone: user.guardiansPhone || '',
       college: user.college || '',
@@ -267,7 +250,7 @@ export default function UserLogDatasManager() {
           email: editingUser.email,
           sid: editFormData.sid,
           name: editFormData.name,
-          password: editFormData.password,
+          password: editingUser.password,
           mobile: editFormData.mobile,
           guardiansPhone: editFormData.guardiansPhone,
           college: editFormData.college,
@@ -615,7 +598,6 @@ export default function UserLogDatasManager() {
 
               const userKey = u.sid || u.email;
               const isBusy = actionLoading === userKey;
-              const isPassVisible = visiblePasswordCards.has(userKey);
 
               return (
                 <div
@@ -763,25 +745,6 @@ export default function UserLogDatasManager() {
                           </span>
                         </div>
                       )}
-
-                      {/* Password / Credentials Pill with Toggle */}
-                      <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-amber-50/70 border border-amber-200/80 text-amber-950">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <Key className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-                          <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wider shrink-0">Pass:</span>
-                          <span className="font-mono text-[11px] font-bold truncate">
-                            {isPassVisible ? u.password || '—' : '••••••••'}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => togglePasswordVisibility(userKey)}
-                          className="p-1 text-amber-800 hover:text-amber-950 hover:bg-amber-100 rounded-md cursor-pointer transition-colors shrink-0"
-                          title={isPassVisible ? 'Hide password' : 'View password'}
-                        >
-                          {isPassVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
                     </div>
                   </div>
 
@@ -990,7 +953,7 @@ export default function UserLogDatasManager() {
                 </div>
                 <div>
                   <h3 className="font-display font-black text-slate-900 text-base">Edit Account Information</h3>
-                  <p className="text-xs text-slate-500 font-medium">Update student profile, SID, or login password</p>
+                  <p className="text-xs text-slate-500 font-medium">Update student profile or SID details</p>
                 </div>
               </div>
               <button
@@ -1037,26 +1000,6 @@ export default function UserLogDatasManager() {
                     value={editFormData.email}
                     className="w-full px-3 py-2 border border-sky-200 bg-white/70 text-sky-950 font-mono text-[11px] rounded-xl cursor-not-allowed shadow-2xs"
                   />
-                </div>
-
-                {/* Password Field */}
-                <div className="bg-amber-50/70 p-2.5 rounded-2xl border border-amber-200">
-                  <label className="block font-bold text-amber-950 mb-1">Login Password</label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={editFormData.password}
-                      onChange={(e) => setEditFormData({ ...editFormData, password: e.target.value })}
-                      className="w-full px-3 py-2 bg-white border border-amber-300 rounded-xl text-slate-900 font-mono focus:outline-hidden focus:ring-2 focus:ring-amber-500 shadow-2xs pr-8"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2.5 top-2.5 text-amber-700 hover:text-amber-900 cursor-pointer"
-                    >
-                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                    </button>
-                  </div>
                 </div>
 
                 {/* Mobile Phone */}
