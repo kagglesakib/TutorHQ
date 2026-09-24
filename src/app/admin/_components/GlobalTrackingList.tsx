@@ -205,135 +205,130 @@ export default function GlobalTrackingList({
 
   return (
     <div className="space-y-4 w-full max-w-full overflow-hidden" id="admin-tracking-container">
-      {/* 1. Aligned KPI Metrics Ribbon with Element-wise Light Background Coloring */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 w-full">
+      {/* 1. Ultra-Compact Aligned KPI Metrics Bar */}
+      <div className="grid grid-cols-4 gap-1 sm:gap-2 w-full">
         {/* Total Sessions - Indigo Tint */}
-        <div className="bg-gradient-to-br from-indigo-50/95 via-sky-50/50 to-blue-50/60 rounded-2xl border border-indigo-200/90 p-3 sm:p-3.5 shadow-2xs flex items-center gap-3 min-w-0 transition-all hover:shadow-xs">
-          <div className="p-2.5 bg-indigo-100 border border-indigo-300/80 text-indigo-700 rounded-xl shrink-0 shadow-2xs">
-            <BookOpen className="w-5 h-5" />
+        <div className="bg-gradient-to-br from-indigo-50/95 via-sky-50/50 to-blue-50/60 rounded-xl border border-indigo-200/90 p-1.5 sm:p-2.5 shadow-2xs flex flex-col justify-between transition-all hover:shadow-xs">
+          <div className="flex items-center justify-between w-full gap-1">
+            <span className="text-[8.5px] sm:text-[10px] font-black text-indigo-950 uppercase tracking-tight truncate">Lessons</span>
+            <div className="p-0.5 sm:p-1 bg-indigo-100 border border-indigo-300/80 text-indigo-700 rounded-md shrink-0">
+              <BookOpen className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-[10.5px] font-black text-indigo-900 uppercase tracking-wider">Total Lessons</p>
-            <p className="text-xl font-display font-black text-indigo-950 tracking-tight leading-none mt-0.5">
+          <div className="mt-0.5 sm:mt-1 flex items-baseline gap-1">
+            <span className="text-sm sm:text-lg font-display font-black text-indigo-950 tracking-tight leading-none font-mono">
               {stats.total}
-            </p>
-            <p className="text-[10px] text-indigo-700 font-medium truncate mt-0.5">
-              {selectedStudentFilter === 'ALL' ? 'Across all students' : 'Filtered student'}
-            </p>
+            </span>
+            <span className="text-[8px] sm:text-[9px] text-indigo-700 font-bold hidden sm:inline truncate">
+              {selectedStudentFilter === 'ALL' ? 'Total' : 'Filtered'}
+            </span>
           </div>
         </div>
 
         {/* Present Sessions & Attendance Rate - Emerald Tint */}
-        <div className="bg-gradient-to-br from-emerald-50/95 via-teal-50/50 to-emerald-100/40 rounded-2xl border border-emerald-200/90 p-3 sm:p-3.5 shadow-2xs flex items-center gap-3 min-w-0 transition-all hover:shadow-xs">
-          <div className="p-2.5 bg-emerald-100 border border-emerald-300/80 text-emerald-700 rounded-xl shrink-0 shadow-2xs">
-            <CheckCircle2 className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              <p className="text-[10.5px] font-black text-emerald-900 uppercase tracking-wider">Attendance</p>
-              <span className="text-[9.5px] bg-emerald-200/90 text-emerald-950 font-mono font-bold px-1.5 py-0.2 rounded-full border border-emerald-300">
-                {stats.attendanceRate}%
-              </span>
+        <div className="bg-gradient-to-br from-emerald-50/95 via-teal-50/50 to-emerald-100/40 rounded-xl border border-emerald-200/90 p-1.5 sm:p-2.5 shadow-2xs flex flex-col justify-between transition-all hover:shadow-xs">
+          <div className="flex items-center justify-between w-full gap-1">
+            <span className="text-[8.5px] sm:text-[10px] font-black text-emerald-950 uppercase tracking-tight truncate">Attend</span>
+            <div className="p-0.5 sm:p-1 bg-emerald-100 border border-emerald-300/80 text-emerald-700 rounded-md shrink-0">
+              <CheckCircle2 className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
             </div>
-            <p className="text-xl font-display font-black text-emerald-950 tracking-tight leading-none mt-0.5">
-              {stats.present} <span className="text-xs text-emerald-800 font-bold font-sans">Present</span>
-            </p>
-            <p className="text-[10px] text-emerald-800 font-medium truncate mt-0.5">
-              Active class completions
-            </p>
+          </div>
+          <div className="mt-0.5 sm:mt-1 flex items-baseline gap-1">
+            <span className="text-sm sm:text-lg font-display font-black text-emerald-950 tracking-tight leading-none font-mono">
+              {stats.present}
+            </span>
+            <span className="text-[7.5px] sm:text-[8.5px] bg-emerald-200 text-emerald-950 font-mono font-bold px-1 py-0.2 rounded border border-emerald-300">
+              {stats.attendanceRate}%
+            </span>
           </div>
         </div>
 
         {/* Absent Count - Rose Tint */}
-        <div className="bg-gradient-to-br from-rose-50/95 via-pink-50/50 to-rose-100/40 rounded-2xl border border-rose-200/90 p-3 sm:p-3.5 shadow-2xs flex items-center gap-3 min-w-0 transition-all hover:shadow-xs">
-          <div className="p-2.5 bg-rose-100 border border-rose-300/80 text-rose-700 rounded-xl shrink-0 shadow-2xs">
-            <XCircle className="w-5 h-5" />
+        <div className="bg-gradient-to-br from-rose-50/95 via-pink-50/50 to-rose-100/40 rounded-xl border border-rose-200/90 p-1.5 sm:p-2.5 shadow-2xs flex flex-col justify-between transition-all hover:shadow-xs">
+          <div className="flex items-center justify-between w-full gap-1">
+            <span className="text-[8.5px] sm:text-[10px] font-black text-rose-950 uppercase tracking-tight truncate">Absence</span>
+            <div className="p-0.5 sm:p-1 bg-rose-100 border border-rose-300/80 text-rose-700 rounded-md shrink-0">
+              <XCircle className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-[10.5px] font-black text-rose-900 uppercase tracking-wider">Absences</p>
-            <p className="text-xl font-display font-black text-rose-950 tracking-tight leading-none mt-0.5">
-              {stats.absent} <span className="text-xs text-rose-800 font-bold font-sans">Missed</span>
-            </p>
-            <p className="text-[10px] text-rose-800 font-medium truncate mt-0.5">
-              {stats.total > 0 ? `${(100 - stats.attendanceRate)}% absence rate` : 'No logs recorded'}
-            </p>
+          <div className="mt-0.5 sm:mt-1 flex items-baseline gap-1">
+            <span className="text-sm sm:text-lg font-display font-black text-rose-950 tracking-tight leading-none font-mono">
+              {stats.absent}
+            </span>
+            <span className="text-[8px] sm:text-[9px] text-rose-700 font-bold hidden sm:inline">
+              Missed
+            </span>
           </div>
         </div>
 
         {/* Academic Marks Average - Amber Tint */}
-        <div className="bg-gradient-to-br from-amber-50/95 via-yellow-50/50 to-amber-100/40 rounded-2xl border border-amber-200/90 p-3 sm:p-3.5 shadow-2xs flex items-center gap-3 min-w-0 transition-all hover:shadow-xs">
-          <div className="p-2.5 bg-amber-100 border border-amber-300/80 text-amber-700 rounded-xl shrink-0 shadow-2xs">
-            <Award className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10.5px] font-black text-amber-900 uppercase tracking-wider">Avg Grading</p>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-xs font-black text-amber-950 bg-amber-200/90 border border-amber-400/80 px-2 py-0.5 rounded-lg font-mono shadow-2xs">
-                HW: {stats.avgHw ?? '—'}
-              </span>
-              <span className="text-xs font-black text-sky-950 bg-sky-200/90 border border-sky-400/80 px-2 py-0.5 rounded-lg font-mono shadow-2xs">
-                CW: {stats.avgCw ?? '—'}
-              </span>
+        <div className="bg-gradient-to-br from-amber-50/95 via-yellow-50/50 to-amber-100/40 rounded-xl border border-amber-200/90 p-1.5 sm:p-2.5 shadow-2xs flex flex-col justify-between transition-all hover:shadow-xs">
+          <div className="flex items-center justify-between w-full gap-1">
+            <span className="text-[8.5px] sm:text-[10px] font-black text-amber-950 uppercase tracking-tight truncate">Grading</span>
+            <div className="p-0.5 sm:p-1 bg-amber-100 border border-amber-300/80 text-amber-700 rounded-md shrink-0">
+              <Award className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
             </div>
-            <p className="text-[10px] text-amber-800 font-medium truncate mt-0.5">
-              Cumulative score averages
-            </p>
+          </div>
+          <div className="mt-0.5 sm:mt-1 flex items-center gap-1 font-mono">
+            <span className="text-[8.5px] sm:text-[10px] font-black text-amber-950 bg-amber-200 px-1 py-0.2 rounded border border-amber-300">
+              H:{stats.avgHw ?? '—'}
+            </span>
+            <span className="text-[8.5px] sm:text-[10px] font-black text-sky-950 bg-sky-200 px-1 py-0.2 rounded border border-sky-300">
+              C:{stats.avgCw ?? '—'}
+            </span>
           </div>
         </div>
       </div>
 
       {/* 2. Main Tracking Matrix Container */}
-      <div className="bg-white rounded-3xl border border-indigo-100/90 shadow-sm overflow-hidden w-full max-w-full">
-        {/* Header Ribbon with Element-wise Light Background Tint */}
-        <div className="p-3.5 sm:p-5 border-b border-indigo-100 bg-gradient-to-r from-indigo-50/95 via-purple-50/40 to-sky-50/50 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2.5 bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-700 text-white rounded-2xl shadow-xs border border-indigo-400/30 shrink-0">
-              <BookOpen className="w-5 h-5" />
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-indigo-100/90 shadow-sm overflow-hidden w-full max-w-full">
+        {/* Header Ribbon */}
+        <div className="p-2.5 sm:p-3.5 border-b border-indigo-100 bg-gradient-to-r from-indigo-50/95 via-purple-50/40 to-sky-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-tr from-indigo-600 via-purple-600 to-indigo-700 text-white rounded-xl shadow-xs border border-indigo-400/30 shrink-0">
+              <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="font-display font-black text-indigo-950 text-base sm:text-lg tracking-tight leading-tight">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h2 className="font-display font-black text-indigo-950 text-xs sm:text-sm tracking-tight leading-tight">
                   Daily Study Logs & Tracking
                 </h2>
-                <span className="text-[10.5px] bg-indigo-100/90 text-indigo-900 border border-indigo-300 font-mono font-bold px-2 py-0.5 rounded-full shadow-2xs">
-                  {filteredActivities.length} {filteredActivities.length === 1 ? 'Record' : 'Records'}
+                <span className="text-[9.5px] bg-indigo-100 text-indigo-900 border border-indigo-300 font-mono font-bold px-1.5 py-0.2 rounded-md shadow-2xs">
+                  {filteredActivities.length}
                 </span>
               </div>
-              <p className="text-xs text-indigo-900/70 font-medium truncate">
-                Monitor student attendance, syllabus progress, homework, and class performance
-              </p>
             </div>
           </div>
 
           {/* Action Tools: View Toggle & Log Button */}
-          <div className="flex items-center gap-2 shrink-0 self-start md:self-auto flex-wrap">
+          <div className="flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
             {/* View Mode Toggle Button */}
-            <div className="flex items-center p-0.5 bg-indigo-100/80 border border-indigo-200 rounded-xl shadow-2xs">
+            <div className="flex items-center p-0.5 bg-indigo-100/80 border border-indigo-200 rounded-lg shadow-2xs">
               <button
                 type="button"
                 onClick={() => setViewMode('table')}
-                className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                className={`p-1 rounded-md text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
                   viewMode === 'table'
                     ? 'bg-white text-indigo-950 shadow-2xs border border-indigo-200 font-black'
                     : 'text-indigo-700 hover:text-indigo-950'
                 }`}
                 title="Aligned Tabular View"
               >
-                <LayoutList className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline text-[11px]">Table</span>
+                <LayoutList className="w-3 h-3" />
+                <span className="hidden sm:inline text-[10px]">Table</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('cards')}
-                className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                className={`p-1 rounded-md text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
                   viewMode === 'cards'
                     ? 'bg-white text-indigo-950 shadow-2xs border border-indigo-200 font-black'
                     : 'text-indigo-700 hover:text-indigo-950'
                 }`}
                 title="Structured Cards View"
               >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline text-[11px]">Cards</span>
+                <LayoutGrid className="w-3 h-3" />
+                <span className="hidden sm:inline text-[10px]">Cards</span>
               </button>
             </div>
 
@@ -341,99 +336,99 @@ export default function GlobalTrackingList({
             <button
               type="button"
               onClick={() => setIsLogModalOpen(true)}
-              className="px-3.5 py-2 bg-gradient-to-r from-purple-700 via-indigo-600 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-indigo-600/20 active:scale-95 border border-white/20"
+              className="px-2.5 py-1 bg-gradient-to-r from-purple-700 via-indigo-600 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white rounded-lg text-[11px] font-black flex items-center gap-1 transition-all cursor-pointer shadow-xs active:scale-95 border border-white/20"
               id="btn-log-daily-lesson"
             >
-              <Plus className="w-4 h-4" />
-              <span className="whitespace-nowrap">Log Daily Lesson</span>
+              <Plus className="w-3 h-3" />
+              <span className="whitespace-nowrap">Log Lesson</span>
             </button>
           </div>
         </div>
 
         {/* 3. Aligned Filter Toolbar with Element-wise Light Coloring */}
-        <div className="p-3 sm:p-4 bg-slate-50/80 border-b border-slate-200 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
+        <div className="p-2 sm:p-3 bg-slate-50/80 border-b border-slate-200 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-1.5">
           {/* Search Input Bar */}
-          <div className="relative flex-1 min-w-[180px]">
-            <Search className="w-3.5 h-3.5 text-indigo-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative flex-1 min-w-[150px]">
+            <Search className="w-3 h-3 text-indigo-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search topic, student name, SID, or remarks..."
-              className="w-full pl-8 pr-7 py-2 sm:py-1.5 bg-white border border-indigo-200/90 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 shadow-2xs font-medium"
+              placeholder="Search topic, student, SID..."
+              className="w-full pl-7 pr-6 py-1 bg-white border border-indigo-200 rounded-lg text-[11px] sm:text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-1.5 focus:ring-indigo-500 shadow-2xs font-medium"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-700 rounded cursor-pointer"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-slate-700 rounded cursor-pointer"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </div>
 
-          {/* Aligned Dropdown Filters (Mobile Grid / Desktop Flex) with Element-wise light background colors */}
-          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
-            {/* Student Filter - Indigo Tint */}
+          {/* Aligned Dropdown Filters */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5">
+            {/* Student Filter */}
             <div className="relative col-span-2 sm:col-span-1">
               <select
                 value={selectedStudentFilter}
                 onChange={(e) => setSelectedStudentFilter(e.target.value)}
-                className="w-full sm:w-auto pl-2.5 pr-7 py-2 sm:py-1.5 bg-indigo-50/80 hover:bg-indigo-50 border border-indigo-200/90 rounded-xl text-xs font-bold text-indigo-950 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 shadow-2xs cursor-pointer appearance-none truncate max-w-full"
+                className="w-full sm:w-auto pl-2 pr-6 py-1 bg-indigo-50/80 hover:bg-indigo-50 border border-indigo-200 rounded-lg text-[11px] font-bold text-indigo-950 focus:outline-hidden focus:ring-1.5 focus:ring-indigo-500 shadow-2xs cursor-pointer appearance-none truncate max-w-full"
               >
                 <option value="ALL">All Students ({activeStudents.length})</option>
                 {activeStudents.map(s => (
                   <option key={s.sid} value={s.sid}>{s.name} ({s.sid})</option>
                 ))}
               </select>
-              <ChevronDown className="w-3 h-3 text-indigo-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-2.5 h-2.5 text-indigo-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
-            {/* Attendance Status Filter - Emerald Tint */}
+            {/* Attendance Status Filter */}
             <div className="relative">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="w-full sm:w-auto pl-2.5 pr-7 py-2 sm:py-1.5 bg-emerald-50/80 hover:bg-emerald-50 border border-emerald-200/90 rounded-xl text-xs font-bold text-emerald-950 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 shadow-2xs cursor-pointer appearance-none"
+                className="w-full sm:w-auto pl-2 pr-6 py-1 bg-emerald-50/80 hover:bg-emerald-50 border border-emerald-200 rounded-lg text-[11px] font-bold text-emerald-950 focus:outline-hidden focus:ring-1.5 focus:ring-emerald-500 shadow-2xs cursor-pointer appearance-none"
               >
                 <option value="ALL">All Status</option>
-                <option value="Present">Present Only</option>
-                <option value="Absent">Absent Only</option>
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
               </select>
-              <ChevronDown className="w-3 h-3 text-emerald-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-2.5 h-2.5 text-emerald-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
-            {/* Month Filter - Purple Tint */}
+            {/* Month Filter */}
             {availableMonths.length > 0 && (
               <div className="relative">
                 <select
                   value={selectedMonthFilter}
                   onChange={(e) => setSelectedMonthFilter(e.target.value)}
-                  className="w-full sm:w-auto pl-2.5 pr-7 py-2 sm:py-1.5 bg-purple-50/80 hover:bg-purple-50 border border-purple-200/90 rounded-xl text-xs font-bold text-purple-950 focus:outline-hidden focus:ring-2 focus:ring-purple-500 shadow-2xs cursor-pointer appearance-none"
+                  className="w-full sm:w-auto pl-2 pr-6 py-1 bg-purple-50/80 hover:bg-purple-50 border border-purple-200 rounded-lg text-[11px] font-bold text-purple-950 focus:outline-hidden focus:ring-1.5 focus:ring-purple-500 shadow-2xs cursor-pointer appearance-none"
                 >
                   <option value="ALL">All Dates</option>
                   {availableMonths.map(m => (
                     <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
-                <ChevronDown className="w-3 h-3 text-purple-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-2.5 h-2.5 text-purple-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             )}
 
-            {/* Sort Order Selector - Amber Tint */}
+            {/* Sort Order Selector */}
             <div className="relative">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full sm:w-auto pl-2.5 pr-7 py-2 sm:py-1.5 bg-amber-50/80 hover:bg-amber-50 border border-amber-200/90 rounded-xl text-xs font-bold text-amber-950 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 shadow-2xs cursor-pointer appearance-none"
+                className="w-full sm:w-auto pl-2 pr-6 py-1 bg-amber-50/80 hover:bg-amber-50 border border-amber-200 rounded-lg text-[11px] font-bold text-amber-950 focus:outline-hidden focus:ring-1.5 focus:ring-indigo-500 shadow-2xs cursor-pointer appearance-none"
               >
-                <option value="newest">Newest Date</option>
-                <option value="oldest">Oldest Date</option>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
                 <option value="hw">Highest HW</option>
                 <option value="cw">Highest CW</option>
               </select>
-              <ChevronDown className="w-3 h-3 text-amber-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-2.5 h-2.5 text-amber-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             {/* Reset Filters Chip */}
@@ -441,10 +436,10 @@ export default function GlobalTrackingList({
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="col-span-2 sm:col-span-1 px-3 py-2 sm:py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-95"
+                className="col-span-2 sm:col-span-1 px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-95"
                 title="Reset All Filters"
               >
-                <RotateCcw className="w-3 h-3 text-rose-600" />
+                <RotateCcw className="w-2.5 h-2.5 text-rose-600" />
                 <span>Reset</span>
               </button>
             )}
