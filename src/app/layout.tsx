@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-slate-50/50 flex flex-col font-sans text-slate-800" id="main-applet-root" suppressHydrationWarning>
         <AuthProvider>
           <NavigationHeader />
-          <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col min-h-0 relative">
+          <main className="flex-grow max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-2.5 sm:py-6 flex flex-col min-h-0 relative">
             <AuthGuard>
               {children}
             </AuthGuard>
