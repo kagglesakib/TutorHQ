@@ -129,7 +129,7 @@ export default function AdminPortalPage() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 max-w-7xl w-full mx-auto px-0 sm:px-2 overflow-x-hidden">
       {error && (
         <div className="bg-rose-950/80 border border-rose-800 py-2 px-3 rounded-xl text-xs font-medium text-rose-200 flex items-center justify-between gap-2 shadow-xs">
           <div className="flex items-center gap-1.5">

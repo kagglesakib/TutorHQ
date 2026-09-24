@@ -557,72 +557,43 @@ export default function AdminPortal({
   }, [filteredStudents, exams, activities]);
 
   return (
-    <div className="space-y-4 pb-10">
-      {/* 1. Header & Dynamic Filters Toolbar */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-4 sm:p-5 border border-slate-800 shadow-lg">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-tr from-indigo-500 to-emerald-400 text-white rounded-xl shadow-md">
-                <BarChart3 className="w-5 h-5" />
-              </div>
-              <h1 className="text-lg sm:text-xl font-display font-black tracking-tight text-white">
-                Academic &amp; Financial Analytics Hub
+    <div className="space-y-3 pb-6 w-full max-w-full overflow-hidden">
+      {/* 1. Header & Dynamic Filters Toolbar (Tight & Compact) */}
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-2.5 sm:p-3 border border-slate-800 shadow-sm w-full overflow-hidden">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="p-1.5 bg-gradient-to-tr from-indigo-500 to-emerald-400 text-white rounded-lg shadow-xs shrink-0">
+              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-xs sm:text-sm font-display font-black tracking-tight text-white flex items-center gap-1.5 truncate">
+                <span className="truncate">Analytics Hub</span>
+                <span className="text-[9px] sm:text-[9.5px] bg-indigo-900/90 text-indigo-200 border border-indigo-700 px-1.5 py-0.2 rounded font-mono font-bold shrink-0">
+                  {filteredStudents.length} Students
+                </span>
               </h1>
             </div>
-            <p className="text-xs text-slate-300 font-medium max-w-2xl">
-              Comprehensive operational intelligence: Track student academic performance, tuition cashflow, examination scorecards, and continuous learning metrics.
-            </p>
           </div>
 
-          {/* Quick Nav Shortcut Buttons */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <Link
-              href="/admin/students"
-              className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 backdrop-blur-xs"
-            >
-              <Users className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Students</span>
-            </Link>
-            <Link
-              href="/admin/tracking"
-              className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 backdrop-blur-xs"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Lessons</span>
-            </Link>
-            <Link
-              href="/admin/exams"
-              className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 backdrop-blur-xs"
-            >
-              <ClipboardList className="w-3.5 h-3.5 text-amber-400" />
-              <span>Exams</span>
-            </Link>
-            <Link
-              href="/admin/payments"
-              className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 backdrop-blur-xs"
-            >
-              <Banknote className="w-3.5 h-3.5 text-teal-400" />
-              <span>Payments</span>
-            </Link>
-            <button
-              type="button"
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="p-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md disabled:opacity-50"
-              title="Refresh Analytics Data"
-            >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
+          {/* Quick Refresh Button */}
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] sm:text-[11px] font-bold rounded-lg transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center gap-1 active:scale-95 shrink-0"
+            title="Refresh Analytics Data"
+          >
+            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'Syncing...' : 'Sync'}</span>
+          </button>
         </div>
 
         {/* Global Filter Controls Bar */}
-        <div className="mt-4 pt-3.5 border-t border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
-          {/* Left: Batch Selector & Quick Chips */}
-          <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
-            <span className="text-[11px] font-bold text-slate-400 font-mono uppercase tracking-wider flex items-center gap-1 shrink-0">
-              <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+        <div className="mt-2 pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          {/* Left: Batch Selector */}
+          <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
+            <span className="text-[9.5px] sm:text-[10px] font-bold text-slate-400 font-mono uppercase tracking-wider flex items-center gap-0.5 shrink-0">
+              <GraduationCap className="w-3 h-3 text-indigo-400" />
               Batch:
             </span>
 
@@ -633,69 +604,67 @@ export default function AdminPortal({
                 setSelectedBatch('all');
                 setIsBatchDropdownOpen(false);
               }}
-              className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap ${
+              className={`px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
                 selectedBatch === 'all'
-                  ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-600/30'
+                  ? 'bg-indigo-600 text-white font-black shadow-xs'
                   : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
               }`}
             >
-              All Batches ({activeStudents.length})
+              All ({activeStudents.length})
             </button>
 
-            {/* Dropdown Selector for Any Number of Batches */}
+            {/* Dropdown Selector for Batches */}
             <div className="relative shrink-0" ref={batchDropdownRef}>
               <button
                 type="button"
                 onClick={() => setIsBatchDropdownOpen(!isBatchDropdownOpen)}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border ${
+                className={`px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 border ${
                   selectedBatch !== 'all'
                     ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/60 shadow-xs'
-                    : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border-slate-700'
+                    : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
                 }`}
                 title="Select Academic Batch"
               >
-                <Filter className="w-3 h-3 text-indigo-400 shrink-0" />
-                <span className="max-w-[140px] truncate">
-                  {selectedBatch === 'all' ? `Select Batch (${uniqueBatches.length})` : formatBatch(selectedBatch)}
+                <Filter className="w-2.5 h-2.5 text-indigo-400 shrink-0" />
+                <span className="max-w-[100px] sm:max-w-[130px] truncate">
+                  {selectedBatch === 'all' ? `Batches (${uniqueBatches.length})` : formatBatch(selectedBatch)}
                 </span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform text-slate-400 ${isBatchDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform text-slate-400 ${isBatchDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Popover Dropdown Panel */}
               {isBatchDropdownOpen && (
-                <div className="absolute left-0 mt-1.5 w-64 bg-slate-900/98 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl z-50 p-2 space-y-1.5 text-xs animate-in fade-in zoom-in-95 duration-150">
-                  {/* Search bar when batches > 4 */}
+                <div className="absolute left-0 mt-1 w-52 bg-slate-900/98 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl z-50 p-1.5 space-y-1 text-xs animate-in fade-in zoom-in-95 duration-150">
                   {uniqueBatches.length > 4 && (
                     <div className="relative mb-1">
-                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                      <Search className="w-3 h-3 text-slate-400 absolute left-2 top-2" />
                       <input
                         type="text"
-                        placeholder="Search batch (e.g. 2028)..."
+                        placeholder="Search batch..."
                         value={batchSearchTerm}
                         onChange={(e) => setBatchSearchTerm(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-indigo-500"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-7 pr-2 py-1 text-[10px] text-white placeholder-slate-500 focus:outline-hidden focus:border-indigo-500"
                         autoFocus
                       />
                     </div>
                   )}
 
-                  <div className="max-h-56 overflow-y-auto no-scrollbar space-y-1 pr-0.5">
-                    {/* All Batches Option */}
+                  <div className="max-h-48 overflow-y-auto no-scrollbar space-y-0.5 pr-0.5">
                     <button
                       type="button"
                       onClick={() => {
                         setSelectedBatch('all');
                         setIsBatchDropdownOpen(false);
                       }}
-                      className={`w-full px-2.5 py-2 rounded-xl flex items-center justify-between text-left transition-colors cursor-pointer ${
+                      className={`w-full px-2 py-1.5 rounded-lg flex items-center justify-between text-left transition-colors cursor-pointer text-[10.5px] ${
                         selectedBatch === 'all'
                           ? 'bg-indigo-600 text-white font-bold'
                           : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                       }`}
                     >
                       <span className="font-semibold">All Batches</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-black/25 font-bold">
-                        {activeStudents.length} students
+                      <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-black/25 font-bold">
+                        {activeStudents.length}
                       </span>
                     </button>
 
@@ -711,7 +680,7 @@ export default function AdminPortal({
                               setSelectedBatch(b);
                               setIsBatchDropdownOpen(false);
                             }}
-                            className={`w-full px-2.5 py-2 rounded-xl flex items-center justify-between text-left transition-colors cursor-pointer ${
+                            className={`w-full px-2 py-1.5 rounded-lg flex items-center justify-between text-left transition-colors cursor-pointer text-[10.5px] ${
                               isSelected
                                 ? 'bg-indigo-600 text-white font-bold'
                                 : 'text-slate-300 hover:bg-slate-800 hover:text-white'
@@ -719,79 +688,50 @@ export default function AdminPortal({
                           >
                             <span className="font-semibold truncate">{formatBatch(b, 'HSC')}</span>
                             <span
-                              className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md font-bold shrink-0 ${
+                              className={`text-[9px] font-mono px-1 py-0.2 rounded font-bold shrink-0 ${
                                 isSelected ? 'bg-black/25 text-white' : 'bg-slate-800 text-indigo-300 border border-slate-700'
                               }`}
                             >
-                              {count} {count === 1 ? 'student' : 'students'}
+                              {count}
                             </span>
                           </button>
                         );
                       })
                     ) : (
-                      <div className="py-3 text-center text-slate-500 text-[11px]">No matching batches found</div>
+                      <div className="py-2 text-center text-slate-500 text-[10px]">No matching batches</div>
                     )}
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Quick Horizontal Scrollable Strip of Batch Chips (Never wraps to row 2!) */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar whitespace-nowrap py-0.5 min-w-0">
-              {uniqueBatches.map((b) => {
-                const isSelected = selectedBatch === b;
-                const count = batchStudentCounts[b] || 0;
-                return (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() => setSelectedBatch(b)}
-                    className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap flex items-center gap-1.5 ${
-                      isSelected
-                        ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-600/30'
-                        : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
-                    }`}
-                  >
-                    <span>{formatBatch(b, 'HSC')}</span>
-                    <span className={`text-[10px] font-mono px-1 py-0.2 rounded-md font-bold ${
-                      isSelected ? 'bg-black/20 text-white' : 'bg-slate-700/80 text-slate-300'
-                    }`}>
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Active Clear Filter Button if a batch is selected */}
             {selectedBatch !== 'all' && (
               <button
                 type="button"
                 onClick={() => setSelectedBatch('all')}
-                className="p-1 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-lg shrink-0 transition-colors cursor-pointer"
+                className="p-0.5 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-md shrink-0 transition-colors cursor-pointer"
                 title="Reset batch filter"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </div>
 
           {/* Right: Timeline Selector */}
-          <div className="flex items-center gap-1.5 shrink-0 self-start md:self-auto bg-slate-800/90 p-0.5 rounded-xl border border-slate-700">
-            <span className="text-[10px] text-slate-400 font-bold px-2">Timeline:</span>
+          <div className="flex items-center gap-1 shrink-0 self-start sm:self-auto bg-slate-800/90 p-0.5 rounded-lg border border-slate-700">
             {(
               [
-                { id: 'all', label: 'All Time' },
-                { id: '30d', label: '30 Days' },
-                { id: '90d', label: '90 Days' },
-                { id: '6m', label: '6 Months' },
+                { id: 'all', label: 'All' },
+                { id: '30d', label: '30D' },
+                { id: '90d', label: '90D' },
+                { id: '6m', label: '6M' },
               ] as const
             ).map((t) => (
               <button
                 key={t.id}
                 type="button"
                 onClick={() => setTimeRange(t.id)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
                   timeRange === t.id
                     ? 'bg-indigo-600 text-white font-black shadow-xs'
                     : 'text-slate-300 hover:text-white'
@@ -804,128 +744,128 @@ export default function AdminPortal({
         </div>
       </div>
 
-      {/* 2. Executive Metric Matrix Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* 2. Executive Metric Matrix Cards (Ultra-Compact) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 w-full">
         {/* Total Students */}
-        <div className="p-3.5 bg-gradient-to-br from-emerald-100/95 via-teal-50/80 to-emerald-100/80 border border-emerald-300/80 rounded-2xl shadow-2xs">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-emerald-100/95 via-teal-50/80 to-emerald-100/80 border border-emerald-300/80 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black text-emerald-900 uppercase tracking-wider font-mono">
-              Enrolled Students
+            <span className="text-[9px] sm:text-[10px] font-black text-emerald-900 uppercase tracking-tight font-mono truncate">
+              Students
             </span>
-            <div className="p-2 bg-emerald-600 text-white rounded-xl shadow-2xs">
-              <Users className="w-4 h-4" />
+            <div className="p-1 bg-emerald-600 text-white rounded-md shadow-2xs shrink-0">
+              <Users className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-display font-black text-emerald-950 mt-1">
+          <p className="text-base sm:text-xl font-display font-black text-emerald-950 mt-0.5 font-mono">
             {filteredStudents.length}
           </p>
-          <div className="flex items-center justify-between text-[10px] text-emerald-800 font-semibold mt-1 pt-1 border-t border-emerald-200/80">
-            <span>{uniqueBatches.length} Active Batches</span>
-            <span className="font-mono bg-emerald-200/80 px-1.5 py-0.2 rounded text-emerald-950">
-              100% Verified
+          <div className="flex items-center justify-between text-[8.5px] text-emerald-800 font-semibold mt-0.5 pt-0.5 border-t border-emerald-200/80">
+            <span className="truncate">{uniqueBatches.length} Batches</span>
+            <span className="font-mono bg-emerald-200/80 px-1 py-0.1 rounded text-emerald-950">
+              Active
             </span>
           </div>
         </div>
 
         {/* Exam Score Index */}
-        <div className="p-3.5 bg-gradient-to-br from-amber-100/95 via-orange-50/80 to-amber-100/80 border border-amber-300/80 rounded-2xl shadow-2xs">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-amber-100/95 via-orange-50/80 to-amber-100/80 border border-amber-300/80 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black text-amber-900 uppercase tracking-wider font-mono">
-              Exam Score Index
+            <span className="text-[9px] sm:text-[10px] font-black text-amber-900 uppercase tracking-tight font-mono truncate">
+              Exam Avg
             </span>
-            <div className="p-2 bg-amber-600 text-white rounded-xl shadow-2xs">
-              <Award className="w-4 h-4" />
+            <div className="p-1 bg-amber-600 text-white rounded-md shadow-2xs shrink-0">
+              <Award className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             </div>
           </div>
-          <div className="flex items-baseline gap-1.5 mt-1">
-            <p className="text-2xl sm:text-3xl font-display font-black text-amber-950">
-              {examStats.avgScorePct > 0 ? `${examStats.avgScorePct}%` : 'N/A'}
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <p className="text-base sm:text-xl font-display font-black text-amber-950 font-mono">
+              {examStats.avgScorePct > 0 ? `${examStats.avgScorePct}%` : '—'}
             </p>
-            <span className="text-xs font-bold text-amber-800">avg</span>
+            <span className="text-[9px] font-bold text-amber-800 hidden sm:inline">avg</span>
           </div>
-          <div className="flex items-center justify-between text-[10px] text-amber-800 font-semibold mt-1 pt-1 border-t border-amber-200/80">
-            <span>Peak: {examStats.highestScorePct}%</span>
-            <span className="font-mono bg-amber-200/80 px-1.5 py-0.2 rounded text-amber-950">
-              {examStats.totalEvaluated} Tests Logged
+          <div className="flex items-center justify-between text-[8.5px] text-amber-800 font-semibold mt-0.5 pt-0.5 border-t border-amber-200/80">
+            <span className="truncate">Peak {examStats.highestScorePct}%</span>
+            <span className="font-mono bg-amber-200/80 px-1 py-0.1 rounded text-amber-950">
+              {examStats.totalEvaluated} Tests
             </span>
           </div>
         </div>
 
         {/* Tuition Revenue Received */}
-        <div className="p-3.5 bg-gradient-to-br from-teal-100/95 via-emerald-50/80 to-teal-100/80 border border-teal-300/80 rounded-2xl shadow-2xs">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-teal-100/95 via-emerald-50/80 to-teal-100/80 border border-teal-300/80 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black text-teal-900 uppercase tracking-wider font-mono">
-              Tuition Collected
+            <span className="text-[9px] sm:text-[10px] font-black text-teal-900 uppercase tracking-tight font-mono truncate">
+              Revenue
             </span>
-            <div className="p-2 bg-teal-600 text-white rounded-xl shadow-2xs">
-              <Banknote className="w-4 h-4" />
+            <div className="p-1 bg-teal-600 text-white rounded-md shadow-2xs shrink-0">
+              <Banknote className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-display font-black text-teal-950 mt-1 font-mono">
+          <p className="text-base sm:text-xl font-display font-black text-teal-950 mt-0.5 font-mono truncate">
             ৳{totalRevenue.toLocaleString()}
           </p>
-          <div className="flex items-center justify-between text-[10px] text-teal-800 font-semibold mt-1 pt-1 border-t border-teal-200/80">
-            <span>{filteredPayments.length} Transactions</span>
-            <span className="font-mono bg-teal-200/80 px-1.5 py-0.2 rounded text-teal-950">
-              Avg ৳{avgPayment.toLocaleString()}
+          <div className="flex items-center justify-between text-[8.5px] text-teal-800 font-semibold mt-0.5 pt-0.5 border-t border-teal-200/80">
+            <span>{filteredPayments.length} Txns</span>
+            <span className="font-mono bg-teal-200/80 px-1 py-0.1 rounded text-teal-950">
+              Paid
             </span>
           </div>
         </div>
 
         {/* Daily Lesson Attendance & Homework */}
-        <div className="p-3.5 bg-gradient-to-br from-indigo-100/95 via-sky-50/80 to-indigo-100/80 border border-indigo-300/80 rounded-2xl shadow-2xs">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-100/95 via-sky-50/80 to-indigo-100/80 border border-indigo-300/80 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black text-indigo-900 uppercase tracking-wider font-mono">
-              Attendance &amp; HW
+            <span className="text-[9px] sm:text-[10px] font-black text-indigo-900 uppercase tracking-tight font-mono truncate">
+              Attendance
             </span>
-            <div className="p-2 bg-indigo-600 text-white rounded-xl shadow-2xs">
-              <BookOpen className="w-4 h-4" />
+            <div className="p-1 bg-indigo-600 text-white rounded-md shadow-2xs shrink-0">
+              <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             </div>
           </div>
-          <div className="flex items-baseline gap-1.5 mt-1">
-            <p className="text-2xl sm:text-3xl font-display font-black text-indigo-950">
+          <div className="flex items-baseline gap-1 mt-0.5">
+            <p className="text-base sm:text-xl font-display font-black text-indigo-950 font-mono">
               {lessonStats.attendanceRate}%
             </p>
-            <span className="text-xs font-bold text-indigo-800">present</span>
+            <span className="text-[9px] font-bold text-indigo-800 hidden sm:inline">rate</span>
           </div>
-          <div className="flex items-center justify-between text-[10px] text-indigo-800 font-semibold mt-1 pt-1 border-t border-indigo-200/80">
+          <div className="flex items-center justify-between text-[8.5px] text-indigo-800 font-semibold mt-0.5 pt-0.5 border-t border-indigo-200/80">
             <span>HW: {lessonStats.avgHwMarks}/10</span>
-            <span className="font-mono bg-indigo-200/80 px-1.5 py-0.2 rounded text-indigo-950">
-              {lessonStats.totalLessons} Sessions
+            <span className="font-mono bg-indigo-200/80 px-1 py-0.1 rounded text-indigo-950">
+              {lessonStats.totalLessons} Logs
             </span>
           </div>
         </div>
       </div>
 
       {/* 3. ROW 1 CHARTS: Financial Revenue & Monthly Trajectory */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3 w-full">
         {/* Monthly Revenue Bar + Line Composed Chart */}
-        <div className="lg:col-span-8 bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-teal-100 text-teal-700 rounded-xl">
-                <TrendingUp className="w-4 h-4" />
+        <div className="lg:col-span-8 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 bg-teal-100 text-teal-700 rounded-lg shrink-0">
+                <TrendingUp className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <h3 className="font-display font-black text-slate-900 text-sm sm:text-base">
+              <div className="min-w-0">
+                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
                   Monthly Tuition Collections &amp; Inflow Trajectory
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-[10.5px] text-slate-500 font-medium truncate">
                   Monthly fee collection amount (৳) and transaction frequency
                 </p>
               </div>
             </div>
-            <span className="text-[11px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200 px-2.5 py-1 rounded-lg self-start sm:self-auto">
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 rounded-md self-start sm:self-auto shrink-0">
               Total ৳{totalRevenue.toLocaleString()}
             </span>
           </div>
 
-          <div className="h-[280px] w-full">
+          <div className="h-[220px] sm:h-[260px] w-full min-w-0">
             {isMounted && monthlyRevenueChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart
                   data={monthlyRevenueChartData}
-                  margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                  margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
                 >
                   <defs>
                     <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
@@ -936,13 +876,13 @@ export default function AdminPortal({
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis
                     dataKey="month"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                   />
                   <YAxis
                     yAxisId="left"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                     tickFormatter={(val) => `৳${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
@@ -950,16 +890,16 @@ export default function AdminPortal({
                   <YAxis
                     yAxisId="right"
                     orientation="right"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                   />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#0f172a',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       color: '#fff',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       border: 'none',
                       boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
                     }}
@@ -970,16 +910,16 @@ export default function AdminPortal({
                   />
                   <Legend
                     verticalAlign="top"
-                    height={36}
-                    wrapperStyle={{ fontSize: '11px', fontWeight: 600 }}
+                    height={30}
+                    wrapperStyle={{ fontSize: '10.5px', fontWeight: 600 }}
                   />
                   <Bar
                     yAxisId="left"
                     dataKey="revenue"
                     name="Revenue"
                     fill="url(#revenueGrad)"
-                    radius={[8, 8, 0, 0]}
-                    maxBarSize={45}
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={40}
                   />
                   <Line
                     yAxisId="right"
@@ -987,15 +927,15 @@ export default function AdminPortal({
                     dataKey="count"
                     name="Transactions"
                     stroke="#4f46e5"
-                    strokeWidth={3}
-                    dot={{ fill: '#4f46e5', r: 4 }}
-                    activeDot={{ r: 6 }}
+                    strokeWidth={2.5}
+                    dot={{ fill: '#4f46e5', r: 3 }}
+                    activeDot={{ r: 5 }}
                   />
                 </ComposedChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-1">
-                <Banknote className="w-8 h-8 text-slate-300" />
+                <Banknote className="w-7 h-7 text-slate-300" />
                 <p className="text-xs font-bold">No payment history recorded for this filter</p>
               </div>
             )}
@@ -1003,22 +943,22 @@ export default function AdminPortal({
         </div>
 
         {/* Revenue Share by HSC Batch Donut Chart */}
-        <div className="lg:col-span-4 bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3 flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                <PieChartIcon className="w-4 h-4" />
+        <div className="lg:col-span-4 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 flex flex-col justify-between w-full min-w-0 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg shrink-0">
+                <PieChartIcon className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <h3 className="font-display font-black text-slate-900 text-sm">
+              <div className="min-w-0">
+                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
                   Revenue by Batch
                 </h3>
-                <p className="text-[11px] text-slate-500">Distribution of tuition fee receipts</p>
+                <p className="text-[10px] sm:text-[10.5px] text-slate-500 truncate">Distribution of tuition receipts</p>
               </div>
             </div>
           </div>
 
-          <div className="h-[220px] w-full">
+          <div className="h-[180px] sm:h-[200px] w-full min-w-0">
             {isMounted && revenueByBatchChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -1028,9 +968,9 @@ export default function AdminPortal({
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
-                    paddingAngle={4}
+                    innerRadius={45}
+                    outerRadius={70}
+                    paddingAngle={3}
                   >
                     {revenueByBatchChartData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={PIE_PALETTE[index % PIE_PALETTE.length]} />
@@ -1039,9 +979,9 @@ export default function AdminPortal({
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#0f172a',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       color: '#fff',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       border: 'none',
                     }}
                     formatter={(value: any) => [`৳${Number(value).toLocaleString()}`, 'Tuition Paid']}
@@ -1056,15 +996,15 @@ export default function AdminPortal({
           </div>
 
           {/* Legend Badges */}
-          <div className="grid grid-cols-2 gap-1.5 pt-2 border-t border-slate-100 text-[10px]">
+          <div className="grid grid-cols-2 gap-1 pt-1.5 border-t border-slate-100 text-[9.5px]">
             {revenueByBatchChartData.map((item, idx) => (
-              <div key={item.name} className="flex items-center gap-1.5 p-1 rounded-lg bg-slate-50 border border-slate-200/60">
+              <div key={item.name} className="flex items-center gap-1 p-1 rounded-md bg-slate-50 border border-slate-200/60 min-w-0">
                 <div
-                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  className="w-2 h-2 rounded-full shrink-0"
                   style={{ backgroundColor: PIE_PALETTE[idx % PIE_PALETTE.length] }}
                 />
                 <span className="font-bold text-slate-700 truncate">{item.name}</span>
-                <span className="font-mono text-slate-900 font-black ml-auto">
+                <span className="font-mono text-slate-900 font-black ml-auto shrink-0">
                   ৳{item.value.toLocaleString()}
                 </span>
               </div>
@@ -1074,41 +1014,41 @@ export default function AdminPortal({
       </div>
 
       {/* 4. ROW 2 CHARTS: Examination Analytics & Scorecard Distributions */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3 w-full">
         {/* Exam Score Trajectory (Area Chart with Benchmarks) */}
-        <div className="lg:col-span-7 bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-amber-100 text-amber-700 rounded-xl">
-                <LineChartIcon className="w-4 h-4" />
+        <div className="lg:col-span-7 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 bg-amber-100 text-amber-700 rounded-lg shrink-0">
+                <LineChartIcon className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <h3 className="font-display font-black text-slate-900 text-sm sm:text-base">
+              <div className="min-w-0">
+                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
                   Chronological Examination Score Trends (%)
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  Average score percentage progression across test dates with 80% distinction line
+                <p className="text-[10.5px] text-slate-500 font-medium truncate">
+                  Score progression with distinction benchmarks
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold">
+            <div className="flex items-center gap-2 text-[9.5px] sm:text-[10px] font-bold shrink-0">
               <span className="flex items-center gap-1 text-emerald-700">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 Distinction (80%)
               </span>
               <span className="flex items-center gap-1 text-amber-700">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                 Pass (50%)
               </span>
             </div>
           </div>
 
-          <div className="h-[280px] w-full">
+          <div className="h-[220px] sm:h-[260px] w-full min-w-0">
             {isMounted && examTrajectoryChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={examTrajectoryChartData}
-                  margin={{ top: 10, right: 15, left: -10, bottom: 0 }}
+                  margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
                 >
                   <defs>
                     <linearGradient id="examScoreGrad" x1="0" y1="0" x2="0" y2="1">
@@ -1119,13 +1059,13 @@ export default function AdminPortal({
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                   />
                   <YAxis
                     domain={[0, 100]}
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                     tickFormatter={(val) => `${val}%`}
@@ -1133,21 +1073,21 @@ export default function AdminPortal({
                   <ReferenceLine
                     y={80}
                     stroke="#059669"
-                    strokeDasharray="4 4"
-                    label={{ value: 'Distinction 80%', fill: '#059669', fontSize: 10, position: 'insideTopRight' }}
+                    strokeDasharray="3 3"
+                    label={{ value: '80%', fill: '#059669', fontSize: 9, position: 'insideTopRight' }}
                   />
                   <ReferenceLine
                     y={50}
                     stroke="#ea580c"
-                    strokeDasharray="4 4"
-                    label={{ value: 'Pass 50%', fill: '#ea580c', fontSize: 10, position: 'insideBottomRight' }}
+                    strokeDasharray="3 3"
+                    label={{ value: '50%', fill: '#ea580c', fontSize: 9, position: 'insideBottomRight' }}
                   />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#0f172a',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       color: '#fff',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       border: 'none',
                     }}
                     formatter={(value: any) => [`${value}%`, 'Average Score']}
@@ -1157,16 +1097,16 @@ export default function AdminPortal({
                     dataKey="avgScore"
                     name="Average Score"
                     stroke="#d97706"
-                    strokeWidth={3}
+                    strokeWidth={2.5}
                     fill="url(#examScoreGrad)"
-                    dot={{ fill: '#d97706', r: 4 }}
-                    activeDot={{ r: 6 }}
+                    dot={{ fill: '#d97706', r: 3 }}
+                    activeDot={{ r: 5 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-1">
-                <ClipboardList className="w-8 h-8 text-slate-300" />
+                <ClipboardList className="w-7 h-7 text-slate-300" />
                 <p className="text-xs font-bold">No exam scores logged in selected interval</p>
               </div>
             )}
@@ -1174,39 +1114,39 @@ export default function AdminPortal({
         </div>
 
         {/* Grade Tier Distribution (Bar Chart) */}
-        <div className="lg:col-span-5 bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-purple-100 text-purple-700 rounded-xl">
-                <BarChart3 className="w-4 h-4" />
+        <div className="lg:col-span-5 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 bg-purple-100 text-purple-700 rounded-lg shrink-0">
+                <BarChart3 className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <h3 className="font-display font-black text-slate-900 text-sm sm:text-base">
+              <div className="min-w-0">
+                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
                   Score Grade Distribution
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">Evaluation breakdown by grade band</p>
+                <p className="text-[10.5px] text-slate-500 font-medium truncate">Evaluation breakdown by grade band</p>
               </div>
             </div>
           </div>
 
-          <div className="h-[280px] w-full">
+          <div className="h-[220px] sm:h-[260px] w-full min-w-0">
             {isMounted && examGradeDistributionData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={examGradeDistributionData}
-                  margin={{ top: 10, right: 10, left: -15, bottom: 25 }}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis
                     dataKey="grade"
-                    tick={{ fontSize: 9.5, fill: '#64748b' }}
+                    tick={{ fontSize: 9, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                     angle={-20}
                     textAnchor="end"
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                     allowDecimals={false}
@@ -1214,14 +1154,14 @@ export default function AdminPortal({
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#0f172a',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       color: '#fff',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       border: 'none',
                     }}
                     formatter={(val: any) => [val, 'Exam Attempts']}
                   />
-                  <Bar dataKey="count" name="Exams" radius={[6, 6, 0, 0]}>
+                  <Bar dataKey="count" name="Exams" radius={[5, 5, 0, 0]}>
                     {examGradeDistributionData.map((entry, index) => {
                       let color = '#7c3aed';
                       if (entry.grade.includes('A+')) color = '#059669';
@@ -1246,52 +1186,52 @@ export default function AdminPortal({
       </div>
 
       {/* 5. ROW 3 CHARTS: Daily Lessons, Homework (HW) vs Classwork (CW) & Batch Comparison */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3 w-full">
         {/* Homework (HW) vs Classwork (CW) Mastery Trends */}
-        <div className="lg:col-span-6 bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-indigo-100 text-indigo-700 rounded-xl">
-                <BookOpen className="w-4 h-4" />
+        <div className="lg:col-span-6 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg shrink-0">
+                <BookOpen className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <h3 className="font-display font-black text-slate-900 text-sm sm:text-base">
-                  Homework (HW) vs. Classwork (CW) Trends
+              <div className="min-w-0">
+                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
+                  HW vs. CW Performance Trends
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  Average daily performance scores logged out of 10
+                <p className="text-[10.5px] text-slate-500 font-medium truncate">
+                  Average daily scores out of 10
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold">
+            <div className="flex items-center gap-2 text-[9.5px] sm:text-[10px] font-bold shrink-0">
               <span className="flex items-center gap-1 text-amber-700 font-mono">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                 HW: {lessonStats.avgHwMarks}/10
               </span>
               <span className="flex items-center gap-1 text-sky-700 font-mono">
-                <span className="w-2 h-2 rounded-full bg-sky-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
                 CW: {lessonStats.avgCwMarks}/10
               </span>
             </div>
           </div>
 
-          <div className="h-[270px] w-full">
+          <div className="h-[220px] sm:h-[250px] w-full min-w-0">
             {isMounted && hwCwTrendsChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={hwCwTrendsChartData}
-                  margin={{ top: 10, right: 15, left: -15, bottom: 0 }}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 10.5, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                   />
                   <YAxis
                     domain={[0, 10]}
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                     tickFormatter={(v) => `${v}/10`}
@@ -1299,9 +1239,9 @@ export default function AdminPortal({
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#0f172a',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       color: '#fff',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       border: 'none',
                     }}
                     formatter={(val: any, name: any) => [
@@ -1311,32 +1251,32 @@ export default function AdminPortal({
                   />
                   <Legend
                     verticalAlign="top"
-                    height={32}
-                    wrapperStyle={{ fontSize: '11px', fontWeight: 600 }}
+                    height={28}
+                    wrapperStyle={{ fontSize: '10.5px', fontWeight: 600 }}
                   />
                   <Line
                     type="monotone"
                     dataKey="avgHw"
                     name="Homework (HW)"
                     stroke="#f59e0b"
-                    strokeWidth={3}
-                    dot={{ fill: '#f59e0b', r: 3.5 }}
-                    activeDot={{ r: 5 }}
+                    strokeWidth={2.5}
+                    dot={{ fill: '#f59e0b', r: 3 }}
+                    activeDot={{ r: 4.5 }}
                   />
                   <Line
                     type="monotone"
                     dataKey="avgCw"
                     name="Classwork (CW)"
                     stroke="#0284c7"
-                    strokeWidth={3}
-                    dot={{ fill: '#0284c7', r: 3.5 }}
-                    activeDot={{ r: 5 }}
+                    strokeWidth={2.5}
+                    dot={{ fill: '#0284c7', r: 3 }}
+                    activeDot={{ r: 4.5 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-1">
-                <BookOpen className="w-8 h-8 text-slate-300" />
+                <BookOpen className="w-7 h-7 text-slate-300" />
                 <p className="text-xs font-bold">No continuous lesson logs found</p>
               </div>
             )}
@@ -1344,40 +1284,40 @@ export default function AdminPortal({
         </div>
 
         {/* Batch-by-Batch Multi-Metric Comparison */}
-        <div className="lg:col-span-6 bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-emerald-100 text-emerald-700 rounded-xl">
-                <Layers className="w-4 h-4" />
+        <div className="lg:col-span-6 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg shrink-0">
+                <Layers className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <h3 className="font-display font-black text-slate-900 text-sm sm:text-base">
+              <div className="min-w-0">
+                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
                   Batch Academic Benchmark Matrix
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  Comparative Exam Score %, Attendance Rate %, and HW Mastery %
+                <p className="text-[10.5px] text-slate-500 font-medium truncate">
+                  Exam Score %, Attendance %, and HW Mastery %
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="h-[270px] w-full">
+          <div className="h-[220px] sm:h-[250px] w-full min-w-0">
             {isMounted && batchComparisonData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={batchComparisonData}
-                  margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+                  margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis
                     dataKey="name"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                   />
                   <YAxis
                     domain={[0, 100]}
-                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     axisLine={{ stroke: '#e2e8f0' }}
                     tickLine={false}
                     tickFormatter={(v) => `${v}%`}
@@ -1385,35 +1325,35 @@ export default function AdminPortal({
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#0f172a',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       color: '#fff',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       border: 'none',
                     }}
                     formatter={(v: any) => [`${v}%`]}
                   />
                   <Legend
                     verticalAlign="top"
-                    height={32}
-                    wrapperStyle={{ fontSize: '11px', fontWeight: 600 }}
+                    height={28}
+                    wrapperStyle={{ fontSize: '10.5px', fontWeight: 600 }}
                   />
                   <Bar
                     dataKey="examAvgPct"
                     name="Exam Score %"
                     fill="#7c3aed"
-                    radius={[6, 6, 0, 0]}
+                    radius={[5, 5, 0, 0]}
                   />
                   <Bar
                     dataKey="attendanceRatePct"
                     name="Attendance %"
                     fill="#059669"
-                    radius={[6, 6, 0, 0]}
+                    radius={[5, 5, 0, 0]}
                   />
                   <Bar
                     dataKey="hwMasteryPct"
                     name="HW Mastery %"
                     fill="#f59e0b"
-                    radius={[6, 6, 0, 0]}
+                    radius={[5, 5, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -1427,45 +1367,45 @@ export default function AdminPortal({
       </div>
 
       {/* 6. ROW 4: Academic Leaderboard & Insights Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3 items-stretch w-full">
         {/* Top Academic Performers Leaderboard */}
-        <div className="lg:col-span-8 bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-tr from-amber-500 to-orange-500 text-white rounded-xl shadow-xs">
-                <Award className="w-4 h-4" />
+        <div className="lg:col-span-8 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="p-1.5 bg-gradient-to-tr from-amber-500 to-orange-500 text-white rounded-lg shadow-xs shrink-0">
+                <Award className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <h3 className="font-display font-black text-slate-900 text-sm sm:text-base">
+              <div className="min-w-0">
+                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
                   Top Academic Performers (Overall Index)
                 </h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  Ranked by combined exam score %, attendance consistency, and homework completion
+                <p className="text-[10px] sm:text-[10.5px] text-slate-500 font-medium truncate">
+                  Ranked by combined exam score %, attendance consistency, and HW
                 </p>
               </div>
             </div>
             <Link
               href="/admin/students"
-              className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
+              className="text-[10px] sm:text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5 shrink-0"
             >
-              <span>Manage All Students</span>
+              <span>Manage All</span>
               <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {topStudentsLeaderboard.length > 0 ? (
               topStudentsLeaderboard.map((student, idx) => (
                 <div
                   key={student.sid}
                   onClick={() => onSelectStudent(student.sid)}
-                  className="p-2.5 sm:p-3 bg-gradient-to-r from-slate-50 via-white to-indigo-50/40 border border-slate-200/80 hover:border-indigo-300 hover:shadow-xs rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition-all group"
+                  className="p-2 bg-gradient-to-r from-slate-50 via-white to-indigo-50/40 border border-slate-200/80 hover:border-indigo-300 hover:shadow-xs rounded-xl flex items-center justify-between gap-2 cursor-pointer transition-all group min-w-0"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0">
                     <div
-                      className={`w-7 h-7 rounded-xl flex items-center justify-center font-mono font-black text-xs shrink-0 shadow-2xs ${
+                      className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-black text-[11px] shrink-0 shadow-2xs ${
                         idx === 0
-                          ? 'bg-amber-400 text-amber-950 ring-2 ring-amber-300'
+                          ? 'bg-amber-400 text-amber-950 ring-1 ring-amber-300'
                           : idx === 1
                           ? 'bg-slate-300 text-slate-900'
                           : idx === 2
@@ -1481,36 +1421,36 @@ export default function AdminPortal({
                         <span className="text-xs sm:text-sm font-black text-slate-900 truncate group-hover:text-indigo-600 transition-colors">
                           {student.name}
                         </span>
-                        <span className="text-[10px] font-mono font-bold bg-indigo-100 text-indigo-800 border border-indigo-200 px-1.5 py-0.2 rounded">
+                        <span className="text-[9px] font-mono font-bold bg-indigo-100 text-indigo-800 border border-indigo-200 px-1 py-0.1 rounded">
                           {student.sid}
                         </span>
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.2 rounded">
+                        <span className="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-1 py-0.1 rounded truncate">
                           {formatBatch(student.hscBatch, 'N/A')}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                      <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
                         🎓 {student.college || 'College N/A'} • 📚 {student.subject || 'General'}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 sm:gap-3 shrink-0 text-right">
+                  <div className="flex items-center gap-2 shrink-0 text-right">
                     <div className="hidden sm:block">
-                      <span className="text-[9px] font-mono text-slate-400 uppercase block">Exams</span>
+                      <span className="text-[8.5px] font-mono text-slate-400 uppercase block">Exams</span>
                       <span className="text-xs font-black font-mono text-slate-800">
                         {student.examAvg !== null ? `${student.examAvg}%` : '—'}
                       </span>
                     </div>
 
                     <div className="hidden sm:block">
-                      <span className="text-[9px] font-mono text-slate-400 uppercase block">Attendance</span>
+                      <span className="text-[8.5px] font-mono text-slate-400 uppercase block">Attendance</span>
                       <span className="text-xs font-black font-mono text-slate-800">
                         {student.attendanceRate !== null ? `${student.attendanceRate}%` : '—'}
                       </span>
                     </div>
 
-                    <div className="p-1.5 sm:px-2.5 sm:py-1 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-700 text-white shadow-2xs flex flex-col items-center justify-center">
-                      <span className="text-[8px] font-mono uppercase tracking-wider text-indigo-200 hidden sm:block">
+                    <div className="px-2 py-0.5 rounded-lg bg-gradient-to-tr from-indigo-600 to-indigo-700 text-white shadow-2xs flex flex-col items-center justify-center">
+                      <span className="text-[7.5px] font-mono uppercase tracking-wider text-indigo-200 hidden sm:block">
                         Index
                       </span>
                       <span className="text-xs sm:text-sm font-black font-mono leading-none">
@@ -1521,60 +1461,60 @@ export default function AdminPortal({
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-400 py-6 text-center">No student performance metrics</p>
+              <p className="text-xs text-slate-400 py-4 text-center">No student performance metrics</p>
             )}
           </div>
         </div>
 
         {/* Actionable Insights & Operations Hub */}
-        <div className="lg:col-span-4 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white rounded-3xl p-4 sm:p-5 shadow-md flex flex-col justify-between space-y-4">
-          <div className="space-y-3">
+        <div className="lg:col-span-4 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-md flex flex-col justify-between space-y-3 w-full min-w-0 overflow-hidden">
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-indigo-500 text-white rounded-xl shadow-xs">
-                <Zap className="w-4 h-4 text-amber-300" />
+              <div className="p-1.5 bg-indigo-500 text-white rounded-lg shadow-xs shrink-0">
+                <Zap className="w-3.5 h-3.5 text-amber-300" />
               </div>
-              <h3 className="font-display font-black text-white text-base">
+              <h3 className="font-display font-black text-white text-xs sm:text-sm">
                 Operational Insights
               </h3>
             </div>
 
-            <div className="space-y-2.5 text-xs text-indigo-100">
-              <div className="p-2.5 rounded-2xl bg-white/10 border border-white/10 space-y-1 backdrop-blur-xs">
-                <div className="flex items-center justify-between text-[11px] font-black text-amber-300">
+            <div className="space-y-2 text-xs text-indigo-100">
+              <div className="p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 backdrop-blur-xs">
+                <div className="flex items-center justify-between text-[10.5px] font-black text-amber-300">
                   <span className="flex items-center gap-1">
-                    <Target className="w-3.5 h-3.5" />
+                    <Target className="w-3 h-3" />
                     Overall Academic Health
                   </span>
                   <span>{examStats.avgScorePct >= 70 ? 'Optimal' : 'Attention'}</span>
                 </div>
-                <p className="text-[11px] text-slate-300 leading-snug">
-                  Average exam score is currently at <strong className="text-white">{examStats.avgScorePct}%</strong> with a lesson attendance rate of <strong className="text-white">{lessonStats.attendanceRate}%</strong>.
+                <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-snug">
+                  Average exam score is <strong className="text-white">{examStats.avgScorePct}%</strong> with lesson attendance at <strong className="text-white">{lessonStats.attendanceRate}%</strong>.
                 </p>
               </div>
 
-              <div className="p-2.5 rounded-2xl bg-white/10 border border-white/10 space-y-1 backdrop-blur-xs">
-                <div className="flex items-center justify-between text-[11px] font-black text-emerald-300">
+              <div className="p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 backdrop-blur-xs">
+                <div className="flex items-center justify-between text-[10.5px] font-black text-emerald-300">
                   <span className="flex items-center gap-1">
-                    <Banknote className="w-3.5 h-3.5" />
+                    <Banknote className="w-3 h-3" />
                     Cashflow Stability
                   </span>
                   <span>৳{totalRevenue.toLocaleString()}</span>
                 </div>
-                <p className="text-[11px] text-slate-300 leading-snug">
-                  Total of <strong className="text-white">{filteredPayments.length}</strong> tuition receipts recorded across <strong className="text-white">{uniqueBatches.length}</strong> active student batches.
+                <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-snug">
+                  <strong className="text-white">{filteredPayments.length}</strong> tuition receipts recorded across <strong className="text-white">{uniqueBatches.length}</strong> active batches.
                 </p>
               </div>
 
-              <div className="p-2.5 rounded-2xl bg-white/10 border border-white/10 space-y-1 backdrop-blur-xs">
-                <div className="flex items-center justify-between text-[11px] font-black text-sky-300">
+              <div className="p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 backdrop-blur-xs">
+                <div className="flex items-center justify-between text-[10.5px] font-black text-sky-300">
                   <span className="flex items-center gap-1">
-                    <BookOpen className="w-3.5 h-3.5" />
+                    <BookOpen className="w-3 h-3" />
                     Continuous HW Completion
                   </span>
                   <span>{lessonStats.avgHwMarks}/10</span>
                 </div>
-                <p className="text-[11px] text-slate-300 leading-snug">
-                  Homework average across {lessonStats.totalLessons} recorded classroom sessions is <strong className="text-white">{lessonStats.avgHwMarks}</strong> out of 10.
+                <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-snug">
+                  Homework average across {lessonStats.totalLessons} recorded classroom sessions is <strong className="text-white">{lessonStats.avgHwMarks}/10</strong>.
                 </p>
               </div>
             </div>
@@ -1583,10 +1523,10 @@ export default function AdminPortal({
           <div className="pt-2 border-t border-indigo-800/80">
             <Link
               href="/admin/students"
-              className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95"
+              className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-[11px] sm:text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95"
             >
               <span>Enroll &amp; Manage Students</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
