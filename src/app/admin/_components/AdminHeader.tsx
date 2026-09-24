@@ -15,7 +15,7 @@ export default function AdminHeader() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [pendingCount, setPendingCount] = useState<number>(0);
-  const [isNavOpen, setIsNavOpen] = useState<boolean>(true);
+  const [isNavOpen, setIsNavOpen] = useState<boolean>(false);
   const pathname = usePathname();
   const { logout, user } = useAuth();
 
