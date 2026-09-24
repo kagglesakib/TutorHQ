@@ -218,9 +218,9 @@ export default function LessonsTracker({
       />
 
       {/* 2. Search, Filter & View Mode Controls */}
-      <div className="bg-gradient-to-r from-indigo-50/90 via-sky-50/70 to-emerald-50/80 p-3 sm:p-3.5 rounded-2xl border-2 border-indigo-200/90 shadow-[0_4px_20px_-4px_rgba(79,70,229,0.14)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 sm:gap-3 transition-all">
-        {/* Search Input */}
-        <div className="flex-1 relative min-w-0">
+      <div className="bg-gradient-to-r from-indigo-50/90 via-sky-50/70 to-emerald-50/80 p-3 sm:p-3.5 rounded-2xl border-2 border-indigo-200/90 shadow-[0_4px_20px_-4px_rgba(79,70,229,0.14)] space-y-2.5 sm:space-y-3 transition-all">
+        {/* Search Input - Full Width */}
+        <div className="relative min-w-0">
           <div className="relative flex items-center bg-white border-2 border-indigo-200/90 focus-within:border-indigo-600 focus-within:ring-3 focus-within:ring-indigo-500/20 rounded-xl px-2.5 py-1.5 shadow-2xs transition-all">
             <div className="p-1 bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-lg shrink-0 mr-2 shadow-2xs">
               <Search className="w-3.5 h-3.5" />
@@ -245,73 +245,76 @@ export default function LessonsTracker({
           </div>
         </div>
 
-        {/* Filter, Sort & View Controls */}
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-between md:justify-end w-full md:w-auto min-w-0">
-          {/* Status Filter Segment */}
-          <div className="flex items-center bg-white/95 p-1 rounded-xl border border-indigo-200/90 shadow-2xs gap-1 flex-1 sm:flex-initial max-w-full overflow-x-auto no-scrollbar">
-            <button
-              type="button"
-              onClick={() => setFilterStatus('All')}
-              className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shrink-0 ${
-                filterStatus === 'All'
-                  ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-[0_2px_8px_rgba(79,70,229,0.35)]'
-                  : 'text-indigo-900/80 hover:text-indigo-950 hover:bg-indigo-50/80'
+        {/* Status Filter Segment - Full Width 3-Column Grid */}
+        <div className="grid grid-cols-3 bg-white/95 p-1 rounded-xl border border-indigo-200/90 shadow-2xs gap-1 w-full">
+          <button
+            type="button"
+            onClick={() => setFilterStatus('All')}
+            className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
+              filterStatus === 'All'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-[0_2px_8px_rgba(79,70,229,0.35)]'
+                : 'text-indigo-900/80 hover:text-indigo-950 hover:bg-indigo-50/80'
+            }`}
+          >
+            <Sparkles className={`w-3 h-3 shrink-0 ${filterStatus === 'All' ? 'text-amber-300' : 'text-indigo-500'}`} />
+            <span>All</span>
+            <span
+              className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
+                filterStatus === 'All' ? 'bg-indigo-800/80 text-white' : 'bg-indigo-100 text-indigo-800'
               }`}
             >
-              <Sparkles className={`w-3 h-3 shrink-0 ${filterStatus === 'All' ? 'text-amber-300' : 'text-indigo-500'}`} />
-              <span>All</span>
-              <span
-                className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
-                  filterStatus === 'All' ? 'bg-indigo-800/80 text-white' : 'bg-indigo-100 text-indigo-800'
-                }`}
-              >
-                {activities.length}
-              </span>
-            </button>
+              {activities.length}
+            </span>
+          </button>
 
-            <button
-              type="button"
-              onClick={() => setFilterStatus('Present')}
-              className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shrink-0 ${
-                filterStatus === 'Present'
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[0_2px_8px_rgba(16,185,129,0.35)]'
-                  : 'text-emerald-800 hover:text-emerald-950 hover:bg-emerald-50/80'
+          <button
+            type="button"
+            onClick={() => setFilterStatus('Present')}
+            className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
+              filterStatus === 'Present'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[0_2px_8px_rgba(16,185,129,0.35)]'
+                : 'text-emerald-800 hover:text-emerald-950 hover:bg-emerald-50/80'
+            }`}
+          >
+            <CheckCircle2 className={`w-3 h-3 shrink-0 ${filterStatus === 'Present' ? 'text-emerald-200' : 'text-emerald-500'}`} />
+            <span>Present</span>
+            <span
+              className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
+                filterStatus === 'Present' ? 'bg-emerald-700/80 text-white' : 'bg-emerald-100 text-emerald-800'
               }`}
             >
-              <CheckCircle2 className={`w-3 h-3 shrink-0 ${filterStatus === 'Present' ? 'text-emerald-200' : 'text-emerald-500'}`} />
-              <span>Present</span>
-              <span
-                className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
-                  filterStatus === 'Present' ? 'bg-emerald-700/80 text-white' : 'bg-emerald-100 text-emerald-800'
-                }`}
-              >
-                {activities.filter((a) => a.status !== 'Absent').length}
-              </span>
-            </button>
+              {activities.filter((a) => a.status !== 'Absent').length}
+            </span>
+          </button>
 
-            <button
-              type="button"
-              onClick={() => setFilterStatus('Absent')}
-              className={`flex-1 sm:flex-initial px-2.5 sm:px-3 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 shrink-0 ${
-                filterStatus === 'Absent'
-                  ? 'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-[0_2px_8px_rgba(244,63,94,0.35)]'
-                  : 'text-rose-800 hover:text-rose-950 hover:bg-rose-50/80'
+          <button
+            type="button"
+            onClick={() => setFilterStatus('Absent')}
+            className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
+              filterStatus === 'Absent'
+                ? 'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-[0_2px_8px_rgba(244,63,94,0.35)]'
+                : 'text-rose-800 hover:text-rose-950 hover:bg-rose-50/80'
+            }`}
+          >
+            <XCircle className={`w-3 h-3 shrink-0 ${filterStatus === 'Absent' ? 'text-rose-200' : 'text-rose-500'}`} />
+            <span>Absent</span>
+            <span
+              className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
+                filterStatus === 'Absent' ? 'bg-rose-700/80 text-white' : 'bg-rose-100 text-rose-800'
               }`}
             >
-              <XCircle className={`w-3 h-3 shrink-0 ${filterStatus === 'Absent' ? 'text-rose-200' : 'text-rose-500'}`} />
-              <span>Absent</span>
-              <span
-                className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
-                  filterStatus === 'Absent' ? 'bg-rose-700/80 text-white' : 'bg-rose-100 text-rose-800'
-                }`}
-              >
-                {activities.filter((a) => a.status === 'Absent').length}
-              </span>
-            </button>
-          </div>
+              {activities.filter((a) => a.status === 'Absent').length}
+            </span>
+          </button>
+        </div>
 
-          {/* Group Sort + View Switcher to ensure no overflow */}
-          <div className="flex items-center gap-1.5 shrink-0">
+        {/* Sort Controls & View Switcher Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-indigo-200/80 text-xs">
+          <span className="text-[10px] font-bold text-indigo-950 font-mono bg-white/90 border border-indigo-200/90 px-2 py-0.5 rounded-md shadow-2xs self-start sm:self-auto">
+            Showing {sortedActivities.length} of {activities.length} lesson records
+          </span>
+
+          <div className="flex items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto">
             {/* Sort Selector */}
             <div className="flex items-center gap-1.5 bg-white/95 px-2.5 py-1 rounded-xl border border-indigo-200/90 shadow-2xs shrink-0">
               <div className="p-1 bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-md shadow-2xs">
