@@ -1,230 +1,309 @@
-import { getMongoDb } from './db';
+import { ObjectId } from 'mongodb';
+import { getMongoDb, sanitizeDate, sanitizeDateString } from './db';
 import { Student } from '../types';
 
-export async function getStudents(): Promise<Student[]> {
-  const mongoDb = await getMongoDb();
-  const students = await mongoDb.collection<Student>('students').find({}, { projection: { _id: 0 } }).toArray();
-  const userlogs = await mongoDb.collection('userlogdatas').find({}, { projection: { _id: 0 } }).toArray();
-
-  const userlogMapBySid = new Map<string, any>();
-  const userlogMapByEmail = new Map<string, any>();
-
-  userlogs.forEach((u) => {
-    if (u.sid) {
-      userlogMapBySid.set(String(u.sid).trim().toUpperCase(), u);
-    }
-    if (u.email) {
-      userlogMapByEmail.set(String(u.email).trim().toLowerCase(), u);
-    }
-  });
-
-  // Enrich students with email, approval status, & contact info from userlogdatas if missing
-  const enrichedStudents: Student[] = students.map((s) => {
-    const sSid = String(s.sid || '').trim().toUpperCase();
-    const sEmail = String(s.email || '').trim().toLowerCase();
-    const matchedLog = userlogMapBySid.get(sSid) || userlogMapByEmail.get(sEmail);
-
-    const logApproval = matchedLog?.isApproved;
-    const isApproved = (logApproval === 'disapproved' || logApproval === 'no' || (s as any).isApproved === 'no')
-      ? 'no'
-      : (logApproval || (s as any).isApproved || 'yes');
-    const status = isApproved === 'no' ? 'revoked' : (isApproved === 'pending' ? 'pending' : 'active');
-
-    return {
-      ...s,
-      email: s.email || matchedLog?.email || '',
-      mobile: s.mobile || matchedLog?.mobile || matchedLog?.phone || '',
-      college: s.college || matchedLog?.college || '',
-      address: s.address || matchedLog?.address || '',
-      isApproved,
-      status,
-    };
-  });
-
-  // Include approved/registered student accounts from userlogdatas if not present in students collection
-  userlogs.forEach((u) => {
-    if (u.sid && u.userType === 'student') {
-      const uSid = String(u.sid).trim().toUpperCase();
-      const exists = enrichedStudents.some((es) => String(es.sid).trim().toUpperCase() === uSid);
-      if (!exists) {
-        const logApproval = u.isApproved;
-        const isApproved = (logApproval === 'disapproved' || logApproval === 'no') ? 'no' : (logApproval || 'pending');
-        const status = isApproved === 'no' ? 'revoked' : (isApproved === 'pending' ? 'pending' : 'active');
-
-        enrichedStudents.push({
-          sid: u.sid,
-          name: u.name || 'Student',
-          email: u.email || '',
-          mobile: u.mobile || u.phone || '',
-          college: u.college || '',
-          hscBatch: u.hscBatch || '',
-          subject: u.subject || '',
-          group: u.group || '',
-          guardiansPhone: u.guardiansPhone || '',
-          address: u.address || '',
-          createdAt: u.createdAt || new Date().toISOString(),
-          isApproved,
-          status,
-        });
-      }
-    }
-  });
-
-  return enrichedStudents;
+function escapeRegex(str: string) {
+  return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
-export async function createStudent(data: Student): Promise<Student> {
-  const { sid, name, college, hscBatch, subject, group, mobile, guardiansPhone, address, email } = data;
+export function isAdminUser(user: any): boolean {
+  if (!user) return false;
+  if (user.userType === 'admin') return true;
+  const sid = String(user.sid || '').trim().toUpperCase();
+  if (sid === 'ADMIN' || sid === '0000000' || sid === '0') return true;
+  const email = String(user.email || '').trim().toLowerCase();
+  if (
+    email === 'sakib1514817122@gmail.com' ||
+    email === 'sakibhasan.office@gmail.com' ||
+    email === 'kagglesakib@gmail.com'
+  ) {
+    return true;
+  }
+  const name = String(user.name || '').trim().toLowerCase();
+  if (name === 'sakibul hasan' || name.includes('sakibul hasan') || name === 'admin') {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Maps a database student document to standard Student interface with UI-compatibility aliases
+ */
+export function formatStudentDoc(s: any): Student {
+  const status: 'active' | 'revoked' | 'pending' = 
+    s.status === 'revoked' || s.status === 'pending' || s.status === 'active'
+      ? s.status
+      : (s.approved === 'no' || s.isApproved === 'no' || s.approved === 'disapproved' || s.isApproved === 'disapproved'
+        ? 'revoked'
+        : (s.approved === 'pending' || s.isApproved === 'pending' ? 'pending' : 'active'));
+
+  const approvalVal: 'yes' | 'no' | 'pending' = 
+    status === 'revoked' ? 'no' : (status === 'pending' ? 'pending' : 'yes');
+
+  const phone = (s.phone || s.mobile || '').trim();
+
+  return {
+    _id: s._id ? String(s._id) : undefined,
+    sid: s.sid || '',
+    name: s.name || 'Student',
+    email: (s.email || '').trim().toLowerCase(),
+    phone,
+    mobile: phone, // alias
+    status,
+    approved: approvalVal, // alias
+    isApproved: approvalVal, // alias
+    college: s.college || '',
+    hscBatch: s.hscBatch || '',
+    group: s.group || '',
+    subject: s.subject || '',
+    guardiansPhone: s.guardiansPhone || '',
+    address: s.address || '',
+    createdAt: s.createdAt ? sanitizeDateString(s.createdAt) : new Date().toISOString(),
+    updatedAt: s.updatedAt ? sanitizeDateString(s.updatedAt) : undefined,
+    userType: 'student',
+  };
+}
+
+/**
+ * Returns all active and pending students (excludes admin accounts)
+ */
+export async function getStudents(): Promise<Student[]> {
+  const mongoDb = await getMongoDb();
+  
+  const rawStudents = await mongoDb.collection('students')
+    .find(
+      {
+        sid: { $nin: ['ADMIN', 'admin', '0000000', '0'] },
+      },
+      { projection: { password: 0 } }
+    )
+    .sort({ sid: 1 })
+    .toArray();
+
+  return rawStudents
+    .filter((s) => !isAdminUser(s))
+    .map(formatStudentDoc);
+}
+
+/**
+ * Lookup single student by SID or ObjectId
+ */
+export async function getStudentBySid(sid: string): Promise<Student | null> {
+  const mongoDb = await getMongoDb();
+  const cleanSid = String(sid).trim();
+  const upperSid = cleanSid.toUpperCase();
+
+  const doc = await (mongoDb.collection('students') as any).findOne({
+    $or: [
+      { sid: cleanSid },
+      { sid: upperSid },
+      { _id: cleanSid },
+      { _id: upperSid },
+      { sid: { $regex: new RegExp(`^${escapeRegex(cleanSid)}$`, 'i') } },
+    ],
+  });
+
+  return doc ? formatStudentDoc(doc) : null;
+}
+
+export async function getStudentById(id: string | ObjectId): Promise<Student | null> {
+  const mongoDb = await getMongoDb();
+  let query: any = { _id: id };
+  if (typeof id === 'string' && ObjectId.isValid(id)) {
+    query = { $or: [{ _id: new ObjectId(id) }, { _id: id }] };
+  }
+
+  const doc = await mongoDb.collection('students').findOne(query);
+  return doc ? formatStudentDoc(doc) : null;
+}
+
+/**
+ * Create a new student in the normalized students collection
+ */
+export async function createStudent(data: Partial<Student>): Promise<Student> {
+  const { sid, name, email, password, phone, mobile, college, hscBatch, subject, group, guardiansPhone, address, status, approved, isApproved } = data;
   if (!sid || !name) {
     throw new Error('Student SID and Name are required');
   }
 
-  const mongoDb = await getMongoDb();
-  const cleanSid = String(sid).trim();
-  const upperSid = cleanSid.toUpperCase();
+  const cleanSid = String(sid).trim().toUpperCase();
+  const cleanEmail = email ? String(email).trim().toLowerCase() : '';
+  const cleanPhone = (phone || mobile || '').trim();
 
-  const existing = await mongoDb.collection('students').findOne({
-    $or: [{ sid: cleanSid }, { sid: upperSid }]
-  });
-  if (existing) {
-    throw new Error(`Student profile with SID ${sid} already exists.`);
+  if (isAdminUser({ sid: cleanSid, name, email: cleanEmail })) {
+    throw new Error('Cannot create student profile for administrator account.');
   }
 
-  const newStudent: Student = {
+  const mongoDb = await getMongoDb();
+
+  // Validate SID uniqueness in students collection
+  const existingBySid = await mongoDb.collection('students').findOne({
+    $or: [{ sid: cleanSid }, { sid: { $regex: new RegExp(`^${escapeRegex(cleanSid)}$`, 'i') } }],
+  });
+  if (existingBySid) {
+    throw new Error(`Student with SID '${cleanSid}' already exists.`);
+  }
+
+  // Validate Email uniqueness in students collection if provided
+  if (cleanEmail) {
+    const existingByEmail = await mongoDb.collection('students').findOne({ email: cleanEmail });
+    if (existingByEmail) {
+      throw new Error(`Student with email '${cleanEmail}' already exists.`);
+    }
+  }
+
+  let finalStatus: 'active' | 'revoked' | 'pending' = status || 'active';
+  const reqApproval: any = approved ?? isApproved;
+  if (reqApproval === 'no' || reqApproval === 'disapproved' || reqApproval === 'rejected' || reqApproval === false) {
+    finalStatus = 'revoked';
+  } else if (reqApproval === 'pending') {
+    finalStatus = 'pending';
+  }
+
+  const newStudentDoc: any = {
+    _id: cleanSid,
     sid: cleanSid,
-    name,
+    name: name.trim(),
+    email: cleanEmail,
+    password: password || 'student123', // plaintext per instructions
+    phone: cleanPhone,
+    status: finalStatus,
+    isApproved: finalStatus === 'active',
     college: college || '',
     hscBatch: hscBatch || '',
-    subject: subject || '',
     group: group || '',
-    mobile: mobile || '',
+    subject: subject || '',
     guardiansPhone: guardiansPhone || '',
     address: address || '',
-    email: email ? String(email).trim().toLowerCase() : '',
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
-  await mongoDb.collection('students').insertOne(newStudent);
+  await mongoDb.collection('students').insertOne(newStudentDoc);
 
-  // Sync to userlogdatas if matching user exists
-  if (newStudent.email || cleanSid) {
-    const userlogQuery: any[] = [{ sid: cleanSid }, { sid: upperSid }];
-    if (newStudent.email) userlogQuery.push({ email: newStudent.email });
-
-    await mongoDb.collection('userlogdatas').updateMany(
-      { $or: userlogQuery },
-      {
-        $set: {
-          sid: cleanSid,
-          college: newStudent.college,
-          mobile: newStudent.mobile,
-          address: newStudent.address,
-        }
-      }
-    );
-  }
-
-  return newStudent;
+  return formatStudentDoc(newStudentDoc);
 }
 
+/**
+ * Update student profile in normalized students collection
+ */
 export async function updateStudent(sid: string, data: Partial<Student>): Promise<Student> {
-  const { name, college, hscBatch, subject, group, mobile, guardiansPhone, address, email } = data;
-  const mongoDb = await getMongoDb();
-  const cleanSid = String(sid).trim();
-  const upperSid = cleanSid.toUpperCase();
+  const { name, college, hscBatch, subject, group, phone, mobile, guardiansPhone, address, email, password, status, approved, isApproved } = data;
+  const cleanSid = String(sid).trim().toUpperCase();
 
-  const updateFields: any = {};
-  if (name !== undefined) updateFields.name = name;
+  if (isAdminUser({ sid: cleanSid, name, email })) {
+    throw new Error('Cannot update administrator account via student endpoint.');
+  }
+
+  const mongoDb = await getMongoDb();
+  const studentsCol = mongoDb.collection('students');
+
+  const updateFields: any = { updatedAt: new Date() };
+  if (name !== undefined) updateFields.name = String(name).trim();
   if (college !== undefined) updateFields.college = college || '';
   if (hscBatch !== undefined) updateFields.hscBatch = hscBatch || '';
   if (subject !== undefined) updateFields.subject = subject || '';
   if (group !== undefined) updateFields.group = group || '';
-  if (mobile !== undefined) updateFields.mobile = mobile || '';
+  if (phone !== undefined || mobile !== undefined) {
+    updateFields.phone = (phone || mobile || '').trim();
+  }
   if (guardiansPhone !== undefined) updateFields.guardiansPhone = guardiansPhone || '';
   if (address !== undefined) updateFields.address = address || '';
-  if (email !== undefined) updateFields.email = email ? String(email).trim().toLowerCase() : '';
+  if (email !== undefined) updateFields.email = String(email).trim().toLowerCase();
+  if (password !== undefined) updateFields.password = password;
 
-  let result = await mongoDb.collection<Student>('students').findOneAndUpdate(
-    { $or: [{ sid: cleanSid }, { sid: upperSid }] },
-    { $set: updateFields },
-    { returnDocument: 'after', projection: { _id: 0 } }
-  );
-
-  // Sync update to userlogdatas collection
-  const userlogUpdate: any = {};
-  if (email !== undefined && email) userlogUpdate.email = String(email).trim().toLowerCase();
-  if (mobile !== undefined) userlogUpdate.mobile = mobile;
-  if (college !== undefined) userlogUpdate.college = college;
-  if (address !== undefined) userlogUpdate.address = address;
-  if (name !== undefined) userlogUpdate.name = name;
-
-  if (Object.keys(userlogUpdate).length > 0) {
-    const userlogCriteria: any[] = [{ sid: cleanSid }, { sid: upperSid }];
-    if (updateFields.email) userlogCriteria.push({ email: updateFields.email });
-
-    await mongoDb.collection('userlogdatas').updateMany(
-      { $or: userlogCriteria },
-      { $set: userlogUpdate }
-    );
+  const reqStatus = status;
+  const reqApproval: any = approved !== undefined ? approved : isApproved;
+  if (reqStatus !== undefined) {
+    updateFields.status = reqStatus;
+  } else if (reqApproval !== undefined) {
+    if (reqApproval === 'no' || reqApproval === 'disapproved' || reqApproval === 'rejected' || reqApproval === false) {
+      updateFields.status = 'revoked';
+    } else if (reqApproval === 'pending') {
+      updateFields.status = 'pending';
+    } else {
+      updateFields.status = 'active';
+    }
   }
 
+  if (updateFields.status !== undefined) {
+    updateFields.isApproved = updateFields.status === 'active';
+  }
+
+  let result = await (studentsCol as any).findOneAndUpdate(
+    {
+      $or: [
+        { sid: cleanSid },
+        { _id: cleanSid },
+        { sid: { $regex: new RegExp(`^${escapeRegex(cleanSid)}$`, 'i') } }
+      ]
+    },
+    { $set: updateFields },
+    { returnDocument: 'after' }
+  );
+
   if (!result) {
-    // Upsert into students collection if not created previously
-    const newStudent: Student = {
+    // Upsert if missing
+    const newDoc: any = {
+      _id: cleanSid,
       sid: cleanSid,
       name: name || 'Student',
+      email: email ? String(email).trim().toLowerCase() : '',
+      phone: (phone || mobile || '').trim(),
+      password: password || 'student123',
+      status: updateFields.status || 'active',
+      isApproved: (updateFields.status || 'active') === 'active',
       college: college || '',
       hscBatch: hscBatch || '',
       subject: subject || '',
       group: group || '',
-      mobile: mobile || '',
       guardiansPhone: guardiansPhone || '',
       address: address || '',
-      email: email ? String(email).trim().toLowerCase() : '',
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
-    await mongoDb.collection('students').insertOne(newStudent);
-    return newStudent;
+    await studentsCol.insertOne(newDoc);
+    return formatStudentDoc(newDoc);
   }
 
-  return result as Student;
+  return formatStudentDoc(result);
 }
 
+/**
+ * Delete student and cascade delete activities, exams, and payments referencing their ObjectId or SID
+ */
 export async function deleteStudent(sid: string): Promise<boolean> {
   const mongoDb = await getMongoDb();
-  const cleanSid = String(sid).trim();
-  const upperSid = cleanSid.toUpperCase();
+  const cleanSid = String(sid).trim().toUpperCase();
 
-  // Find student doc to get email if available
-  const studentDoc = await mongoDb.collection('students').findOne({
-    $or: [{ sid: cleanSid }, { sid: upperSid }]
+  // Find student doc to get ObjectId
+  const student = await mongoDb.collection('students').findOne({
+    $or: [
+      { sid: cleanSid },
+      { sid: { $regex: new RegExp(`^${escapeRegex(cleanSid)}$`, 'i') } }
+    ]
   });
 
-  const studentEmail = studentDoc?.email ? String(studentDoc.email).trim().toLowerCase() : null;
+  const studentObjId = student?._id;
 
-  // Delete all related activity, exam, and payment records
-  await mongoDb.collection('activities').deleteMany({
-    $or: [{ studentSid: cleanSid }, { studentSid: upperSid }]
-  });
-  await mongoDb.collection('exams').deleteMany({
-    $or: [{ studentSid: cleanSid }, { studentSid: upperSid }]
-  });
-  await mongoDb.collection('payments').deleteMany({
-    $or: [{ studentSid: cleanSid }, { studentSid: upperSid }]
-  });
-
-  // Delete account from userlogdatas
-  if (studentEmail) {
-    await mongoDb.collection('userlogdatas').deleteOne({ email: studentEmail });
+  // Delete all referencing activity, exam, and payment records by ObjectId FK or SID
+  const refClauses: any[] = [{ studentSid: cleanSid }];
+  if (studentObjId) {
+    refClauses.push({ studentId: studentObjId });
+    refClauses.push({ studentId: String(studentObjId) });
   }
-  await mongoDb.collection('userlogdatas').deleteMany({
-    $or: [{ sid: cleanSid }, { sid: upperSid }]
-  });
 
-  // Delete student profile from students
-  await mongoDb.collection('students').deleteOne({
-    $or: [{ sid: cleanSid }, { sid: upperSid }]
-  });
+  await Promise.allSettled([
+    mongoDb.collection('activities').deleteMany({ $or: refClauses }),
+    mongoDb.collection('exams').deleteMany({ $or: refClauses }),
+    mongoDb.collection('payments').deleteMany({ $or: refClauses }),
+    mongoDb.collection('students').deleteOne({
+      $or: [
+        { sid: cleanSid },
+        ...(studentObjId ? [{ _id: studentObjId }] : []),
+      ]
+    }),
+  ]);
 
   return true;
 }

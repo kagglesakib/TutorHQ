@@ -55,41 +55,78 @@ export async function POST(req: NextRequest) {
     }
 
     const db = await getMongoDb();
-    const userlogCollection = db.collection('userlogdatas');
+    const adminsCol = db.collection('admins');
+    const studentsCol = db.collection('students');
 
-    // Find user record in userlogdatas by SID or Email
-    const queryConditions: any[] = [];
+    const isAdmin = session?.userType === 'admin' || userSid.toUpperCase() === 'ADMIN' || userEmail.toLowerCase() === 'sakib1514817122@gmail.com';
+
+    if (isAdmin) {
+      const admin = await adminsCol.findOne({
+        $or: [
+          { email: userEmail.toLowerCase() },
+          { email: 'sakib1514817122@gmail.com' },
+        ],
+      });
+
+      if (!admin) {
+        return NextResponse.json({ error: 'Admin account record not found.' }, { status: 404 });
+      }
+
+      if (admin.password !== cleanOldPass) {
+        return NextResponse.json(
+          { error: 'Current (old) password is incorrect. Please try again.' },
+          { status: 400 }
+        );
+      }
+
+      await adminsCol.updateOne(
+        { _id: admin._id },
+        {
+          $set: {
+            password: cleanNewPass,
+            updatedAt: new Date(),
+          },
+        }
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: 'Admin password changed successfully!',
+      });
+    }
+
+    // Student password change
+    const studentQuery: any[] = [];
     if (userSid) {
-      queryConditions.push({ sid: { $regex: new RegExp(`^${escapeRegex(userSid)}$`, 'i') } });
+      studentQuery.push({ sid: userSid.toUpperCase() });
+      studentQuery.push({ sid: { $regex: new RegExp(`^${escapeRegex(userSid)}$`, 'i') } });
     }
     if (userEmail) {
-      queryConditions.push({ email: userEmail.toLowerCase() });
+      studentQuery.push({ email: userEmail.toLowerCase() });
     }
 
-    let userlog = await userlogCollection.findOne({ $or: queryConditions });
+    const student = await studentsCol.findOne({ $or: studentQuery });
 
-    if (!userlog) {
+    if (!student) {
       return NextResponse.json(
-        { error: 'User account record not found.' },
+        { error: 'Student account record not found.' },
         { status: 404 }
       );
     }
 
-    // Verify Old Password
-    if (userlog.password !== cleanOldPass) {
+    if (student.password !== cleanOldPass) {
       return NextResponse.json(
         { error: 'Current (old) password is incorrect. Please try again.' },
         { status: 400 }
       );
     }
 
-    // Update password in userlogdatas
-    await userlogCollection.updateOne(
-      { _id: userlog._id },
+    await studentsCol.updateOne(
+      { _id: student._id },
       {
         $set: {
           password: cleanNewPass,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date(),
         },
       }
     );

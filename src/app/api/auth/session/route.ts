@@ -18,6 +18,14 @@ export async function GET(req: NextRequest) {
 
     const timeLeftMs = Math.max(0, session.expiresAt - Date.now());
 
+    const rawStatus = (session.approved ?? session.isApproved) as any;
+    const approved: 'yes' | 'no' | 'pending' = 
+      rawStatus === 'yes' || rawStatus === 'approved' || rawStatus === true || session.userType === 'admin'
+        ? 'yes'
+        : rawStatus === 'no' || rawStatus === 'rejected' || rawStatus === 'disapproved' || rawStatus === false
+        ? 'no'
+        : 'pending';
+
     return NextResponse.json({
       authenticated: true,
       user: {
@@ -26,7 +34,8 @@ export async function GET(req: NextRequest) {
         phone: session.phone,
         sid: session.sid || '',
         userType: session.userType || 'admin',
-        isApproved: session.isApproved || 'yes',
+        approved,
+        isApproved: approved,
       },
       expiresAt: session.expiresAt,
       timeLeftMs,

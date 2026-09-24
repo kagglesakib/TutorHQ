@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Student, Activity } from '@/types';
+import { isActiveEnrolledStudent } from '@/utils/studentFilters';
 import {
   BookOpen,
   Search,
@@ -24,7 +25,13 @@ import {
   Sparkles,
   ChevronDown,
   MessageSquare,
-  FileText
+  FileText,
+  ClipboardList,
+  Flame,
+  Star,
+  Hash,
+  ArrowRight,
+  TrendingUp
 } from 'lucide-react';
 import { formatAid } from '@/utils/id';
 import LogDailyLessonModal from './LogDailyLessonModal';
@@ -60,7 +67,7 @@ export default function GlobalTrackingList({
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
 
   const studentMap = useMemo(() => new Map(students.map(s => [s.sid, s])), [students]);
-  const activeStudents = useMemo(() => students.filter(s => s.isApproved !== 'no' && s.status !== 'revoked'), [students]);
+  const activeStudents = useMemo(() => students.filter(isActiveEnrolledStudent), [students]);
 
   // Extract unique available months for quick filtering (e.g. "2026-03")
   const availableMonths = useMemo(() => {
@@ -978,103 +985,174 @@ export default function GlobalTrackingList({
                 );
               }
 
+              const isPresent = act.status === 'Present';
+              const hwNum = typeof act.hwMarks === 'number' ? act.hwMarks : (act.hwMarks !== undefined && act.hwMarks !== null && act.hwMarks !== 'null' ? Number(act.hwMarks) : null);
+              const cwNum = typeof act.cwMarks === 'number' ? act.cwMarks : (act.cwMarks !== undefined && act.cwMarks !== null && act.cwMarks !== 'null' ? Number(act.cwMarks) : null);
+              const isHwNull = hwNum === null || isNaN(hwNum);
+              const isCwNull = cwNum === null || isNaN(cwNum);
+
               return (
                 <div
                   key={act.aid}
-                  className={`rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between border-2 ${
-                    act.status === 'Present'
-                      ? 'bg-gradient-to-br from-emerald-50/70 via-teal-50/30 to-white border-emerald-200/90 hover:border-emerald-400'
-                      : 'bg-gradient-to-br from-rose-50/70 via-pink-50/30 to-white border-rose-200/90 hover:border-rose-400'
+                  className={`group relative rounded-2xl p-4 sm:p-4.5 space-y-3.5 transition-all duration-300 flex flex-col justify-between border-2 ${
+                    isPresent
+                      ? 'bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white border-emerald-300 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.18)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.32)] hover:border-emerald-500 hover:-translate-y-0.5'
+                      : 'bg-gradient-to-br from-rose-50/90 via-pink-50/40 to-white border-rose-300 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.18)] hover:shadow-[0_8px_30px_-4px_rgba(244,63,94,0.32)] hover:border-rose-500 hover:-translate-y-0.5'
                   }`}
                 >
-                  {/* Top Row: Student Avatar & Info + Status Pill */}
-                  <div className="flex items-start justify-between gap-2">
+                  {/* Subtle decorative glowing corner accent */}
+                  <div
+                    className={`absolute -top-1 -right-1 w-12 h-12 rounded-full blur-xl pointer-events-none opacity-40 transition-opacity group-hover:opacity-80 ${
+                      isPresent ? 'bg-emerald-400' : 'bg-rose-400'
+                    }`}
+                  />
+
+                  {/* Top Row: Student Avatar & Info + Glowing Status Pill */}
+                  <div className="flex items-start justify-between gap-2 relative z-10">
                     <button
                       type="button"
                       onClick={() => onSelectStudent(act.studentSid)}
-                      className="text-left group/cardbtn min-w-0 flex items-center gap-2.5 cursor-pointer"
+                      className="text-left group/cardbtn min-w-0 flex items-center gap-3 cursor-pointer"
                     >
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 border border-indigo-300 text-indigo-800 font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                        {(student?.name || act.studentSid).charAt(0).toUpperCase()}
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 border border-indigo-200 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(99,102,241,0.35)] group-hover/cardbtn:scale-105 transition-transform">
+                          {(student?.name || act.studentSid).charAt(0).toUpperCase()}
+                        </div>
+                        <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white flex items-center justify-center ${isPresent ? 'bg-emerald-500' : 'bg-rose-500'}`}>
+                          {isPresent ? <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> : <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </span>
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-slate-900 group-hover/cardbtn:text-indigo-700 transition-colors truncate text-xs sm:text-sm">
-                          {student?.name || act.studentSid}
+                        <p className="font-extrabold text-slate-900 group-hover/cardbtn:text-indigo-600 transition-colors truncate text-sm sm:text-[15px] flex items-center gap-1.5">
+                          <span>{student?.name || act.studentSid}</span>
                         </p>
-                        <span className="text-[10px] font-mono font-bold text-indigo-800 bg-indigo-100/90 border border-indigo-200 px-1.5 py-0.2 rounded shadow-2xs">
-                          SID: {act.studentSid}
-                        </span>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[10px] font-mono font-bold text-indigo-700 bg-indigo-100/90 border border-indigo-300/80 px-2 py-0.5 rounded-md shadow-2xs flex items-center gap-1">
+                            <Hash className="w-2.5 h-2.5 text-indigo-500" />
+                            <span>SID: {act.studentSid}</span>
+                          </span>
+                        </div>
                       </div>
                     </button>
 
                     <div className="shrink-0">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold border shadow-2xs ${
-                          act.status === 'Present'
-                            ? 'bg-emerald-100/90 text-emerald-950 border-emerald-300'
-                            : 'bg-rose-100/90 text-rose-950 border-rose-300'
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border shadow-xs tracking-wide transition-all ${
+                          isPresent
+                            ? 'bg-emerald-500 text-white border-emerald-400 shadow-[0_2px_10px_rgba(16,185,129,0.35)]'
+                            : 'bg-rose-500 text-white border-rose-400 shadow-[0_2px_10px_rgba(244,63,94,0.35)]'
                         }`}
                       >
-                        {act.status === 'Present' ? (
-                          <CheckCircle2 className="w-3 h-3 text-emerald-700 shrink-0" />
+                        {isPresent ? (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
                         ) : (
-                          <XCircle className="w-3 h-3 text-rose-700 shrink-0" />
+                          <XCircle className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
                         )}
                         <span>{act.status}</span>
                       </span>
                     </div>
                   </div>
 
-                  {/* Middle: Lesson Topic & Metadata - Indigo Light Background */}
-                  <div className="space-y-1.5 bg-indigo-50/80 border border-indigo-200/90 rounded-xl p-2.5">
-                    <p className="text-indigo-950 font-bold text-xs sm:text-[13px] leading-snug">
+                  {/* Middle: Lesson Topic & Metadata - Glowing Indigo Card */}
+                  <div className="space-y-2 bg-gradient-to-br from-indigo-50/90 via-sky-50/60 to-white border border-indigo-200/90 rounded-xl p-3 shadow-2xs group-hover:border-indigo-300 transition-colors relative z-10">
+                    <div className="flex items-center gap-1.5 text-[10px] font-mono font-extrabold text-indigo-700 uppercase tracking-wider">
+                      <BookOpen className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                      <span>Topic Covered</span>
+                    </div>
+                    <p className="text-slate-900 font-extrabold text-[13px] sm:text-sm leading-snug break-words">
                       {act.subjectTuitioned || 'General Tuition Session'}
                     </p>
-                    <div className="flex items-center gap-2 text-[10px] text-slate-600 font-mono flex-wrap">
-                      <span className="flex items-center gap-1 font-bold text-indigo-900">
+                    <div className="flex items-center gap-2 text-[10.5px] text-slate-600 font-mono flex-wrap pt-0.5">
+                      <span className="flex items-center gap-1.5 font-bold text-slate-800 bg-white/95 border border-indigo-200/80 px-2 py-0.5 rounded-lg shadow-2xs">
                         <Calendar className="w-3 h-3 text-indigo-600" />
                         {act.date}
                       </span>
-                      <span>•</span>
-                      <span className="bg-white/95 border border-indigo-200 px-1.5 py-0.2 rounded font-bold text-indigo-800 shadow-2xs">
+                      <span className="text-indigo-300">•</span>
+                      <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-lg font-bold shadow-[0_2px_6px_rgba(79,70,229,0.3)] flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-300" />
                         {formatAid(act.aid)}
                       </span>
                     </div>
                   </div>
 
-                  {/* Scores & Remarks with element-wise light background colors */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-amber-100/80 border border-amber-300/90 rounded-xl px-2.5 py-1.5 flex items-center justify-between shadow-2xs">
-                        <span className="text-[10px] font-black text-amber-950 uppercase">HW</span>
-                        <span className="font-mono font-black text-amber-950 text-xs">
-                          {act.hwMarks !== undefined ? `${act.hwMarks}/10` : '—'}
-                        </span>
+                  {/* Scores & Remarks: HW & CW with vibrant glowing elements & icons */}
+                  <div className="space-y-2.5 relative z-10">
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {/* HW Badge */}
+                      <div className="bg-gradient-to-br from-amber-50 via-amber-100/50 to-white border-2 border-amber-300/90 rounded-xl p-2.5 shadow-[0_2px_10px_-2px_rgba(245,158,11,0.2)] hover:border-amber-400 transition-all">
+                        <div className="flex items-center justify-between text-[10px] font-black text-amber-900 uppercase tracking-wide mb-1">
+                          <span className="flex items-center gap-1">
+                            <FileText className="w-3 h-3 text-amber-600" />
+                            HW
+                          </span>
+                          <span className="text-[9px] text-amber-700 font-mono">Homework</span>
+                        </div>
+                        <div className="flex items-baseline justify-between">
+                          <span className="font-mono font-black text-amber-950 text-sm">
+                            {isHwNull ? (
+                              <span className="text-amber-800/70 font-semibold italic text-xs">null/10</span>
+                            ) : (
+                              <span>{hwNum}<span className="text-xs text-amber-700 font-medium">/10</span></span>
+                            )}
+                          </span>
+                          {!isHwNull && (
+                            <span className="text-[9.5px] font-mono font-extrabold text-amber-900 bg-amber-200/90 border border-amber-300 px-1.5 py-0.2 rounded-md">
+                              {Math.round(((hwNum as number) / 10) * 100)}%
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex-1 bg-sky-100/80 border border-sky-300/90 rounded-xl px-2.5 py-1.5 flex items-center justify-between shadow-2xs">
-                        <span className="text-[10px] font-black text-sky-950 uppercase">CW</span>
-                        <span className="font-mono font-black text-sky-950 text-xs">
-                          {act.cwMarks !== undefined ? `${act.cwMarks}/10` : '—'}
-                        </span>
+
+                      {/* CW Badge */}
+                      <div className="bg-gradient-to-br from-sky-50 via-cyan-100/50 to-white border-2 border-sky-300/90 rounded-xl p-2.5 shadow-[0_2px_10px_-2px_rgba(14,165,233,0.2)] hover:border-sky-400 transition-all">
+                        <div className="flex items-center justify-between text-[10px] font-black text-sky-900 uppercase tracking-wide mb-1">
+                          <span className="flex items-center gap-1">
+                            <ClipboardList className="w-3 h-3 text-sky-600" />
+                            CW
+                          </span>
+                          <span className="text-[9px] text-sky-700 font-mono">Classwork</span>
+                        </div>
+                        <div className="flex items-baseline justify-between">
+                          <span className="font-mono font-black text-sky-950 text-sm">
+                            {isCwNull ? (
+                              <span className="text-sky-800/70 font-semibold italic text-xs">null/10</span>
+                            ) : (
+                              <span>{cwNum}<span className="text-xs text-sky-700 font-medium">/10</span></span>
+                            )}
+                          </span>
+                          {!isCwNull && (
+                            <span className="text-[9.5px] font-mono font-extrabold text-sky-900 bg-sky-200/90 border border-sky-300 px-1.5 py-0.2 rounded-md">
+                              {Math.round(((cwNum as number) / 10) * 100)}%
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
-                    {act.comment && (
-                      <div className="text-[11px] text-purple-950 italic bg-purple-50/90 border border-purple-200/90 rounded-xl p-2 flex items-start gap-1.5 shadow-2xs">
+                    {/* Teacher's Note / Remarks with glowing purple badge */}
+                    {act.comment ? (
+                      <div className="text-xs text-purple-950 italic bg-gradient-to-r from-purple-50 via-fuchsia-50/40 to-white border border-purple-200/90 rounded-xl p-2.5 flex items-start gap-2 shadow-[0_2px_8px_-2px_rgba(168,85,247,0.18)]">
                         <MessageSquare className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                        <span className="line-clamp-2">&ldquo;{act.comment}&rdquo;</span>
+                        <span className="font-medium line-clamp-2">&ldquo;{act.comment}&rdquo;</span>
+                      </div>
+                    ) : (
+                      <div className="text-[11px] text-slate-400 italic bg-slate-50/60 border border-dashed border-slate-200 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5">
+                        <MessageSquare className="w-3 h-3 text-slate-300 shrink-0" />
+                        <span>No remark added for this session</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Card Actions Footer - Touch friendly for Android */}
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/70 gap-2">
+                  {/* Card Actions Footer - Glowing buttons & clear affordances */}
+                  <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/80 gap-2 relative z-10">
                     <button
                       type="button"
                       onClick={() => onSelectStudent(act.studentSid)}
-                      className="text-[10.5px] font-bold text-indigo-800 hover:text-indigo-950 bg-white/90 border border-indigo-200 hover:bg-indigo-50 px-2.5 py-1 rounded-lg transition-all shadow-2xs cursor-pointer active:scale-95"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 hover:text-white bg-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-purple-600 border border-indigo-300 hover:border-transparent px-3 py-1.5 rounded-xl transition-all duration-200 shadow-2xs hover:shadow-[0_4px_12px_rgba(99,102,241,0.3)] cursor-pointer active:scale-95"
                     >
-                      View Profile →
+                      <User className="w-3 h-3" />
+                      <span>View Profile</span>
+                      <ArrowRight className="w-3 h-3 ml-0.5" />
                     </button>
 
                     {isConfirmingDelete ? (
@@ -1082,7 +1160,7 @@ export default function GlobalTrackingList({
                         <button
                           type="button"
                           onClick={() => handleDelete(act.aid)}
-                          className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-[10.5px] font-bold cursor-pointer transition-all active:scale-95 shadow-xs"
+                          className="px-3 py-1.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-xl text-[10.5px] font-bold cursor-pointer transition-all active:scale-95 shadow-[0_2px_8px_rgba(244,63,94,0.35)]"
                         >
                           Confirm Delete
                         </button>
@@ -1099,20 +1177,20 @@ export default function GlobalTrackingList({
                         <button
                           type="button"
                           onClick={() => handleStartEdit(act)}
-                          className="p-2 sm:p-1.5 text-indigo-900 hover:text-indigo-950 bg-indigo-100/90 hover:bg-indigo-200 border border-indigo-300 rounded-xl cursor-pointer transition-all shadow-2xs active:scale-95 flex items-center gap-1"
+                          className="px-2.5 py-1.5 text-indigo-900 hover:text-white bg-indigo-100 hover:bg-indigo-600 border border-indigo-300 hover:border-transparent rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_10px_rgba(99,102,241,0.3)] active:scale-95 flex items-center gap-1"
                           title="Edit Record"
                         >
-                          <Edit2 className="w-3.5 h-3.5 text-indigo-700" />
-                          <span className="text-[10.5px] font-bold hidden sm:inline">Edit</span>
+                          <Edit2 className="w-3 h-3" />
+                          <span className="text-[11px] font-bold">Edit</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeleteConfirmAid(act.aid)}
-                          className="p-2 sm:p-1.5 text-rose-900 hover:text-rose-950 bg-rose-100/90 hover:bg-rose-200 border border-rose-300 rounded-xl cursor-pointer transition-all shadow-2xs active:scale-95 flex items-center gap-1"
+                          className="px-2.5 py-1.5 text-rose-900 hover:text-white bg-rose-100 hover:bg-rose-600 border border-rose-300 hover:border-transparent rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_10px_rgba(244,63,94,0.3)] active:scale-95 flex items-center gap-1"
                           title="Delete Record"
                         >
-                          <Trash2 className="w-3.5 h-3.5 text-rose-700" />
-                          <span className="text-[10.5px] font-bold hidden sm:inline">Delete</span>
+                          <Trash2 className="w-3 h-3" />
+                          <span className="text-[11px] font-bold">Delete</span>
                         </button>
                       </div>
                     )}

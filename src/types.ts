@@ -1,79 +1,126 @@
-export interface UserLogItem {
-  _id?: string;
-  sid: string;
+export type AccountStatus = 'active' | 'revoked' | 'pending';
+export type ApprovalStatus = 'yes' | 'no' | 'pending';
+
+/**
+ * Normalized Admin Model
+ * Collection: admins
+ */
+export interface Admin {
+  _id?: any;
   email: string;
   password?: string;
-  isApproved: 'yes' | 'no' | 'pending' | string;
-  userType: 'admin' | 'student';
+  name?: string;
+  phone?: string;
+  status?: AccountStatus;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  userType?: 'admin' | 'student';
+}
+
+/**
+ * Normalized Student Model
+ * Collection: students
+ * Single source of truth for student identity and profile.
+ */
+export interface Student {
+  _id?: any;
+  sid: string; // unique human-readable identifier (e.g., "S101")
   name: string;
+  email: string;
+  password?: string; // plaintext
+  phone?: string; // single field replacing phone + mobile
+  status?: AccountStatus; // 'active' | 'revoked' | 'pending'
   college?: string;
   hscBatch?: string;
-  subject?: string;
   group?: string;
-  mobile?: string;
+  subject?: string;
   guardiansPhone?: string;
   address?: string;
   createdAt?: string;
+  updatedAt?: string;
+
+  // Aliases for view compatibility
+  mobile?: string;
+  approved?: ApprovalStatus;
+  isApproved?: ApprovalStatus | boolean;
+  userType?: 'admin' | 'student';
 }
+
+export type User = Student | Admin;
+export type UserLogItem = Student & { userType?: 'admin' | 'student' };
 
 export interface AuthUser {
   name: string;
   email: string;
   phone?: string;
   sid?: string;
-  userType?: 'admin' | 'student';
-  isApproved?: 'yes' | 'no' | 'pending' | string;
+  userType: 'admin' | 'student';
+  approved?: ApprovalStatus;
+  isApproved?: ApprovalStatus;
+  status?: AccountStatus;
 }
 
-export interface Student {
-  sid: string; // Manually entered custom Student ID
-  name: string;
-  college: string;
-  hscBatch: string;
-  subject: string;
-  group: string;
-  mobile: string;
-  guardiansPhone?: string;
-  address: string;
-  email?: string;
-  createdAt?: string;
-  isApproved?: 'yes' | 'no' | 'pending' | string;
-  status?: 'active' | 'revoked' | 'pending' | string;
-}
-
+/**
+ * Normalized Activity Model
+ * Collection: activities
+ * studentId: ObjectId FK -> students._id
+ */
 export interface Activity {
-  aid: string;
-  studentSid: string;
-  date: string; // format YYYY-MM-DD
-  status: string; // "Present" or "Absent"
-  subjectTuitioned?: string;
-  hwMarks?: number;
-  cwMarks?: number;
+  _id?: any;
+  aid?: string;
+  studentId?: any; // ObjectId reference (resolved on server)
+  studentSid?: string; // Populated for display/compatibility
+  studentName?: string; // Populated for display
+  date: string;
+  status: string; // e.g. Present | Absent
+  subject?: string; // split out of subjectTuitioned
+  topic?: string; // split out of subjectTuitioned
+  subjectTuitioned?: string; // Computed compatibility: "${subject} - ${topic}"
+  hwMarks?: number | null;
+  cwMarks?: number | null;
   comment?: string;
   createdAt?: string;
 }
 
+/**
+ * Normalized Exam Model
+ * Collection: exams
+ * studentId: ObjectId FK -> students._id
+ */
 export interface Exam {
-  eid: string;
-  studentSid: string;
-  date: string; // format YYYY-MM-DD
-  subjectAndTopic: string;
-  status: string; // "Present" or "Absent"
+  _id?: any;
+  eid?: string;
+  studentId?: any; // ObjectId reference (resolved on server)
+  studentSid?: string; // Populated for display/compatibility
+  studentName?: string; // Populated for display
+  date: string;
+  subject?: string; // split out of subjectAndTopic
+  topic?: string; // split out of subjectAndTopic
+  subjectAndTopic?: string; // Computed compatibility: "${subject} - ${topic}"
+  status?: string; // Present | Absent
   totalMarks: number;
-  obtainedMarks?: number;
+  obtainedMarks?: number | null;
   remarks?: string;
   comment?: string;
   createdAt?: string;
 }
 
+/**
+ * Normalized Payment Model
+ * Collection: payments
+ * studentId: ObjectId FK -> students._id
+ */
 export interface Payment {
-  pid: string;
-  studentSid: string;
-  date: string; // format YYYY-MM-DD
-  amount: number; // in taka
-  paymentMonth: string; // format YYYY-MM (e.g., "2026-07")
-  method?: string;
-  status?: string;
+  _id?: any;
+  pid?: string;
+  studentId?: any; // ObjectId reference (resolved on server)
+  studentSid?: string; // Populated for display/compatibility
+  studentName?: string; // Populated for display
+  date: string;
+  amount: number;
+  paymentMonth: string; // YYYY-MM
   comment?: string;
   createdAt?: string;
+  method?: string;
+  status?: string;
 }

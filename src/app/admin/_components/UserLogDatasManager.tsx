@@ -25,6 +25,12 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Hash,
+  AlertTriangle,
+  Smartphone,
+  ShieldAlert,
+  Building2,
+  Calendar,
 } from 'lucide-react';
 
 type FilterTab = 'all' | 'pending' | 'approved' | 'revoked';
@@ -95,6 +101,11 @@ export default function UserLogDatasManager() {
 
   useEffect(() => {
     fetchUsers();
+    const handleSync = () => fetchUsers();
+    window.addEventListener('pending-registrations-updated', handleSync);
+    return () => {
+      window.removeEventListener('pending-registrations-updated', handleSync);
+    };
   }, []);
 
   // Approval status updater: supports 'yes', 'no' (revoked), or 'pending'
@@ -103,7 +114,7 @@ export default function UserLogDatasManager() {
     isApproved: 'yes' | 'no' | 'pending',
     customSid?: string
   ) => {
-    const key = user.sid || user.email;
+    const key = user._id || user.sid || user.email;
     setActionLoading(key);
 
     try {
@@ -113,9 +124,21 @@ export default function UserLogDatasManager() {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          id: user._id,
+          _id: user._id,
+          originalSid: user.sid,
           email: user.email,
           sid: targetSid,
+          approved: isApproved,
           isApproved,
+          name: user.name,
+          mobile: user.mobile,
+          college: user.college,
+          hscBatch: user.hscBatch,
+          subject: user.subject,
+          group: user.group,
+          guardiansPhone: user.guardiansPhone,
+          address: user.address,
         }),
       });
 
@@ -129,11 +152,13 @@ export default function UserLogDatasManager() {
       setUsers((prev) =>
         prev.map((u) => {
           if (
+            (user._id && u._id === user._id) ||
             (user.email && u.email && u.email.toLowerCase() === user.email.toLowerCase()) ||
             (user.sid && u.sid && u.sid.toUpperCase() === user.sid.toUpperCase())
           ) {
             return {
               ...u,
+              approved: isApproved,
               isApproved,
               sid: targetSid || u.sid,
             };
@@ -153,6 +178,9 @@ export default function UserLogDatasManager() {
       });
 
       // Background re-sync
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('pending-registrations-updated'));
+      }
       await fetchUsers();
     } catch (err: any) {
       console.error(err);
@@ -183,11 +211,12 @@ export default function UserLogDatasManager() {
       return;
     }
 
-    const key = user.sid || user.email;
+    const key = user._id || user.sid || user.email;
     setActionLoading(key);
 
     try {
       const params = new URLSearchParams();
+      if (user._id) params.set('id', user._id);
       if (user.email) params.set('email', user.email);
       if (user.sid) params.set('sid', user.sid);
 
@@ -200,7 +229,10 @@ export default function UserLogDatasManager() {
         throw new Error(data.error || 'Failed to delete account');
       }
 
-      setUsers((prev) => prev.filter((u) => u.email !== user.email && (!user.sid || u.sid !== user.sid)));
+      setUsers((prev) => prev.filter((u) => (user._id ? u._id !== user._id : (u.email !== user.email && (!user.sid || u.sid !== user.sid)))));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('pending-registrations-updated'));
+      }
       setToast({
         type: 'success',
         message: `Account for ${user.name || user.email} was removed.`,
@@ -284,16 +316,43 @@ export default function UserLogDatasManager() {
   };
 
   // Metrics calculation
-  const totalCount = users.length;
-  const pendingCount = users.filter((u) => !u.isApproved || u.isApproved.toLowerCase() === 'pending').length;
-  const approvedCount = users.filter((u) => u.isApproved && u.isApproved.toLowerCase() === 'yes').length;
-  const revokedCount = users.filter((u) => u.isApproved && (u.isApproved.toLowerCase() === 'no' || u.isApproved.toLowerCase() === 'disapproved')).length;
+  const getApprovalStatus = (u: UserLogItem): 'yes' | 'no' | 'pending' => {
+    const raw = (u.approved ?? u.isApproved) as any;
+    if (raw === 'yes' || raw === 'approved' || raw === true) return 'yes';
+    if (raw === 'no' || raw === 'disapproved' || raw === 'rejected' || raw === false) return 'no';
+    return 'pending';
+  };
+
+  // Helper to identify admin
+  const isAdminAccount = (u: UserLogItem) => {
+    if (u.userType === 'admin') return true;
+    const sid = String(u.sid || '').trim().toUpperCase();
+    if (sid === 'ADMIN' || sid === '0000000' || sid === '0') return true;
+    const email = String(u.email || '').trim().toLowerCase();
+    if (
+      email === 'sakib1514817122@gmail.com' ||
+      email === 'sakibhasan.office@gmail.com' ||
+      email === 'kagglesakib@gmail.com'
+    ) return true;
+    const name = String(u.name || '').trim().toLowerCase();
+    if (name === 'sakibul hasan' || name.includes('sakibul hasan') || name === 'admin') return true;
+    return false;
+  };
+
+  // Strictly filter out admin accounts so they are not shown as students in approvals matrix
+  const studentUsers = users.filter((u) => !isAdminAccount(u));
+
+  const totalCount = studentUsers.length;
+  const pendingCount = studentUsers.filter((u) => getApprovalStatus(u) === 'pending').length;
+  const approvedCount = studentUsers.filter((u) => getApprovalStatus(u) === 'yes').length;
+  const revokedCount = studentUsers.filter((u) => getApprovalStatus(u) === 'no').length;
 
   // Filter accounts
-  const filteredUsers = users.filter((u) => {
-    const isAppr = u.isApproved && u.isApproved.toLowerCase() === 'yes';
-    const isPend = !u.isApproved || u.isApproved.toLowerCase() === 'pending';
-    const isRevk = u.isApproved && (u.isApproved.toLowerCase() === 'no' || u.isApproved.toLowerCase() === 'disapproved');
+  const filteredUsers = studentUsers.filter((u) => {
+    const status = getApprovalStatus(u);
+    const isAppr = status === 'yes';
+    const isPend = status === 'pending';
+    const isRevk = status === 'no';
 
     if (activeTab === 'pending' && !isPend) return false;
     if (activeTab === 'approved' && !isAppr) return false;
@@ -592,99 +651,116 @@ export default function UserLogDatasManager() {
         ) : filteredUsers.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
             {filteredUsers.map((u) => {
-              const isApproved = u.isApproved && u.isApproved.toLowerCase() === 'yes';
-              const isRevoked = u.isApproved && (u.isApproved.toLowerCase() === 'no' || u.isApproved.toLowerCase() === 'disapproved');
-              const isPending = !u.isApproved || u.isApproved.toLowerCase() === 'pending';
+              const status = getApprovalStatus(u);
+              const isApproved = status === 'yes';
+              const isRevoked = status === 'no';
+              const isPending = status === 'pending';
 
-              const userKey = u.sid || u.email;
+              const userKey = u._id || u.sid || u.email;
               const isBusy = actionLoading === userKey;
 
               return (
                 <div
                   key={u._id || userKey}
-                  className={`rounded-3xl border p-4 sm:p-5 flex flex-col justify-between gap-3.5 transition-all shadow-xs ${
+                  className={`group relative rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col justify-between gap-3.5 transition-all duration-300 border-2 ${
                     isPending
-                      ? 'bg-amber-50/50 border-amber-300/90 hover:border-amber-400'
+                      ? 'bg-gradient-to-br from-amber-50/90 via-orange-50/30 to-white border-amber-300 shadow-[0_4px_20px_-4px_rgba(245,158,11,0.22)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.36)] hover:border-amber-500 hover:-translate-y-0.5'
                       : isRevoked
-                      ? 'bg-rose-50/40 border-rose-300/90 hover:border-rose-400'
-                      : 'bg-white border-slate-200 hover:border-teal-400'
+                      ? 'bg-gradient-to-br from-rose-50/90 via-red-50/30 to-white border-rose-300 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.2)] hover:shadow-[0_8px_30px_-4px_rgba(244,63,94,0.34)] hover:border-rose-500 hover:-translate-y-0.5'
+                      : 'bg-gradient-to-br from-emerald-50/90 via-teal-50/30 to-white border-emerald-300 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.18)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.32)] hover:border-emerald-500 hover:-translate-y-0.5'
                   }`}
                 >
+                  {/* Decorative ambient glowing corner aura */}
+                  <div
+                    className={`absolute -top-1 -right-1 w-14 h-14 rounded-full blur-xl pointer-events-none opacity-40 transition-opacity group-hover:opacity-80 ${
+                      isPending ? 'bg-amber-400' : isRevoked ? 'bg-rose-400' : 'bg-emerald-400'
+                    }`}
+                  />
+
                   {/* Card Top: Student Profile & Status */}
-                  <div className="space-y-3">
+                  <div className="space-y-3 relative z-10">
                     {/* Header Row */}
                     <div className="flex items-start justify-between gap-2.5">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        {/* Avatar Pill with Light Background */}
-                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-sm shrink-0 border shadow-2xs ${
-                          isPending
-                            ? 'bg-amber-100 border-amber-300 text-amber-950'
-                            : isRevoked
-                            ? 'bg-rose-100 border-rose-300 text-rose-950'
-                            : 'bg-teal-100 border-teal-300 text-teal-950'
-                        }`}>
-                          {(u.name || u.email || 'S').charAt(0).toUpperCase()}
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Avatar with Radiant Gradient & Active Status Pulse Dot */}
+                        <div className="relative shrink-0">
+                          <div
+                            className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm text-white shadow-md transition-transform group-hover:scale-105 border ${
+                              isPending
+                                ? 'bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 border-amber-300/80 shadow-[0_4px_12px_rgba(245,158,11,0.35)]'
+                                : isRevoked
+                                ? 'bg-gradient-to-br from-rose-500 via-red-500 to-rose-600 border-rose-300/80 shadow-[0_4px_12px_rgba(244,63,94,0.35)]'
+                                : 'bg-gradient-to-br from-teal-500 via-emerald-500 to-teal-600 border-teal-300/80 shadow-[0_4px_12px_rgba(16,185,129,0.35)]'
+                            }`}
+                          >
+                            {(u.name || u.email || 'S').charAt(0).toUpperCase()}
+                          </div>
+                          <span
+                            className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white flex items-center justify-center ${
+                              isPending ? 'bg-amber-500' : isRevoked ? 'bg-rose-500' : 'bg-emerald-500'
+                            }`}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                          </span>
                         </div>
 
                         <div className="min-w-0">
-                          <h4 className="font-bold text-slate-900 text-sm sm:text-base leading-snug truncate" title={u.name || 'Unnamed'}>
+                          <h4
+                            className="font-extrabold text-slate-900 group-hover:text-teal-950 transition-colors text-sm sm:text-base leading-snug truncate"
+                            title={u.name || 'Unnamed'}
+                          >
                             {u.name || 'Unnamed Student'}
                           </h4>
                           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                             {u.sid ? (
-                              <span className="text-[10.5px] font-mono font-bold bg-indigo-50 text-indigo-950 border border-indigo-200 px-2 py-0.2 rounded-md shadow-2xs">
-                                SID: {u.sid}
+                              <span className="text-[10px] font-mono font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-md shadow-[0_2px_6px_rgba(79,70,229,0.25)] flex items-center gap-1">
+                                <Hash className="w-2.5 h-2.5 text-indigo-200" />
+                                <span>SID: {u.sid}</span>
                               </span>
                             ) : (
-                              <span className="text-[9.5px] font-mono font-bold bg-amber-100 text-amber-950 border border-amber-300 px-1.5 py-0.2 rounded-md">
-                                SID Unassigned
+                              <span className="text-[10px] font-mono font-bold bg-amber-500 text-white px-2 py-0.5 rounded-md shadow-[0_2px_6px_rgba(245,158,11,0.3)] flex items-center gap-1 animate-pulse">
+                                <AlertTriangle className="w-2.5 h-2.5 text-amber-100" />
+                                <span>SID Unassigned</span>
                               </span>
                             )}
                             {u.userType === 'admin' && (
-                              <span className="text-[9.5px] font-bold bg-purple-100 text-purple-950 border border-purple-300 px-1.5 py-0.2 rounded-md">
-                                Admin
+                              <span className="text-[10px] font-extrabold bg-purple-600 text-white px-2 py-0.5 rounded-md shadow-[0_2px_6px_rgba(147,51,234,0.25)] flex items-center gap-1">
+                                <ShieldCheck className="w-2.5 h-2.5 text-purple-200" />
+                                <span>Admin</span>
                               </span>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Status Badge */}
-                      <span
-                        className={`text-[10px] font-black px-2.5 py-1 rounded-full border flex items-center gap-1 shadow-2xs shrink-0 ${
-                          isApproved
-                            ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
-                            : isPending
-                            ? 'bg-amber-100 text-amber-950 border-amber-300'
-                            : 'bg-rose-100 text-rose-950 border-rose-300'
-                        }`}
-                      >
+                      {/* Glowing Status Badge */}
+                      <div className="shrink-0">
                         {isApproved ? (
-                          <>
-                            <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border shadow-xs tracking-wide bg-emerald-500 text-white border-emerald-400 shadow-[0_2px_10px_rgba(16,185,129,0.35)]">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
                             <span>Approved</span>
-                          </>
+                          </span>
                         ) : isPending ? (
-                          <>
-                            <Clock className="w-3 h-3 text-amber-700" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border shadow-xs tracking-wide bg-amber-500 text-white border-amber-400 shadow-[0_2px_10px_rgba(245,158,11,0.35)] animate-pulse">
+                            <Clock className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
                             <span>Pending</span>
-                          </>
+                          </span>
                         ) : (
-                          <>
-                            <XCircle className="w-3 h-3 text-rose-700" />
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border shadow-xs tracking-wide bg-rose-600 text-white border-rose-500 shadow-[0_2px_10px_rgba(244,63,94,0.35)]">
+                            <XCircle className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
                             <span>Revoked</span>
-                          </>
+                          </span>
                         )}
-                      </span>
+                      </div>
                     </div>
 
                     {/* ========================================================= */}
-                    {/* ELEMENT-WISE LIGHT BACKGROUND DETAIL BLOCKS               */}
+                    {/* ELEMENT-WISE GLOWING DETAIL BLOCKS                         */}
                     {/* ========================================================= */}
                     <div className="space-y-2 text-xs">
                       {/* Email Address Block */}
-                      <div className="flex items-center gap-2 p-2 rounded-xl bg-sky-50/70 border border-sky-200/80 text-sky-950">
-                        <Mail className="w-3.5 h-3.5 text-sky-700 shrink-0" />
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-sky-50 via-blue-50/40 to-white border border-sky-200/90 text-sky-950 shadow-2xs">
+                        <Mail className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                         <span className="font-mono text-[11px] truncate select-all font-semibold" title={u.email}>
                           {u.email}
                         </span>
@@ -692,34 +768,43 @@ export default function UserLogDatasManager() {
 
                       {/* Phone & Guardian Phone Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                        <div className="flex items-center gap-1.5 p-2 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-emerald-950">
-                          <Phone className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-br from-emerald-50/90 to-teal-50/40 border border-emerald-200/90 text-emerald-950 shadow-2xs">
+                          <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                           <div className="min-w-0">
-                            <span className="text-[9px] text-emerald-800 font-bold block uppercase tracking-wider">Mobile</span>
-                            <span className="font-mono text-[11px] font-bold truncate block">{u.mobile || '—'}</span>
+                            <span className="text-[9px] text-emerald-800 font-extrabold block uppercase tracking-wider">
+                              Mobile
+                            </span>
+                            <span className="font-mono text-[11px] font-bold truncate block">
+                              {u.mobile || '—'}
+                            </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 p-2 rounded-xl bg-teal-50/70 border border-teal-200/80 text-teal-950">
-                          <Phone className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-br from-teal-50/90 to-cyan-50/40 border border-teal-200/90 text-teal-950 shadow-2xs">
+                          <Phone className="w-3.5 h-3.5 text-teal-600 shrink-0" />
                           <div className="min-w-0">
-                            <span className="text-[9px] text-teal-800 font-bold block uppercase tracking-wider">Guardian</span>
-                            <span className="font-mono text-[11px] font-bold truncate block">{u.guardiansPhone || '—'}</span>
+                            <span className="text-[9px] text-teal-800 font-extrabold block uppercase tracking-wider">
+                              Guardian
+                            </span>
+                            <span className="font-mono text-[11px] font-bold truncate block">
+                              {u.guardiansPhone || '—'}
+                            </span>
                           </div>
                         </div>
                       </div>
 
                       {/* College & Batch Block */}
                       {(u.college || u.hscBatch) && (
-                        <div className="flex items-center gap-2 p-2 rounded-xl bg-purple-50/70 border border-purple-200/80 text-purple-950">
-                          <GraduationCap className="w-3.5 h-3.5 text-purple-700 shrink-0" />
+                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-purple-50 via-fuchsia-50/30 to-white border border-purple-200/90 text-purple-950 shadow-2xs">
+                          <Building2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
                           <div className="min-w-0 flex-1 flex items-center justify-between gap-1">
-                            <span className="truncate font-semibold text-[11px]" title={u.college || ''}>
+                            <span className="truncate font-bold text-[11px]" title={u.college || ''}>
                               {u.college || 'Institution unlisted'}
                             </span>
                             {u.hscBatch && (
-                              <span className="font-mono font-bold text-[10px] bg-purple-100/90 text-purple-950 px-1.5 py-0.2 rounded border border-purple-300 shrink-0">
-                                HSC {u.hscBatch}
+                              <span className="font-mono font-bold text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-md shadow-2xs shrink-0 flex items-center gap-1">
+                                <Calendar className="w-2.5 h-2.5 text-purple-200" />
+                                <span>HSC {u.hscBatch}</span>
                               </span>
                             )}
                           </div>
@@ -728,9 +813,9 @@ export default function UserLogDatasManager() {
 
                       {/* Subject & Group Block (if available) */}
                       {(u.subject || u.group) && (
-                        <div className="flex items-center gap-2 p-2 rounded-xl bg-blue-50/70 border border-blue-200/80 text-blue-950">
-                          <BookOpen className="w-3.5 h-3.5 text-blue-700 shrink-0" />
-                          <span className="text-[11px] font-medium truncate">
+                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-blue-50 via-indigo-50/30 to-white border border-blue-200/90 text-blue-950 shadow-2xs">
+                          <BookOpen className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                          <span className="text-[11px] font-semibold truncate">
                             {u.subject || 'General'} {u.group ? `(${u.group})` : ''}
                           </span>
                         </div>
@@ -738,7 +823,7 @@ export default function UserLogDatasManager() {
 
                       {/* Residential Address (if available) */}
                       {u.address && (
-                        <div className="flex items-start gap-2 p-2 rounded-xl bg-slate-100/80 border border-slate-200 text-slate-800">
+                        <div className="flex items-start gap-2 p-2.5 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/60 border border-slate-200 text-slate-800 shadow-2xs">
                           <MapPin className="w-3.5 h-3.5 text-slate-600 shrink-0 mt-0.5" />
                           <span className="text-[11px] truncate font-medium" title={u.address}>
                             {u.address}
@@ -748,30 +833,63 @@ export default function UserLogDatasManager() {
                     </div>
                   </div>
 
-                  {/* Card Actions Footer with Large Touch Targets */}
-                  <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-1.5 flex-wrap">
+                  {/* Card Actions Footer with Radiant Gradient Buttons */}
+                  <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-2 flex-wrap relative z-10">
                     {/* Primary Approval / Revocation Button */}
                     <div className="flex-1 min-w-[140px]">
                       {!isApproved ? (
-                        <button
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() => initiateApprove(u)}
-                          className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-xs active:scale-95"
-                        >
-                          {isBusy ? (
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <UserCheck className="w-3.5 h-3.5" />
-                          )}
-                          <span>{u.sid ? 'Approve Access' : 'Assign SID & Approve'}</span>
-                        </button>
+                        isPending ? (
+                          <div className="flex items-center gap-1.5 w-full">
+                            <button
+                              type="button"
+                              disabled={isBusy}
+                              onClick={() => initiateApprove(u)}
+                              className="flex-1 py-2 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-[0_3px_12px_rgba(16,185,129,0.35)] active:scale-95 whitespace-nowrap"
+                            >
+                              {isBusy ? (
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <UserCheck className="w-3.5 h-3.5" />
+                              )}
+                              <span>{u.sid ? 'Approve' : 'Assign SID & Approve'}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={isBusy}
+                              onClick={() => handleUpdateApproval(u, 'no')}
+                              className="py-2 px-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all shadow-[0_3px_12px_rgba(244,63,94,0.35)] active:scale-95 shrink-0"
+                              title="Reject registration for this student"
+                            >
+                              {isBusy ? (
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <UserX className="w-3.5 h-3.5" />
+                              )}
+                              <span>Reject</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={isBusy}
+                            onClick={() => initiateApprove(u)}
+                            className="w-full py-2 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-[0_3px_12px_rgba(16,185,129,0.35)] active:scale-95"
+                          >
+                            {isBusy ? (
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <UserCheck className="w-3.5 h-3.5" />
+                            )}
+                            <span>{u.sid ? 'Approve Access' : 'Assign SID & Approve'}</span>
+                          </button>
+                        )
                       ) : (
                         <button
                           type="button"
                           disabled={isBusy}
                           onClick={() => handleUpdateApproval(u, 'no')}
-                          className="w-full py-2 px-3 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-xs active:scale-95"
+                          className="w-full py-2 px-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-[0_3px_12px_rgba(244,63,94,0.35)] active:scale-95"
                           title="Revoke portal access for this student"
                         >
                           {isBusy ? (
@@ -785,14 +903,14 @@ export default function UserLogDatasManager() {
                     </div>
 
                     {/* Secondary Actions (Reset, Edit, Delete) */}
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       {/* Reset to Pending (if already approved or revoked) */}
                       {!isPending && (
                         <button
                           type="button"
                           disabled={isBusy}
                           onClick={() => handleUpdateApproval(u, 'pending')}
-                          className="p-2 text-amber-900 bg-amber-50 hover:bg-amber-100 hover:text-amber-950 border border-amber-300 rounded-xl cursor-pointer transition-all shadow-2xs active:scale-95"
+                          className="p-2 text-amber-900 bg-amber-100 hover:bg-amber-600 hover:text-white border border-amber-300 rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(245,158,11,0.3)] active:scale-95"
                           title="Reset status back to Pending review"
                         >
                           <Clock className="w-3.5 h-3.5" />
@@ -804,7 +922,7 @@ export default function UserLogDatasManager() {
                         type="button"
                         disabled={isBusy}
                         onClick={() => openEditModal(u)}
-                        className="p-2 text-indigo-900 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-950 border border-indigo-200 rounded-xl cursor-pointer transition-all shadow-2xs active:scale-95"
+                        className="p-2 text-indigo-900 bg-indigo-100 hover:bg-indigo-600 hover:text-white border border-indigo-300 rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(99,102,241,0.3)] active:scale-95"
                         title="Edit Account Credentials & Info"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -815,7 +933,7 @@ export default function UserLogDatasManager() {
                         type="button"
                         disabled={isBusy}
                         onClick={() => handleDeleteUser(u)}
-                        className="p-2 text-rose-900 bg-rose-50 hover:bg-rose-100 hover:text-rose-950 border border-rose-200 rounded-xl cursor-pointer transition-all shadow-2xs active:scale-95"
+                        className="p-2 text-rose-900 bg-rose-100 hover:bg-rose-600 hover:text-white border border-rose-300 rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(244,63,94,0.3)] active:scale-95"
                         title="Permanently Delete Account"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

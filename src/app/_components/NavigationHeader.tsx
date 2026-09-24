@@ -9,7 +9,12 @@ export default function NavigationHeader() {
   const { user, isAuthenticated } = useAuth();
 
   // Hide navigation header completely on login/signup page or unapproved student status
-  if (!isAuthenticated || !user || (user.userType === 'student' && user.isApproved !== 'yes')) {
+  if (!isAuthenticated || !user) {
+    return null;
+  }
+
+  const isApproved = user.isApproved === 'yes' || (user as any).approved === 'yes';
+  if (user.userType === 'student' && !isApproved) {
     return null;
   }
 

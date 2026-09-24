@@ -172,16 +172,26 @@ export default function LogDailyLessonModal({
           </div>
 
           {/* Section 1: ATTENDANCE STATUS */}
-          <div className="bg-emerald-50/80 border-2 border-emerald-200/90 rounded-2xl p-2.5 space-y-1.5 shadow-2xs">
-            <label className="block text-[10px] font-mono font-black tracking-wider text-emerald-950 uppercase">
+          <div className={`border-2 rounded-2xl p-2.5 space-y-1.5 shadow-2xs transition-colors ${
+            status === 'Present'
+              ? 'bg-emerald-50/80 border-emerald-200/90'
+              : 'bg-rose-50/80 border-rose-200/90'
+          }`}>
+            <label className={`block text-[10px] font-mono font-black tracking-wider uppercase ${
+              status === 'Present' ? 'text-emerald-950' : 'text-rose-950'
+            }`}>
               ATTENDANCE STATUS
             </label>
             <div className="grid grid-cols-2 gap-2">
               {/* Present Button */}
               <button
                 type="button"
-                onClick={() => setStatus('Present')}
-                className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                onClick={() => {
+                  setStatus('Present');
+                  setIsHwNotGraded(false);
+                  setIsCwNotGraded(false);
+                }}
+                className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   status === 'Present'
                     ? 'bg-emerald-600 text-white shadow-xs border border-emerald-500 active:scale-98'
                     : 'bg-white text-emerald-900 border border-emerald-200/90 hover:bg-emerald-100/60'
@@ -194,8 +204,15 @@ export default function LogDailyLessonModal({
               {/* Absent Button */}
               <button
                 type="button"
-                onClick={() => setStatus('Absent')}
-                className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                onClick={() => {
+                  setStatus('Absent');
+                  if (!subjectTopic || subjectTopic.includes('Topic Name')) {
+                    setSubjectTopic('Absent — No Lesson Conducted');
+                  }
+                  setIsHwNotGraded(true);
+                  setIsCwNotGraded(true);
+                }}
+                className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                   status === 'Absent'
                     ? 'bg-rose-600 text-white shadow-xs border border-rose-500 active:scale-98'
                     : 'bg-white text-rose-800 border border-rose-200/90 hover:bg-rose-100/60'
@@ -215,7 +232,7 @@ export default function LogDailyLessonModal({
             <input
               id="subject-topic-input"
               type="text"
-              required
+              required={status === 'Present'}
               value={subjectTopic}
               onChange={(e) => setSubjectTopic(e.target.value)}
               placeholder="e.g. Physics – Circular Motion & Gravitationa"

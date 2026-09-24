@@ -224,10 +224,10 @@ export default function StudentExamsView({
           </div>
 
           {/* Attendance Status Filter Pills */}
-          <div className="flex items-center bg-purple-100 p-0.5 rounded-lg border border-purple-300 shadow-2xs justify-between">
+          <div className="flex items-center bg-purple-100 p-0.5 rounded-lg border border-purple-300 shadow-2xs justify-between min-w-0">
             <button
               onClick={() => setFilterStatus('All')}
-              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+              className={`flex-1 py-1 px-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer truncate ${
                 filterStatus === 'All'
                   ? 'bg-purple-700 text-white shadow-2xs'
                   : 'text-purple-950 hover:bg-purple-200/80'
@@ -237,7 +237,7 @@ export default function StudentExamsView({
             </button>
             <button
               onClick={() => setFilterStatus('Present')}
-              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+              className={`flex-1 py-1 px-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer truncate ${
                 filterStatus === 'Present'
                   ? 'bg-emerald-600 text-white shadow-2xs'
                   : 'text-emerald-950 hover:bg-emerald-200/80'
@@ -247,7 +247,7 @@ export default function StudentExamsView({
             </button>
             <button
               onClick={() => setFilterStatus('Absent')}
-              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+              className={`flex-1 py-1 px-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer truncate ${
                 filterStatus === 'Absent'
                   ? 'bg-rose-600 text-white shadow-2xs'
                   : 'text-rose-950 hover:bg-rose-200/80'

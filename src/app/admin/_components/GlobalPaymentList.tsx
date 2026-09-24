@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Student, Payment } from '@/types';
+import { isActiveEnrolledStudent } from '@/utils/studentFilters';
 import {
   Banknote,
   Search,
@@ -21,7 +22,11 @@ import {
   TrendingUp,
   Receipt,
   Users,
-  CreditCard
+  CreditCard,
+  CheckCircle2,
+  ArrowRight,
+  Hash,
+  Coins
 } from 'lucide-react';
 import { formatPid, generatePaymentId } from '@/utils/id';
 
@@ -79,7 +84,7 @@ export default function GlobalPaymentList({
   });
 
   const studentMap = useMemo(() => new Map(students.map((s) => [s.sid, s])), [students]);
-  const activeStudents = useMemo(() => students.filter((s) => s.isApproved !== 'no' && s.status !== 'revoked'), [students]);
+  const activeStudents = useMemo(() => students.filter(isActiveEnrolledStudent), [students]);
 
   // Unique months available
   const availableMonths = useMemo(() => {
@@ -530,119 +535,165 @@ export default function GlobalPaymentList({
               return (
                 <div
                   key={pay.pid}
-                  className="bg-white border-2 border-teal-200/90 hover:border-teal-400 rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between group"
+                  className="group relative rounded-2xl p-4 sm:p-4.5 space-y-3.5 transition-all duration-300 flex flex-col justify-between border-2 bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white border-emerald-300 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.18)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.32)] hover:border-emerald-500 hover:-translate-y-0.5"
                 >
-                  {/* Top Bar: PID Badge, Date Badge, and Actions */}
-                  <div className="flex items-center justify-between gap-1.5 border-b border-teal-100 pb-2">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-mono font-black text-teal-950 bg-teal-100 border border-teal-300 px-2 py-0.5 rounded-lg shadow-2xs flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-teal-700 shrink-0" />
-                        {formatPid(pay.pid)}
-                      </span>
-                      <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-slate-500" />
-                        {pay.date}
-                      </span>
-                    </div>
+                  {/* Decorative ambient glowing corner accent */}
+                  <div className="absolute -top-1 -right-1 w-12 h-12 rounded-full blur-xl pointer-events-none opacity-40 transition-opacity group-hover:opacity-80 bg-emerald-400" />
 
-                    {/* Card Actions */}
-                    <div className="flex items-center gap-1 shrink-0">
-                      {isConfirmingDelete ? (
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              onDeletePayment(pay.pid);
-                              setDeleteConfirmPid(null);
-                            }}
-                            className="px-2 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded-md text-[10px] font-bold shadow-2xs cursor-pointer active:scale-95"
-                          >
-                            Confirm
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setDeleteConfirmPid(null)}
-                            className="px-1.5 py-0.5 bg-slate-200 text-slate-700 rounded-md text-[10px] font-bold cursor-pointer"
-                          >
-                            No
-                          </button>
+                  {/* Top Row: Student Profile & Glowing Status Pill */}
+                  <div className="flex items-start justify-between gap-2 relative z-10">
+                    <button
+                      type="button"
+                      onClick={() => onSelectStudent(pay.studentSid)}
+                      className="text-left group/cardbtn min-w-0 flex items-center gap-3 cursor-pointer"
+                    >
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 via-emerald-500 to-teal-600 border border-teal-200 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(16,185,129,0.35)] group-hover/cardbtn:scale-105 transition-transform">
+                          {(student?.name || pay.studentSid).charAt(0).toUpperCase()}
                         </div>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => handleStartEdit(pay)}
-                            className="p-1.5 text-teal-800 hover:text-teal-950 hover:bg-teal-100 bg-teal-50 border border-teal-200 rounded-lg cursor-pointer transition-all shadow-2xs active:scale-95"
-                            title="Edit Record"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setDeleteConfirmPid(pay.pid)}
-                            className="p-1.5 text-rose-800 hover:text-rose-950 hover:bg-rose-100 bg-rose-50 border border-rose-200 rounded-lg cursor-pointer transition-all shadow-2xs active:scale-95"
-                            title="Delete Record"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </>
-                      )}
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white bg-emerald-500 flex items-center justify-center">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-extrabold text-slate-900 group-hover/cardbtn:text-teal-700 transition-colors truncate text-sm sm:text-[15px] flex items-center gap-1.5">
+                          <span>{student?.name || pay.studentSid}</span>
+                        </p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-100/90 border border-teal-300/80 px-2 py-0.5 rounded-md shadow-2xs flex items-center gap-1">
+                            <Hash className="w-2.5 h-2.5 text-teal-600" />
+                            <span>SID: {pay.studentSid}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Glowing Status Pill */}
+                    <div className="shrink-0">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border shadow-xs tracking-wide bg-emerald-500 text-white border-emerald-400 shadow-[0_2px_10px_rgba(16,185,129,0.35)]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
+                        <span>Paid</span>
+                      </span>
                     </div>
                   </div>
 
-                  {/* Student Profile Row */}
-                  <button
-                    type="button"
-                    onClick={() => onSelectStudent(pay.studentSid)}
-                    className="text-left group/btn min-w-0 flex items-center gap-2.5 cursor-pointer bg-slate-50/80 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-300 p-2 rounded-xl transition-all"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 font-black text-xs flex items-center justify-center shrink-0">
-                      {(student?.name || pay.studentSid).charAt(0).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-extrabold text-slate-900 group-hover/btn:text-indigo-800 text-xs truncate">
-                        {student?.name || pay.studentSid}
-                      </p>
-                      <span className="text-[10px] font-mono font-bold text-indigo-700">
-                        SID: {pay.studentSid}
+                  {/* Middle: Voucher Metadata - Glowing Teal Card */}
+                  <div className="space-y-2 bg-gradient-to-br from-teal-50/90 via-emerald-50/60 to-white border border-teal-200/90 rounded-xl p-3 shadow-2xs group-hover:border-teal-300 transition-colors relative z-10">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono font-extrabold text-teal-800 uppercase tracking-wider">
+                        <Receipt className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                        <span>Payment Voucher</span>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold text-teal-900 bg-teal-100/90 border border-teal-300/80 px-2 py-0.5 rounded-md flex items-center gap-1">
+                        <Coins className="w-2.5 h-2.5 text-teal-600" />
+                        <span>Month: {pay.paymentMonth || 'Current'}</span>
                       </span>
                     </div>
-                  </button>
 
-                  {/* Prominent Amount Box & Month Tag */}
-                  <div className="bg-gradient-to-br from-emerald-500 via-teal-600 to-emerald-700 text-white rounded-xl p-3 shadow-xs flex items-center justify-between">
-                    <div>
-                      <span className="text-[9.5px] font-bold uppercase tracking-wider text-emerald-100 block">
-                        Received Amount
+                    <div className="flex items-center gap-2 text-[10.5px] text-slate-600 font-mono flex-wrap pt-0.5">
+                      <span className="flex items-center gap-1.5 font-bold text-slate-800 bg-white/95 border border-teal-200/80 px-2 py-0.5 rounded-lg shadow-2xs">
+                        <Calendar className="w-3 h-3 text-teal-600" />
+                        {pay.date}
                       </span>
-                      <p className="text-xl sm:text-2xl font-black font-mono tracking-tight text-white mt-0.5">
-                        ৳{(Number(pay.amount) || 0).toLocaleString()}
-                      </p>
+                      <span className="text-teal-300">•</span>
+                      <span className="bg-teal-600 text-white px-2 py-0.5 rounded-lg font-bold shadow-[0_2px_6px_rgba(13,148,136,0.3)] flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-300" />
+                        {formatPid(pay.pid)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Prominent Glowing Amount Box with Currency and Billed Month */}
+                  <div className="bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-800 text-white rounded-xl p-3.5 shadow-[0_4px_16px_-2px_rgba(5,150,105,0.4)] flex items-center justify-between border border-emerald-400/30 relative overflow-hidden group-hover:shadow-[0_6px_20px_-2px_rgba(5,150,105,0.5)] transition-all z-10">
+                    <div>
+                      <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-100">
+                        <Banknote className="w-3.5 h-3.5 text-emerald-200" />
+                        <span>Tuition Fee Received</span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white mt-0.5 flex items-baseline gap-1">
+                        <span>৳{(Number(pay.amount) || 0).toLocaleString()}</span>
+                        <span className="text-xs text-emerald-200 font-semibold font-sans">BDT</span>
+                      </div>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[9px] font-bold uppercase text-emerald-200 block font-mono">
+                      <span className="text-[9.5px] font-bold uppercase text-emerald-200 block font-mono">
                         Billing Month
                       </span>
-                      <span className="inline-block mt-0.5 px-2 py-0.5 bg-white/20 backdrop-blur-xs rounded-md text-[11px] font-black font-mono text-white border border-white/30 shadow-2xs">
+                      <span className="inline-flex items-center gap-1 mt-1 px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-lg text-xs font-black font-mono text-white border border-white/40 shadow-2xs">
+                        <Calendar className="w-3 h-3 text-emerald-200" />
                         {pay.paymentMonth || 'Current'}
                       </span>
                     </div>
                   </div>
 
                   {/* Remarks / Comment Card */}
-                  <div className="pt-1">
+                  <div className="space-y-2.5 relative z-10">
                     {pay.comment ? (
-                      <div className="flex items-start gap-1.5 text-slate-800 bg-amber-50/80 border border-amber-200/90 rounded-xl p-2 text-xs">
-                        <MessageSquare className="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" />
-                        <span className="font-medium text-[11px] italic truncate" title={pay.comment}>
-                          &ldquo;{pay.comment}&rdquo;
-                        </span>
+                      <div className="text-xs text-purple-950 italic bg-gradient-to-r from-purple-50 via-fuchsia-50/40 to-white border border-purple-200/90 rounded-xl p-2.5 flex items-start gap-2 shadow-[0_2px_8px_-2px_rgba(168,85,247,0.18)]">
+                        <MessageSquare className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                        <span className="font-medium line-clamp-2">&ldquo;{pay.comment}&rdquo;</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 text-slate-500 bg-slate-50 border border-slate-200 rounded-xl p-2 text-[11px]">
-                        <Check className="w-3 h-3 text-emerald-600 shrink-0" />
-                        <span className="italic">Tuition fee paid in full</span>
+                      <div className="text-[11px] text-teal-800 italic bg-teal-50/60 border border-dashed border-teal-200 rounded-xl px-2.5 py-1.5 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3 h-3 text-teal-600 shrink-0" />
+                        <span>Tuition fee paid in full • Cash / MFS</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Actions Footer - Glowing buttons & clear affordances */}
+                  <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/80 gap-2 relative z-10">
+                    <button
+                      type="button"
+                      onClick={() => onSelectStudent(pay.studentSid)}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-700 hover:text-white bg-white hover:bg-gradient-to-r hover:from-teal-600 hover:to-emerald-600 border border-teal-300 hover:border-transparent px-3 py-1.5 rounded-xl transition-all duration-200 shadow-2xs hover:shadow-[0_4px_12px_rgba(13,148,136,0.3)] cursor-pointer active:scale-95"
+                    >
+                      <User className="w-3 h-3" />
+                      <span>View Profile</span>
+                      <ArrowRight className="w-3 h-3 ml-0.5" />
+                    </button>
+
+                    {isConfirmingDelete ? (
+                      <div className="flex items-center gap-1.5 animate-fadeIn">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onDeletePayment(pay.pid);
+                            setDeleteConfirmPid(null);
+                          }}
+                          className="px-3 py-1.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-xl text-[10.5px] font-bold cursor-pointer transition-all active:scale-95 shadow-[0_2px_8px_rgba(244,63,94,0.35)]"
+                        >
+                          Confirm Delete
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteConfirmPid(null)}
+                          className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[10.5px] font-bold cursor-pointer transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEdit(pay)}
+                          className="px-2.5 py-1.5 text-teal-900 hover:text-white bg-teal-100 hover:bg-teal-600 border border-teal-300 hover:border-transparent rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_10px_rgba(13,148,136,0.3)] active:scale-95 flex items-center gap-1"
+                          title="Edit Record"
+                        >
+                          <Edit2 className="w-3 h-3" />
+                          <span className="text-[11px] font-bold">Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteConfirmPid(pay.pid)}
+                          className="px-2.5 py-1.5 text-rose-900 hover:text-white bg-rose-100 hover:bg-rose-600 border border-rose-300 hover:border-transparent rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_10px_rgba(244,63,94,0.3)] active:scale-95 flex items-center gap-1"
+                          title="Delete Record"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          <span className="text-[11px] font-bold">Delete</span>
+                        </button>
                       </div>
                     )}
                   </div>

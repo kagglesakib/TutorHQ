@@ -15,7 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   expiresAt: number | null;
   timeLeftMs: number;
-  login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
+  login: (identifier: string, pass: string, role?: 'admin' | 'student') => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 }
@@ -103,12 +103,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [expiresAt]);
 
-  const login = async (identifier: string, pass: string) => {
+  const login = async (identifier: string, pass: string, role?: 'admin' | 'student') => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, sid: identifier, email: identifier, password: pass }),
+        body: JSON.stringify({ identifier, sid: identifier, email: identifier, password: pass, role }),
       });
 
       const resText = await res.text();
@@ -206,11 +206,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!mounted || isLoading || !isAuthenticated || !user) return;
 
     if (user.userType === 'student') {
-      if (pathname.startsWith('/admin') || pathname === '/') {
+      if (pathname && (pathname.startsWith('/admin') || pathname === '/')) {
         router.replace('/student');
       }
     } else if (user.userType === 'admin') {
-      if (pathname === '/' || pathname.startsWith('/student')) {
+      if (pathname && (pathname === '/' || pathname.startsWith('/student'))) {
         router.replace('/admin');
       }
     }
@@ -232,12 +232,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   // 1. Student View logic
   if (user?.userType === 'student') {
     // If account pending approval
-    if (user.isApproved !== 'yes') {
+    const isApproved = user.isApproved === 'yes' || (user as any).approved === 'yes';
+    if (!isApproved) {
       return <PendingApprovalCard user={user} />;
     }
 
     // Prevent flashing admin route if pending redirect
-    if (pathname.startsWith('/admin')) {
+    if (pathname?.startsWith('/admin')) {
       return null;
     }
 
@@ -245,7 +246,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   // 2. Admin View logic (userType === 'admin')
-  if (pathname.startsWith('/student')) {
+  if (pathname?.startsWith('/student')) {
     return null;
   }
 

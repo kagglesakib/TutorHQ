@@ -10,8 +10,8 @@ import { motion, AnimatePresence } from 'motion/react';
 function StudentsPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const sidParam = searchParams.get('sid');
-  const addParam = searchParams.get('add');
+  const sidParam = searchParams?.get('sid') ?? null;
+  const addParam = searchParams?.get('add') ?? null;
 
   const [students, setStudents] = useState<Student[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -35,7 +35,22 @@ function StudentsPageInner() {
       ]);
 
       if (!resStudents.ok) throw new Error('Failed to load students ledger');
-      setStudents(await resStudents.json());
+      const studentsData = await resStudents.json();
+      const list = Array.isArray(studentsData) ? studentsData : [];
+      setStudents(list.filter((s: Student) => {
+        if (s.userType === 'admin') return false;
+        const sid = String(s.sid || '').trim().toUpperCase();
+        if (sid === 'ADMIN' || sid === '0000000' || sid === '0') return false;
+        const email = String(s.email || '').trim().toLowerCase();
+        if (
+          email === 'sakib1514817122@gmail.com' ||
+          email === 'sakibhasan.office@gmail.com' ||
+          email === 'kagglesakib@gmail.com'
+        ) return false;
+        const name = String(s.name || '').trim().toLowerCase();
+        if (name === 'sakibul hasan' || name.includes('sakibul hasan') || name === 'admin') return false;
+        return true;
+      }));
       if (resActivities.ok) setActivities(await resActivities.json());
       if (resExams.ok) setExams(await resExams.json());
       if (resPayments.ok) setPayments(await resPayments.json());
@@ -276,22 +291,35 @@ function StudentsPageInner() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ duration: 0.2 }}
-                className="bg-gradient-to-br from-emerald-100/70 via-teal-50/80 to-indigo-50/70 rounded-3xl p-6 sm:p-10 border border-emerald-200/90 shadow-sm text-center space-y-5"
+                className="relative overflow-hidden bg-gradient-to-br from-emerald-50/90 via-teal-50/70 to-indigo-50/80 rounded-3xl p-8 sm:p-12 border-2 border-emerald-300/80 shadow-[0_8px_30px_-4px_rgba(16,185,129,0.18)] text-center space-y-6"
               >
-                <div className="p-4 bg-gradient-to-tr from-emerald-600 via-teal-600 to-indigo-600 text-white rounded-2xl w-16 h-16 flex items-center justify-center mx-auto shadow-md shadow-emerald-200">
-                  <BookOpen className="w-8 h-8" />
-                </div>
-                <div className="space-y-2 max-w-md mx-auto">
-                  <h3 className="text-xl font-display font-black text-slate-800 tracking-tight">Student Profiles & Academic Ledger</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">Select any student from the directory to log daily progress, check exam marks, manage monthly tuition payments, or generate PDF report cards.</p>
-                </div>
-                <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-                  <button
-                    onClick={() => setIsAddingStudent(true)}
-                    className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs rounded-2xl transition-all cursor-pointer shadow-md shadow-emerald-200"
-                  >
-                    + Add New Student
-                  </button>
+                {/* Ambient glowing aura */}
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-emerald-400/30 blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-teal-400/30 blur-3xl pointer-events-none" />
+
+                <div className="relative z-10 space-y-4">
+                  <div className="relative mx-auto w-20 h-20">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 via-teal-500 to-indigo-600 rounded-3xl blur-md opacity-60 animate-pulse" />
+                    <div className="relative p-5 bg-gradient-to-tr from-emerald-600 via-teal-600 to-indigo-600 text-white rounded-3xl w-20 h-20 flex items-center justify-center shadow-lg border border-white/40">
+                      <BookOpen className="w-10 h-10 drop-shadow-sm" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 max-w-md mx-auto">
+                    <h3 className="text-xl sm:text-2xl font-display font-black text-slate-900 tracking-tight">
+                      Student Profiles & Academic Ledger
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                      Select any student from the directory to log daily progress, check exam marks, manage monthly tuition payments, or generate PDF report cards.
+                    </p>
+                  </div>
+                  <div className="pt-3 flex flex-wrap items-center justify-center gap-3">
+                    <button
+                      onClick={() => setIsAddingStudent(true)}
+                      className="px-6 py-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:via-teal-500 hover:to-emerald-500 text-white font-black text-xs sm:text-sm rounded-2xl transition-all duration-200 cursor-pointer shadow-[0_4px_16px_rgba(16,185,129,0.35)] hover:shadow-[0_6px_22px_rgba(16,185,129,0.45)] hover:scale-105 active:scale-95 border border-emerald-400/40 flex items-center gap-2"
+                    >
+                      <span>+ Add New Student</span>
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}

@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Student, Exam } from '@/types';
+import { isActiveEnrolledStudent } from '@/utils/studentFilters';
 import {
   Trophy,
   Award,
@@ -78,7 +79,7 @@ export default function GlobalExamList({
   });
 
   const studentMap = useMemo(() => new Map(students.map((s) => [s.sid, s])), [students]);
-  const activeStudents = useMemo(() => students.filter((s) => s.isApproved !== 'no' && s.status !== 'revoked'), [students]);
+  const activeStudents = useMemo(() => students.filter(isActiveEnrolledStudent), [students]);
 
   // Telemetry Calculations matching Student Portal
   const totalLogs = exams.length;
@@ -329,9 +330,9 @@ export default function GlobalExamList({
 
       {/* 2. Filter & Search Toolbar (Exact Student Portal Match + Student Filter) */}
       <div className="bg-gradient-to-r from-purple-100/90 via-indigo-100/90 to-teal-100/90 border border-purple-300/90 rounded-xl p-2.5 sm:p-3 shadow-2xs space-y-2.5">
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {/* Topic & Subject Search */}
-          <div className="relative flex items-center bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border border-purple-300/90 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-purple-500/40 focus-within:border-purple-500 shadow-2xs transition-all sm:col-span-1 md:col-span-1">
+          <div className="relative flex items-center bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border border-purple-300/90 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-purple-500/40 focus-within:border-purple-500 shadow-2xs transition-all min-w-0">
             <div className="p-1 bg-purple-700 text-white rounded-md shrink-0 mr-2 shadow-2xs">
               <Search className="w-2.5 h-2.5" />
             </div>
@@ -395,11 +396,11 @@ export default function GlobalExamList({
           </div>
 
           {/* Attendance Status Filter Pills */}
-          <div className="flex items-center bg-purple-100 p-0.5 rounded-lg border border-purple-300 shadow-2xs justify-between">
+          <div className="flex items-center bg-purple-100 p-0.5 rounded-lg border border-purple-300 shadow-2xs justify-between min-w-0">
             <button
               type="button"
               onClick={() => setFilterStatus('All')}
-              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+              className={`flex-1 py-1 px-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer truncate ${
                 filterStatus === 'All'
                   ? 'bg-purple-700 text-white shadow-2xs'
                   : 'text-purple-950 hover:bg-purple-200/80'
@@ -410,7 +411,7 @@ export default function GlobalExamList({
             <button
               type="button"
               onClick={() => setFilterStatus('Present')}
-              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+              className={`flex-1 py-1 px-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer truncate ${
                 filterStatus === 'Present'
                   ? 'bg-emerald-600 text-white shadow-2xs'
                   : 'text-emerald-950 hover:bg-emerald-200/80'
@@ -421,7 +422,7 @@ export default function GlobalExamList({
             <button
               type="button"
               onClick={() => setFilterStatus('Absent')}
-              className={`flex-1 py-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+              className={`flex-1 py-1 px-1 text-center text-[10px] font-bold rounded-md transition-all cursor-pointer truncate ${
                 filterStatus === 'Absent'
                   ? 'bg-rose-600 text-white shadow-2xs'
                   : 'text-rose-950 hover:bg-rose-200/80'

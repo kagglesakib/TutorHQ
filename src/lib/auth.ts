@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { ApprovalStatus } from '../types';
 
 const SESSION_SECRET = process.env.SESSION_SECRET || 'tutorhq_secret_key_3h_session_2026';
 export const SESSION_DURATION_MS = 3 * 60 * 60 * 1000; // 3 Hours in milliseconds
@@ -10,7 +11,8 @@ export interface UserSession {
   phone?: string;
   sid?: string;
   userType?: 'admin' | 'student';
-  isApproved?: string; // 'yes' | 'no'
+  approved?: ApprovalStatus;
+  isApproved?: ApprovalStatus;
   expiresAt: number;
   iat: number;
 }
@@ -25,17 +27,29 @@ export function createSessionToken(user: {
   phone?: string;
   sid?: string;
   userType?: 'admin' | 'student';
-  isApproved?: string;
+  approved?: ApprovalStatus;
+  isApproved?: ApprovalStatus;
 }): { token: string; expiresAt: number } {
   const iat = Date.now();
   const expiresAt = iat + SESSION_DURATION_MS;
+  const rawStatus = (user.approved ?? user.isApproved) as any;
+  let normalizedApproved: ApprovalStatus = 'pending';
+  if (rawStatus === 'yes' || rawStatus === 'approved' || rawStatus === true || user.userType === 'admin') {
+    normalizedApproved = 'yes';
+  } else if (rawStatus === 'no' || rawStatus === 'rejected' || rawStatus === 'disapproved' || rawStatus === false) {
+    normalizedApproved = 'no';
+  } else {
+    normalizedApproved = 'pending';
+  }
+
   const payloadData: UserSession = {
     name: user.name,
     email: user.email.toLowerCase().trim(),
     phone: user.phone || '',
     sid: user.sid || '',
     userType: user.userType || 'admin',
-    isApproved: user.isApproved || 'yes',
+    approved: normalizedApproved,
+    isApproved: normalizedApproved,
     expiresAt,
     iat,
   };

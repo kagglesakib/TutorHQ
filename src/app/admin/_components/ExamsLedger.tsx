@@ -18,6 +18,8 @@ import {
   ArrowUpDown,
   CheckCircle2,
   XCircle,
+  LayoutGrid,
+  LayoutList,
 } from 'lucide-react';
 import { generateExamId, formatEid } from '@/utils/id';
 
@@ -42,6 +44,7 @@ export default function ExamsLedger({
   const [filterStatus, setFilterStatus] = useState<'All' | 'Present' | 'Absent'>('All');
   const [sortBy, setSortBy] = useState<'date' | 'marks' | 'pct'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
   const [newExam, setNewExam] = useState<Partial<Exam>>({
     date: new Date().toISOString().slice(0, 10),
@@ -450,6 +453,36 @@ export default function ExamsLedger({
           </span>
 
           <div className="flex items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto">
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-purple-200/90 border border-purple-300 p-0.5 rounded-lg shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setViewMode('cards')}
+                className={`px-2 py-1 rounded-md text-[10px] font-extrabold flex items-center gap-1 cursor-pointer transition-all ${
+                  viewMode === 'cards'
+                    ? 'bg-purple-700 text-white shadow-2xs'
+                    : 'text-purple-950 hover:bg-purple-300/80'
+                }`}
+                title="Card View"
+              >
+                <LayoutGrid className="w-3 h-3" />
+                <span>Cards</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                className={`px-2 py-1 rounded-md text-[10px] font-extrabold flex items-center gap-1 cursor-pointer transition-all ${
+                  viewMode === 'table'
+                    ? 'bg-purple-700 text-white shadow-2xs'
+                    : 'text-purple-950 hover:bg-purple-300/80'
+                }`}
+                title="Table View"
+              >
+                <LayoutList className="w-3 h-3" />
+                <span>Table</span>
+              </button>
+            </div>
+
             <div className="flex items-center gap-1 flex-1 sm:flex-initial min-w-0">
               <label className="text-[10px] font-bold text-purple-950 mr-0.5 font-mono shrink-0">Sort by:</label>
               <select
@@ -476,8 +509,213 @@ export default function ExamsLedger({
         </div>
       </div>
 
-      {/* 3. Exam Scorecards List (Exact Student Portal Match) */}
-      <div className="space-y-2">
+      {/* 3. Exam Scorecards List / Grid */}
+      {viewMode === 'table' ? (
+        <div className="overflow-x-auto border border-purple-200/90 rounded-2xl bg-white shadow-2xs">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-purple-100/90 border-b border-purple-200 text-purple-950 font-black text-[10.5px] uppercase tracking-wider">
+                <th className="py-2.5 px-3">EID & Date</th>
+                <th className="py-2.5 px-3">Topic / Syllabus</th>
+                <th className="py-2.5 px-3">Status</th>
+                <th className="py-2.5 px-3">Score & Grade</th>
+                <th className="py-2.5 px-3">Remarks</th>
+                <th className="py-2.5 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-purple-100">
+              {sortedExams.length > 0 ? (
+                sortedExams.map((exam, index) => {
+                  const isAbsent = exam.status === 'Absent';
+                  const isEditing = editingEid === exam.eid;
+                  const pct =
+                    !isAbsent && exam.totalMarks > 0 && exam.obtainedMarks !== undefined && exam.obtainedMarks !== null
+                      ? Math.round((exam.obtainedMarks / exam.totalMarks) * 100)
+                      : null;
+
+                  if (isEditing && editFormData) {
+                    return (
+                      <tr key={exam.eid} className="bg-purple-50/90">
+                        <td colSpan={6} className="p-3">
+                          <div className="space-y-3">
+                            <span className="text-xs font-black text-purple-950">Editing Exam: {formatEid(exam.eid)}</span>
+                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                              <div>
+                                <label className="text-[10px] font-bold text-purple-950 block">Date</label>
+                                <input
+                                  type="date"
+                                  value={editFormData.date}
+                                  onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+                                  className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs"
+                                />
+                              </div>
+                              <div className="sm:col-span-2">
+                                <label className="text-[10px] font-bold text-purple-950 block">Subject & Topic</label>
+                                <input
+                                  type="text"
+                                  value={editFormData.subjectAndTopic}
+                                  onChange={(e) => setEditFormData({ ...editFormData, subjectAndTopic: e.target.value })}
+                                  className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold text-purple-950 block">Status</label>
+                                <select
+                                  value={editFormData.status}
+                                  onChange={(e) =>
+                                    setEditFormData({ ...editFormData, status: e.target.value as 'Present' | 'Absent' })
+                                  }
+                                  className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs"
+                                >
+                                  <option value="Present">Present</option>
+                                  <option value="Absent">Absent</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold text-purple-950 block">Total Marks</label>
+                                <input
+                                  type="number"
+                                  value={editFormData.totalMarks}
+                                  onChange={(e) => setEditFormData({ ...editFormData, totalMarks: Number(e.target.value) })}
+                                  className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs font-mono font-bold"
+                                />
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold text-purple-950 block">Obtained</label>
+                                <input
+                                  type="number"
+                                  value={editFormData.obtainedMarks ?? ''}
+                                  onChange={(e) =>
+                                    setEditFormData({
+                                      ...editFormData,
+                                      obtainedMarks: e.target.value ? Number(e.target.value) : undefined,
+                                    })
+                                  }
+                                  disabled={editFormData.status === 'Absent'}
+                                  className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs font-mono font-bold disabled:bg-slate-100"
+                                />
+                              </div>
+                              <div className="sm:col-span-2">
+                                <label className="text-[10px] font-bold text-purple-950 block">Remarks</label>
+                                <input
+                                  type="text"
+                                  value={editFormData.remarks || ''}
+                                  onChange={(e) => setEditFormData({ ...editFormData, remarks: e.target.value })}
+                                  className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setEditingEid(null)}
+                                className="px-3 py-1 bg-slate-200 text-slate-700 rounded text-xs font-bold"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleSaveEdit}
+                                className="px-3 py-1 bg-purple-700 text-white rounded text-xs font-bold"
+                              >
+                                Save Changes
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  return (
+                    <tr key={exam.eid || index} className="hover:bg-purple-50/50 transition-colors">
+                      <td className="py-2.5 px-3">
+                        <div className="flex flex-col">
+                          <span className="font-mono font-black text-purple-950 text-[10px]">{formatEid(exam.eid)}</span>
+                          <span className="text-[10px] text-slate-600 font-mono flex items-center gap-1">
+                            <Calendar className="w-2.5 h-2.5" />
+                            {exam.date}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-2.5 px-3 max-w-[200px]">
+                        <span className="font-bold text-slate-900 block truncate">{exam.subjectAndTopic}</span>
+                        {exam.comment && <p className="text-[10px] text-slate-500 italic truncate">&ldquo;{exam.comment}&rdquo;</p>}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[9.5px] font-black uppercase inline-flex items-center gap-1 ${
+                            isAbsent ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                          }`}
+                        >
+                          {isAbsent ? <XCircle className="w-2.5 h-2.5" /> : <CheckCircle2 className="w-2.5 h-2.5" />}
+                          {exam.status}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {!isAbsent ? (
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono font-black text-slate-900 text-xs">
+                              {exam.obtainedMarks ?? 0}/{exam.totalMarks}
+                            </span>
+                            {pct !== null && (
+                              <span className="text-[9.5px] font-bold px-1.5 py-0.2 bg-purple-100 text-purple-900 rounded font-mono">
+                                {pct}%
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-slate-400 italic">—</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {exam.remarks ? (
+                          <span className="text-[10px] font-bold text-purple-900 bg-purple-100 px-1.5 py-0.5 rounded">
+                            {exam.remarks}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-slate-400 italic">—</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(exam)}
+                            className="p-1 text-purple-700 hover:bg-purple-100 rounded"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (confirm(`Delete exam record ${formatEid(exam.eid)}?`)) {
+                                onDeleteExam(exam.eid);
+                              }
+                            }}
+                            className="p-1 text-rose-600 hover:bg-rose-100 rounded"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-6 text-center text-slate-500 text-xs font-semibold">
+                    No Exam Logs Found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {sortedExams.length > 0 ? (
           sortedExams.map((exam, index) => {
             const isAbsent = exam.status === 'Absent';
@@ -631,63 +869,69 @@ export default function ExamsLedger({
                     : 'bg-gradient-to-br from-white via-purple-50/40 to-indigo-50/50 border-purple-200/90'
                 }`}
               >
-                {/* Header bar: ID & Date on left, Grade & Attendance Status & Actions on right */}
-                <div className="flex items-center justify-between gap-2 border-b border-purple-100 pb-2.5">
-                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                    <span className="text-[10px] font-mono font-bold text-purple-950 bg-purple-100/90 px-2 py-0.5 rounded-md border border-purple-300/80 shadow-2xs flex items-center gap-1 shrink-0">
+                {/* Header bar: 2 Clean Rows to Guarantee Zero Overlap */}
+                <div className="space-y-2 border-b border-purple-100 pb-2.5">
+                  {/* Row 1: ID on left, Grade & Status on right */}
+                  <div className="flex items-center justify-between gap-2 min-w-0">
+                    <span className="text-[10px] font-mono font-bold text-purple-950 bg-purple-100/90 px-2 py-0.5 rounded-md border border-purple-300/80 shadow-2xs flex items-center gap-1 shrink-0 max-w-[210px]">
                       <ShieldCheck className="w-3 h-3 text-purple-700 shrink-0" />
-                      <span>{formatEid(exam.eid)}</span>
+                      <span className="truncate">{formatEid(exam.eid)}</span>
                     </span>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {pct !== null && (
+                        <span
+                          className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-2xs ${badgeColor}`}
+                        >
+                          {gradeLabel}
+                        </span>
+                      )}
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border shadow-2xs flex items-center gap-1 shrink-0 ${
+                          isAbsent
+                            ? 'bg-rose-100 text-rose-900 border-rose-300'
+                            : 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                        }`}
+                      >
+                        {isAbsent ? (
+                          <XCircle className="w-3 h-3 text-rose-600 shrink-0" />
+                        ) : (
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                        )}
+                        <span>{exam.status}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Date on left, Actions on right */}
+                  <div className="flex items-center justify-between gap-2 min-w-0 pt-0.5">
                     <span className="text-[10px] font-bold text-slate-700 font-mono flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 shrink-0">
                       <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
                       <span>{exam.date}</span>
                     </span>
-                  </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                    {pct !== null && (
-                      <span
-                        className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-2xs ${badgeColor}`}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleStartEdit(exam)}
+                        className="p-1.5 text-purple-700 hover:text-purple-950 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
+                        title="Edit Record"
                       >
-                        {gradeLabel}
-                      </span>
-                    )}
-                    <span
-                      className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border shadow-2xs flex items-center gap-1 ${
-                        isAbsent
-                          ? 'bg-rose-100 text-rose-900 border-rose-300'
-                          : 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                      }`}
-                    >
-                      {isAbsent ? (
-                        <XCircle className="w-3 h-3 text-rose-600 shrink-0" />
-                      ) : (
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                      )}
-                      <span>{exam.status}</span>
-                    </span>
-
-                    {/* Actions */}
-                    <button
-                      type="button"
-                      onClick={() => handleStartEdit(exam)}
-                      className="p-1.5 text-purple-700 hover:text-purple-950 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
-                      title="Edit Record"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm(`Delete exam record ${formatEid(exam.eid)}?`)) {
-                          onDeleteExam(exam.eid);
-                        }
-                      }}
-                      className="p-1.5 text-rose-700 hover:text-rose-950 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
-                      title="Delete Record"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
+                        <Edit2 className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Delete exam record ${formatEid(exam.eid)}?`)) {
+                            onDeleteExam(exam.eid);
+                          }
+                        }}
+                        className="p-1.5 text-rose-700 hover:text-rose-950 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
+                        title="Delete Record"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -764,7 +1008,7 @@ export default function ExamsLedger({
             );
           })
         ) : (
-          <div className="py-8 text-center text-slate-500 border-2 border-dashed border-purple-300 rounded-2xl bg-gradient-to-br from-purple-100/60 via-indigo-50 to-teal-100/60 shadow-2xs space-y-2">
+          <div className="md:col-span-2 py-8 text-center text-slate-500 border-2 border-dashed border-purple-300 rounded-2xl bg-gradient-to-br from-purple-100/60 via-indigo-50 to-teal-100/60 shadow-2xs space-y-2">
             <div className="p-2.5 bg-purple-200 text-purple-800 rounded-xl w-10 h-10 mx-auto flex items-center justify-center border border-purple-300 shadow-2xs">
               <Trophy className="w-5 h-5" />
             </div>
@@ -775,6 +1019,7 @@ export default function ExamsLedger({
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

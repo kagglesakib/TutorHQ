@@ -31,7 +31,25 @@ export default function AdminHeader() {
         if (!res.ok) return;
         const data = await res.json();
         const list = Array.isArray(data) ? data : data.users || [];
-        const pending = list.filter((u: any) => u.isApproved !== 'yes').length;
+        const pending = list.filter((u: any) => {
+          if (u.userType === 'admin') return false;
+          const sid = String(u.sid || '').trim().toUpperCase();
+          if (sid === 'ADMIN' || sid === '0000000' || sid === '0') return false;
+          const email = String(u.email || '').trim().toLowerCase();
+          if (
+            email === 'sakib1514817122@gmail.com' ||
+            email === 'sakibhasan.office@gmail.com' ||
+            email === 'kagglesakib@gmail.com'
+          ) return false;
+          const name = String(u.name || '').trim().toLowerCase();
+          if (name === 'sakibul hasan' || name.includes('sakibul hasan') || name === 'admin') return false;
+
+          const appr = String(u.approved ?? '').trim().toLowerCase();
+          const isAppr = String(u.isApproved ?? '').trim().toLowerCase();
+          if (appr === 'no' || isAppr === 'no' || appr === 'revoked' || isAppr === 'revoked') return false;
+          if (appr === 'yes' || isAppr === 'yes' || appr === 'approved' || isAppr === 'approved') return false;
+          return appr === 'pending' || isAppr === 'pending' || (!u.sid && appr !== 'no');
+        }).length;
         setPendingCount(pending);
       } catch {
         // Ignore transient errors
@@ -39,7 +57,12 @@ export default function AdminHeader() {
     };
     fetchPendingCount();
     const interval = setInterval(fetchPendingCount, 25000);
-    return () => clearInterval(interval);
+    const handleSync = () => fetchPendingCount();
+    window.addEventListener('pending-registrations-updated', handleSync);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('pending-registrations-updated', handleSync);
+    };
   }, []);
 
   const handleRefresh = () => {
@@ -140,7 +163,7 @@ export default function AdminHeader() {
   ];
 
   const checkIsActive = (href?: string) => {
-    if (!href) return false;
+    if (!href || !pathname) return false;
     if (href === '/admin') return pathname === '/admin' || pathname === '/';
     return pathname === href || pathname.startsWith(href + '/');
   };
@@ -258,9 +281,6 @@ export default function AdminHeader() {
                           <span className="absolute -top-1 -right-2 text-[7.5px] font-mono font-bold px-1 py-0.2 rounded-full shadow-2xs leading-none bg-rose-500 text-white animate-pulse">
                             {item.count}
                           </span>
-                        )}
-                        {isActive && (!item.count || item.count === 0) && (
-                          <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                         )}
                       </div>
 
