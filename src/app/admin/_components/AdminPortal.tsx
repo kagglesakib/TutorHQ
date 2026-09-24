@@ -558,29 +558,32 @@ export default function AdminPortal({
 
   return (
     <div className="space-y-3 pb-6 w-full max-w-full overflow-hidden">
-      {/* 1. Header & Dynamic Filters Toolbar (Tight & Compact) */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-2.5 sm:p-3 border border-slate-800 shadow-sm w-full overflow-hidden">
+      {/* 1. Header & Dynamic Filters Toolbar (Sleek Box Structure) */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 text-white rounded-2xl p-2.5 sm:p-3.5 border border-slate-800 shadow-md w-full overflow-hidden space-y-2.5">
+        {/* Top Row: Title, Student Counter & Sync Action */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="p-1.5 bg-gradient-to-tr from-indigo-500 to-emerald-400 text-white rounded-lg shadow-xs shrink-0">
-              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 via-teal-400 to-emerald-400 p-0.5 shadow-sm shrink-0 flex items-center justify-center">
+              <div className="w-full h-full bg-slate-950/20 rounded-[10px] flex items-center justify-center text-white">
+                <BarChart3 className="w-4 h-4" />
+              </div>
             </div>
-            <div className="min-w-0">
-              <h1 className="text-xs sm:text-sm font-display font-black tracking-tight text-white flex items-center gap-1.5 truncate">
-                <span className="truncate">Analytics Hub</span>
-                <span className="text-[9px] sm:text-[9.5px] bg-indigo-900/90 text-indigo-200 border border-indigo-700 px-1.5 py-0.2 rounded font-mono font-bold shrink-0">
-                  {filteredStudents.length} Students
-                </span>
+            <div className="min-w-0 flex items-center gap-2 flex-wrap">
+              <h1 className="text-xs sm:text-sm font-display font-black tracking-tight text-white truncate">
+                Analytics Hub
               </h1>
+              <span className="text-[9.5px] sm:text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono font-bold shrink-0">
+                {filteredStudents.length} Students
+              </span>
             </div>
           </div>
 
-          {/* Quick Refresh Button */}
+          {/* Refresh / Sync Button */}
           <button
             type="button"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] sm:text-[11px] font-bold rounded-lg transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center gap-1 active:scale-95 shrink-0"
+            className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-[10.5px] sm:text-[11px] font-bold rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center gap-1.5 active:scale-95 shrink-0"
             title="Refresh Analytics Data"
           >
             <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -588,25 +591,25 @@ export default function AdminPortal({
           </button>
         </div>
 
-        {/* Global Filter Controls Bar */}
-        <div className="mt-2 pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          {/* Left: Batch Selector */}
-          <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
-            <span className="text-[9.5px] sm:text-[10px] font-bold text-slate-400 font-mono uppercase tracking-wider flex items-center gap-0.5 shrink-0">
+        {/* Bottom Row: Unified Filter Matrix (Batch + Period) */}
+        <div className="pt-2 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+          {/* Left / Batch Filter (sm: 7 cols) */}
+          <div className="sm:col-span-7 flex items-center gap-1.5 flex-wrap min-w-0">
+            <span className="text-[9.5px] font-bold text-slate-400 font-mono uppercase tracking-wider flex items-center gap-1 shrink-0">
               <GraduationCap className="w-3 h-3 text-indigo-400" />
               Batch:
             </span>
 
-            {/* "All Batches" Quick Pill */}
+            {/* "All" Quick Pill */}
             <button
               type="button"
               onClick={() => {
                 setSelectedBatch('all');
                 setIsBatchDropdownOpen(false);
               }}
-              className={`px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
+              className={`px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-bold transition-all cursor-pointer shrink-0 ${
                 selectedBatch === 'all'
-                  ? 'bg-indigo-600 text-white font-black shadow-xs'
+                  ? 'bg-indigo-600 text-white font-black shadow-xs ring-1 ring-indigo-400/40'
                   : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
               }`}
             >
@@ -618,15 +621,15 @@ export default function AdminPortal({
               <button
                 type="button"
                 onClick={() => setIsBatchDropdownOpen(!isBatchDropdownOpen)}
-                className={`px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 border ${
+                className={`px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1.5 border ${
                   selectedBatch !== 'all'
-                    ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/60 shadow-xs'
+                    ? 'bg-indigo-600/30 text-indigo-200 border-indigo-500 shadow-xs ring-1 ring-indigo-500/40'
                     : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
                 }`}
                 title="Select Academic Batch"
               >
                 <Filter className="w-2.5 h-2.5 text-indigo-400 shrink-0" />
-                <span className="max-w-[100px] sm:max-w-[130px] truncate">
+                <span className="max-w-[110px] sm:max-w-[140px] truncate">
                   {selectedBatch === 'all' ? `Batches (${uniqueBatches.length})` : formatBatch(selectedBatch)}
                 </span>
                 <ChevronDown className={`w-3 h-3 transition-transform text-slate-400 ${isBatchDropdownOpen ? 'rotate-180' : ''}`} />
@@ -709,7 +712,7 @@ export default function AdminPortal({
               <button
                 type="button"
                 onClick={() => setSelectedBatch('all')}
-                className="p-0.5 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-md shrink-0 transition-colors cursor-pointer"
+                className="p-1 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-lg shrink-0 transition-colors cursor-pointer"
                 title="Reset batch filter"
               >
                 <X className="w-3 h-3" />
@@ -717,29 +720,31 @@ export default function AdminPortal({
             )}
           </div>
 
-          {/* Right: Timeline Selector */}
-          <div className="flex items-center gap-1 shrink-0 self-start sm:self-auto bg-slate-800/90 p-0.5 rounded-lg border border-slate-700">
-            {(
-              [
-                { id: 'all', label: 'All' },
-                { id: '30d', label: '30D' },
-                { id: '90d', label: '90D' },
-                { id: '6m', label: '6M' },
-              ] as const
-            ).map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTimeRange(t.id)}
-                className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
-                  timeRange === t.id
-                    ? 'bg-indigo-600 text-white font-black shadow-xs'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
+          {/* Right / Timeline Segment (sm: 5 cols, full-width grid on mobile) */}
+          <div className="sm:col-span-5 sm:justify-self-end w-full sm:w-auto">
+            <div className="grid grid-cols-4 sm:flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-xl border border-slate-800 w-full sm:w-auto">
+              {(
+                [
+                  { id: 'all', label: 'All' },
+                  { id: '30d', label: '30D' },
+                  { id: '90d', label: '90D' },
+                  { id: '6m', label: '6M' },
+                ] as const
+              ).map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTimeRange(t.id)}
+                  className={`py-1 sm:py-0.5 px-2.5 rounded-lg text-[10px] sm:text-[10.5px] font-bold text-center transition-all cursor-pointer ${
+                    timeRange === t.id
+                      ? 'bg-indigo-600 text-white font-black shadow-xs'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
