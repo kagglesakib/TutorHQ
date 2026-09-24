@@ -635,6 +635,15 @@ export async function connectMongoDB(): Promise<Db> {
     ''
   ).trim();
 
+  // Check if running during Next.js production build phase
+  const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || process.env.npm_lifecycle_event === 'build';
+
+  if (isBuildTime && !localUri && !globalUri) {
+    useMemoryFallback = true;
+    activeSource = 'memory';
+    return getMemoryDb() as Db;
+  }
+
   if (localUri || globalUri) {
     useMemoryFallback = false;
   } else if (useMemoryFallback) {
@@ -648,6 +657,9 @@ export async function connectMongoDB(): Promise<Db> {
   if (connectionPromise) {
     return connectionPromise;
   }
+
+  const globalTimeout = isBuildTime ? 2000 : 8000;
+  const localTimeout = isBuildTime ? 1500 : 2500;
 
   connectionPromise = (async () => {
     function parseDbName(uri: string): string | undefined {
@@ -670,8 +682,8 @@ export async function connectMongoDB(): Promise<Db> {
       try {
         console.log('🔄 Attempting connection to Global MongoDB (Atlas)...');
         const client = new MongoClient(globalUri, {
-          serverSelectionTimeoutMS: 8000,
-          connectTimeoutMS: 8000,
+          serverSelectionTimeoutMS: globalTimeout,
+          connectTimeoutMS: globalTimeout,
         });
         await client.connect();
 

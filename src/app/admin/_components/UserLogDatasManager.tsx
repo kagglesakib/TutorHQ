@@ -404,27 +404,27 @@ export default function UserLogDatasManager() {
       )}
 
       {/* ========================================================= */}
-      {/* 1. RESPONSIVE KPI METRICS RIBBON WITH LIGHT BACKGROUND COLORS */}
+      {/* 1. COMPACT RESPONSIVE KPI METRICS RIBBON                  */}
       {/* ========================================================= */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
         {/* Metric 1: Total Registered */}
         <button
           type="button"
           onClick={() => setActiveTab('all')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all text-left cursor-pointer shadow-2xs ${
+          className={`p-2.5 sm:p-3 rounded-xl border transition-all text-left cursor-pointer shadow-2xs ${
             activeTab === 'all'
               ? 'bg-indigo-100/90 border-indigo-400 ring-2 ring-indigo-400/30'
               : 'bg-indigo-50/70 border-indigo-200/80 hover:bg-indigo-100/60'
           }`}
         >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-black uppercase tracking-wider text-indigo-950">Total Registered</span>
-            <div className="p-1.5 rounded-xl bg-indigo-200/80 text-indigo-800 shrink-0">
-              <Users className="w-4 h-4" />
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] font-black uppercase tracking-wider text-indigo-950 truncate">Total Registered</span>
+            <div className="p-1 rounded-lg bg-indigo-200/80 text-indigo-800 shrink-0">
+              <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl sm:text-2xl font-black text-indigo-950 font-mono">{totalCount}</span>
+          <div className="mt-1 flex items-baseline gap-1.5">
+            <span className="text-lg sm:text-xl font-black text-indigo-950 font-mono">{totalCount}</span>
             <span className="text-[10px] font-bold text-indigo-700">Accounts</span>
           </div>
         </button>
@@ -433,24 +433,26 @@ export default function UserLogDatasManager() {
         <button
           type="button"
           onClick={() => setActiveTab('pending')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all text-left cursor-pointer shadow-2xs relative ${
+          className={`p-2.5 sm:p-3 rounded-xl border transition-all text-left cursor-pointer shadow-2xs relative ${
             activeTab === 'pending'
               ? 'bg-amber-100/90 border-amber-400 ring-2 ring-amber-400/30'
               : 'bg-amber-50/70 border-amber-200/80 hover:bg-amber-100/60'
           }`}
         >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-black uppercase tracking-wider text-amber-950">Pending Review</span>
-            <div className="p-1.5 rounded-xl bg-amber-200/80 text-amber-800 shrink-0">
-              <Clock className="w-4 h-4" />
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] font-black uppercase tracking-wider text-amber-950 truncate">Pending Review</span>
+            <div className="p-1 rounded-lg bg-amber-200/80 text-amber-800 shrink-0">
+              <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl sm:text-2xl font-black text-amber-950 font-mono">{pendingCount}</span>
-            {pendingCount > 0 && (
-              <span className="text-[10px] font-bold text-white bg-amber-600 px-1.5 py-0.2 rounded-full animate-pulse">
-                Needs Action
+          <div className="mt-1 flex items-baseline gap-1.5">
+            <span className="text-lg sm:text-xl font-black text-amber-950 font-mono">{pendingCount}</span>
+            {pendingCount > 0 ? (
+              <span className="text-[9px] font-extrabold text-white bg-amber-600 px-1.5 py-0.2 rounded-md animate-pulse">
+                Action Req
               </span>
+            ) : (
+              <span className="text-[10px] font-bold text-amber-700">All Set</span>
             )}
           </div>
         </button>
@@ -459,21 +461,21 @@ export default function UserLogDatasManager() {
         <button
           type="button"
           onClick={() => setActiveTab('approved')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all text-left cursor-pointer shadow-2xs ${
+          className={`p-2.5 sm:p-3 rounded-xl border transition-all text-left cursor-pointer shadow-2xs ${
             activeTab === 'approved'
               ? 'bg-emerald-100/90 border-emerald-400 ring-2 ring-emerald-400/30'
               : 'bg-emerald-50/70 border-emerald-200/80 hover:bg-emerald-100/60'
           }`}
         >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-black uppercase tracking-wider text-emerald-950">Active Approved</span>
-            <div className="p-1.5 rounded-xl bg-emerald-200/80 text-emerald-800 shrink-0">
-              <CheckCircle2 className="w-4 h-4" />
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] font-black uppercase tracking-wider text-emerald-950 truncate">Active Approved</span>
+            <div className="p-1 rounded-lg bg-emerald-200/80 text-emerald-800 shrink-0">
+              <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl sm:text-2xl font-black text-emerald-950 font-mono">{approvedCount}</span>
-            <span className="text-[10px] font-bold text-emerald-700">Active Access</span>
+          <div className="mt-1 flex items-baseline gap-1.5">
+            <span className="text-lg sm:text-xl font-black text-emerald-950 font-mono">{approvedCount}</span>
+            <span className="text-[10px] font-bold text-emerald-700">Active</span>
           </div>
         </button>
 
@@ -481,45 +483,45 @@ export default function UserLogDatasManager() {
         <button
           type="button"
           onClick={() => setActiveTab('revoked')}
-          className={`p-3.5 sm:p-4 rounded-2xl border transition-all text-left cursor-pointer shadow-2xs ${
+          className={`p-2.5 sm:p-3 rounded-xl border transition-all text-left cursor-pointer shadow-2xs ${
             activeTab === 'revoked'
               ? 'bg-rose-100/90 border-rose-400 ring-2 ring-rose-400/30'
               : 'bg-rose-50/70 border-rose-200/80 hover:bg-rose-100/60'
           }`}
         >
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-black uppercase tracking-wider text-rose-950">Revoked / Rejected</span>
-            <div className="p-1.5 rounded-xl bg-rose-200/80 text-rose-800 shrink-0">
-              <XCircle className="w-4 h-4" />
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="text-[10px] font-black uppercase tracking-wider text-rose-950 truncate">Revoked</span>
+            <div className="p-1 rounded-lg bg-rose-200/80 text-rose-800 shrink-0">
+              <XCircle className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl sm:text-2xl font-black text-rose-950 font-mono">{revokedCount}</span>
+          <div className="mt-1 flex items-baseline gap-1.5">
+            <span className="text-lg sm:text-xl font-black text-rose-950 font-mono">{revokedCount}</span>
             <span className="text-[10px] font-bold text-rose-700">Blocked</span>
           </div>
         </button>
       </div>
 
       {/* ========================================================= */}
-      {/* 2. RESPONSIVE CONTROLS & FILTER TOOLBAR                   */}
+      {/* 2. COMPACT CONTROLS & FILTER TOOLBAR                      */}
       {/* ========================================================= */}
-      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-3.5 sm:p-4 space-y-3.5 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Search Box with Light Tint */}
-          <div className="relative flex-1 bg-slate-50/90 rounded-2xl border border-slate-300/90 p-1.5 flex items-center focus-within:ring-2 focus-within:ring-teal-500 focus-within:bg-white shadow-2xs">
-            <Search className="w-4 h-4 text-teal-700 ml-2 mr-2 shrink-0" />
+      <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-2.5 sm:p-3 space-y-2.5 shadow-2xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+          {/* Search Box */}
+          <div className="relative flex-1 bg-slate-50/90 rounded-xl border border-slate-300/90 px-2.5 py-1 flex items-center focus-within:ring-2 focus-within:ring-teal-500 focus-within:bg-white shadow-2xs">
+            <Search className="w-3.5 h-3.5 text-teal-700 mr-2 shrink-0" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by student name, SID, email, mobile, batch, college..."
-              className="py-1 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden w-full font-medium"
+              placeholder="Search name, SID, email, mobile, batch, college..."
+              className="py-0.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden w-full font-medium"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
-                className="p-1 hover:bg-slate-200 rounded-lg text-slate-400 cursor-pointer mr-1"
+                className="p-0.5 hover:bg-slate-200 rounded text-slate-400 cursor-pointer mr-0.5"
                 title="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
@@ -532,30 +534,30 @@ export default function UserLogDatasManager() {
             type="button"
             onClick={() => fetchUsers(true)}
             disabled={refreshing}
-            className="px-3.5 py-2.5 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs shrink-0 disabled:opacity-50 active:scale-95"
+            className="px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs shrink-0 disabled:opacity-50 active:scale-95"
             title="Sync user accounts from server"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-teal-700 ${refreshing ? 'animate-spin' : ''}`} />
-            <span>{refreshing ? 'Syncing...' : 'Sync Accounts'}</span>
+            <RefreshCw className={`w-3 h-3 text-teal-700 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshing ? 'Syncing...' : 'Sync'}</span>
           </button>
         </div>
 
-        {/* Filter Tabs - 2x2 Matrix for Android / Mobile, Flex Row on Desktop */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:flex md:flex-wrap md:items-center gap-2 w-full">
+        {/* Filter Tabs - Compact Inline Row */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
           {/* 1. All Accounts */}
           <button
             type="button"
             onClick={() => setActiveTab('all')}
-            className={`min-h-[44px] px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center justify-between sm:justify-center gap-2 cursor-pointer shadow-2xs active:scale-95 ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95 ${
               activeTab === 'all'
-                ? 'bg-slate-900 text-white ring-2 ring-slate-700/40'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
             }`}
           >
-            <span className="truncate text-xs">All Accounts</span>
+            <span>All</span>
             <span
-              className={`text-[10.5px] px-2 py-0.5 rounded-full font-mono font-black ${
-                activeTab === 'all' ? 'bg-slate-800 text-slate-100' : 'bg-slate-200 text-slate-800'
+              className={`text-[9.5px] px-1.5 py-0.2 rounded-md font-mono font-black ${
+                activeTab === 'all' ? 'bg-slate-800 text-slate-100' : 'bg-slate-200 text-slate-700'
               }`}
             >
               {totalCount}
@@ -566,18 +568,16 @@ export default function UserLogDatasManager() {
           <button
             type="button"
             onClick={() => setActiveTab('pending')}
-            className={`min-h-[44px] px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center justify-between sm:justify-center gap-2 cursor-pointer shadow-2xs active:scale-95 ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95 ${
               activeTab === 'pending'
-                ? 'bg-amber-600 text-white ring-2 ring-amber-500/40'
+                ? 'bg-amber-600 text-white shadow-xs'
                 : 'bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300'
             }`}
           >
-            <div className="flex items-center gap-1.5 min-w-0">
-              <Clock className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'pending' ? 'text-white' : 'text-amber-600'}`} />
-              <span className="truncate text-xs">Pending</span>
-            </div>
+            <Clock className={`w-3 h-3 shrink-0 ${activeTab === 'pending' ? 'text-white' : 'text-amber-600'}`} />
+            <span>Pending</span>
             <span
-              className={`text-[10.5px] px-2 py-0.5 rounded-full font-mono font-black ${
+              className={`text-[9.5px] px-1.5 py-0.2 rounded-md font-mono font-black ${
                 activeTab === 'pending'
                   ? 'bg-amber-700 text-amber-100'
                   : 'bg-amber-200/90 text-amber-950'
@@ -591,18 +591,16 @@ export default function UserLogDatasManager() {
           <button
             type="button"
             onClick={() => setActiveTab('approved')}
-            className={`min-h-[44px] px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center justify-between sm:justify-center gap-2 cursor-pointer shadow-2xs active:scale-95 ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95 ${
               activeTab === 'approved'
-                ? 'bg-emerald-700 text-white ring-2 ring-emerald-600/40'
+                ? 'bg-emerald-700 text-white shadow-xs'
                 : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300'
             }`}
           >
-            <div className="flex items-center gap-1.5 min-w-0">
-              <CheckCircle2 className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'approved' ? 'text-white' : 'text-emerald-600'}`} />
-              <span className="truncate text-xs">Approved</span>
-            </div>
+            <CheckCircle2 className={`w-3 h-3 shrink-0 ${activeTab === 'approved' ? 'text-white' : 'text-emerald-600'}`} />
+            <span>Approved</span>
             <span
-              className={`text-[10.5px] px-2 py-0.5 rounded-full font-mono font-black ${
+              className={`text-[9.5px] px-1.5 py-0.2 rounded-md font-mono font-black ${
                 activeTab === 'approved'
                   ? 'bg-emerald-800 text-emerald-100'
                   : 'bg-emerald-200/90 text-emerald-950'
@@ -616,18 +614,16 @@ export default function UserLogDatasManager() {
           <button
             type="button"
             onClick={() => setActiveTab('revoked')}
-            className={`min-h-[44px] px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center justify-between sm:justify-center gap-2 cursor-pointer shadow-2xs active:scale-95 ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0 active:scale-95 ${
               activeTab === 'revoked'
-                ? 'bg-rose-700 text-white ring-2 ring-rose-600/40'
+                ? 'bg-rose-700 text-white shadow-xs'
                 : 'bg-rose-50 hover:bg-rose-100 text-rose-950 border border-rose-300'
             }`}
           >
-            <div className="flex items-center gap-1.5 min-w-0">
-              <XCircle className={`w-3.5 h-3.5 shrink-0 ${activeTab === 'revoked' ? 'text-white' : 'text-rose-600'}`} />
-              <span className="truncate text-xs">Revoked</span>
-            </div>
+            <XCircle className={`w-3 h-3 shrink-0 ${activeTab === 'revoked' ? 'text-white' : 'text-rose-600'}`} />
+            <span>Revoked</span>
             <span
-              className={`text-[10.5px] px-2 py-0.5 rounded-full font-mono font-black ${
+              className={`text-[9.5px] px-1.5 py-0.2 rounded-md font-mono font-black ${
                 activeTab === 'revoked'
                   ? 'bg-rose-800 text-rose-100'
                   : 'bg-rose-200/90 text-rose-950'
@@ -640,16 +636,16 @@ export default function UserLogDatasManager() {
       </div>
 
       {/* ========================================================= */}
-      {/* 3. RESPONSIVE CARDS GRID (NO TABLES)                      */}
+      {/* 3. COMPACT STUDENT CARDS GRID                             */}
       {/* ========================================================= */}
-      <div className="space-y-3.5">
+      <div className="space-y-3">
         {loading ? (
-          <div className="py-20 text-center text-slate-500 space-y-3 bg-white rounded-3xl border border-slate-200">
-            <RefreshCw className="w-8 h-8 text-teal-600 animate-spin mx-auto" />
-            <p className="text-xs font-bold text-slate-800">Loading student authentication ledger...</p>
+          <div className="py-16 text-center text-slate-500 space-y-2 bg-white rounded-2xl border border-slate-200">
+            <RefreshCw className="w-6 h-6 text-teal-600 animate-spin mx-auto" />
+            <p className="text-xs font-bold text-slate-800">Loading student accounts...</p>
           </div>
         ) : filteredUsers.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2.5 sm:gap-3">
             {filteredUsers.map((u) => {
               const status = getApprovalStatus(u);
               const isApproved = status === 'yes';
@@ -662,209 +658,171 @@ export default function UserLogDatasManager() {
               return (
                 <div
                   key={u._id || userKey}
-                  className={`group relative rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col justify-between gap-3.5 transition-all duration-300 border-2 ${
+                  className={`group relative rounded-xl sm:rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 transition-all duration-200 border ${
                     isPending
-                      ? 'bg-gradient-to-br from-amber-50/90 via-orange-50/30 to-white border-amber-300 shadow-[0_4px_20px_-4px_rgba(245,158,11,0.22)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.36)] hover:border-amber-500 hover:-translate-y-0.5'
+                      ? 'bg-gradient-to-br from-amber-50/80 via-orange-50/20 to-white border-amber-300 shadow-[0_2px_12px_-2px_rgba(245,158,11,0.18)] hover:border-amber-400'
                       : isRevoked
-                      ? 'bg-gradient-to-br from-rose-50/90 via-red-50/30 to-white border-rose-300 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.2)] hover:shadow-[0_8px_30px_-4px_rgba(244,63,94,0.34)] hover:border-rose-500 hover:-translate-y-0.5'
-                      : 'bg-gradient-to-br from-emerald-50/90 via-teal-50/30 to-white border-emerald-300 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.18)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.32)] hover:border-emerald-500 hover:-translate-y-0.5'
+                      ? 'bg-gradient-to-br from-rose-50/80 via-red-50/20 to-white border-rose-300 shadow-[0_2px_12px_-2px_rgba(244,63,94,0.16)] hover:border-rose-400'
+                      : 'bg-gradient-to-br from-emerald-50/80 via-teal-50/20 to-white border-emerald-300 shadow-[0_2px_12px_-2px_rgba(16,185,129,0.16)] hover:border-emerald-400'
                   }`}
                 >
-                  {/* Decorative ambient glowing corner aura */}
-                  <div
-                    className={`absolute -top-1 -right-1 w-14 h-14 rounded-full blur-xl pointer-events-none opacity-40 transition-opacity group-hover:opacity-80 ${
-                      isPending ? 'bg-amber-400' : isRevoked ? 'bg-rose-400' : 'bg-emerald-400'
-                    }`}
-                  />
-
                   {/* Card Top: Student Profile & Status */}
-                  <div className="space-y-3 relative z-10">
+                  <div className="space-y-2 relative z-10">
                     {/* Header Row */}
-                    <div className="flex items-start justify-between gap-2.5">
-                      <div className="flex items-center gap-3 min-w-0">
-                        {/* Avatar with Radiant Gradient & Active Status Pulse Dot */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {/* Compact Avatar */}
                         <div className="relative shrink-0">
                           <div
-                            className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm text-white shadow-md transition-transform group-hover:scale-105 border ${
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs text-white shadow-2xs border ${
                               isPending
-                                ? 'bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 border-amber-300/80 shadow-[0_4px_12px_rgba(245,158,11,0.35)]'
+                                ? 'bg-gradient-to-br from-amber-500 to-orange-600 border-amber-300/80'
                                 : isRevoked
-                                ? 'bg-gradient-to-br from-rose-500 via-red-500 to-rose-600 border-rose-300/80 shadow-[0_4px_12px_rgba(244,63,94,0.35)]'
-                                : 'bg-gradient-to-br from-teal-500 via-emerald-500 to-teal-600 border-teal-300/80 shadow-[0_4px_12px_rgba(16,185,129,0.35)]'
+                                ? 'bg-gradient-to-br from-rose-500 to-red-600 border-rose-300/80'
+                                : 'bg-gradient-to-br from-teal-500 to-emerald-600 border-teal-300/80'
                             }`}
                           >
                             {(u.name || u.email || 'S').charAt(0).toUpperCase()}
                           </div>
                           <span
-                            className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white flex items-center justify-center ${
+                            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white flex items-center justify-center ${
                               isPending ? 'bg-amber-500' : isRevoked ? 'bg-rose-500' : 'bg-emerald-500'
                             }`}
                           >
-                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                            <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
                           </span>
                         </div>
 
                         <div className="min-w-0">
                           <h4
-                            className="font-extrabold text-slate-900 group-hover:text-teal-950 transition-colors text-sm sm:text-base leading-snug truncate"
+                            className="font-extrabold text-slate-900 group-hover:text-teal-950 transition-colors text-xs sm:text-sm leading-snug truncate"
                             title={u.name || 'Unnamed'}
                           >
                             {u.name || 'Unnamed Student'}
                           </h4>
                           <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                             {u.sid ? (
-                              <span className="text-[10px] font-mono font-bold bg-indigo-600 text-white px-2 py-0.5 rounded-md shadow-[0_2px_6px_rgba(79,70,229,0.25)] flex items-center gap-1">
+                              <span className="text-[9.5px] font-mono font-bold bg-indigo-600 text-white px-1.5 py-0.2 rounded shadow-2xs flex items-center gap-0.5">
                                 <Hash className="w-2.5 h-2.5 text-indigo-200" />
-                                <span>SID: {u.sid}</span>
+                                <span>{u.sid}</span>
                               </span>
                             ) : (
-                              <span className="text-[10px] font-mono font-bold bg-amber-500 text-white px-2 py-0.5 rounded-md shadow-[0_2px_6px_rgba(245,158,11,0.3)] flex items-center gap-1 animate-pulse">
+                              <span className="text-[9.5px] font-mono font-bold bg-amber-500 text-white px-1.5 py-0.2 rounded shadow-2xs flex items-center gap-0.5 animate-pulse">
                                 <AlertTriangle className="w-2.5 h-2.5 text-amber-100" />
-                                <span>SID Unassigned</span>
+                                <span>No SID</span>
                               </span>
                             )}
-                            {u.userType === 'admin' && (
-                              <span className="text-[10px] font-extrabold bg-purple-600 text-white px-2 py-0.5 rounded-md shadow-[0_2px_6px_rgba(147,51,234,0.25)] flex items-center gap-1">
-                                <ShieldCheck className="w-2.5 h-2.5 text-purple-200" />
-                                <span>Admin</span>
+                            {u.hscBatch && (
+                              <span className="text-[9.5px] font-mono font-bold bg-purple-100 text-purple-900 border border-purple-200 px-1.5 py-0.2 rounded">
+                                HSC {u.hscBatch}
                               </span>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Glowing Status Badge */}
+                      {/* Compact Status Badge */}
                       <div className="shrink-0">
                         {isApproved ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border shadow-xs tracking-wide bg-emerald-500 text-white border-emerald-400 shadow-[0_2px_10px_rgba(16,185,129,0.35)]">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white shadow-2xs">
+                            <CheckCircle2 className="w-3 h-3 text-white shrink-0" />
                             <span>Approved</span>
                           </span>
                         ) : isPending ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border shadow-xs tracking-wide bg-amber-500 text-white border-amber-400 shadow-[0_2px_10px_rgba(245,158,11,0.35)] animate-pulse">
-                            <Clock className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-white shadow-2xs animate-pulse">
+                            <Clock className="w-3 h-3 text-white shrink-0" />
                             <span>Pending</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border shadow-xs tracking-wide bg-rose-600 text-white border-rose-500 shadow-[0_2px_10px_rgba(244,63,94,0.35)]">
-                            <XCircle className="w-3.5 h-3.5 text-white shrink-0 drop-shadow-xs" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-600 text-white shadow-2xs">
+                            <XCircle className="w-3 h-3 text-white shrink-0" />
                             <span>Revoked</span>
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* ========================================================= */}
-                    {/* ELEMENT-WISE GLOWING DETAIL BLOCKS                         */}
-                    {/* ========================================================= */}
-                    <div className="space-y-2 text-xs">
-                      {/* Email Address Block */}
-                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-sky-50 via-blue-50/40 to-white border border-sky-200/90 text-sky-950 shadow-2xs">
-                        <Mail className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                        <span className="font-mono text-[11px] truncate select-all font-semibold" title={u.email}>
+                    {/* Compact Details List */}
+                    <div className="space-y-1.5 text-xs pt-1">
+                      {/* Email Address */}
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-sky-50/70 border border-sky-200/80 text-sky-950">
+                        <Mail className="w-3 h-3 text-sky-600 shrink-0" />
+                        <span className="font-mono text-[10.5px] truncate select-all font-semibold" title={u.email}>
                           {u.email}
                         </span>
                       </div>
 
-                      {/* Phone & Guardian Phone Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-br from-emerald-50/90 to-teal-50/40 border border-emerald-200/90 text-emerald-950 shadow-2xs">
-                          <Smartphone className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      {/* Mobile & Guardian Phones */}
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-50/70 border border-emerald-200/80 text-emerald-950">
+                          <Smartphone className="w-3 h-3 text-emerald-600 shrink-0" />
                           <div className="min-w-0">
-                            <span className="text-[9px] text-emerald-800 font-extrabold block uppercase tracking-wider">
+                            <span className="text-[8.5px] text-emerald-800 font-extrabold uppercase tracking-wider block">
                               Mobile
                             </span>
-                            <span className="font-mono text-[11px] font-bold truncate block">
+                            <span className="font-mono text-[10.5px] font-bold truncate block">
                               {u.mobile || '—'}
                             </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-br from-teal-50/90 to-cyan-50/40 border border-teal-200/90 text-teal-950 shadow-2xs">
-                          <Phone className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-teal-50/70 border border-teal-200/80 text-teal-950">
+                          <Phone className="w-3 h-3 text-teal-600 shrink-0" />
                           <div className="min-w-0">
-                            <span className="text-[9px] text-teal-800 font-extrabold block uppercase tracking-wider">
+                            <span className="text-[8.5px] text-teal-800 font-extrabold uppercase tracking-wider block">
                               Guardian
                             </span>
-                            <span className="font-mono text-[11px] font-bold truncate block">
+                            <span className="font-mono text-[10.5px] font-bold truncate block">
                               {u.guardiansPhone || '—'}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* College & Batch Block */}
-                      {(u.college || u.hscBatch) && (
-                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-purple-50 via-fuchsia-50/30 to-white border border-purple-200/90 text-purple-950 shadow-2xs">
-                          <Building2 className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                          <div className="min-w-0 flex-1 flex items-center justify-between gap-1">
-                            <span className="truncate font-bold text-[11px]" title={u.college || ''}>
-                              {u.college || 'Institution unlisted'}
-                            </span>
-                            {u.hscBatch && (
-                              <span className="font-mono font-bold text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-md shadow-2xs shrink-0 flex items-center gap-1">
-                                <Calendar className="w-2.5 h-2.5 text-purple-200" />
-                                <span>HSC {u.hscBatch}</span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Subject & Group Block (if available) */}
-                      {(u.subject || u.group) && (
-                        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-blue-50 via-indigo-50/30 to-white border border-blue-200/90 text-blue-950 shadow-2xs">
-                          <BookOpen className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                          <span className="text-[11px] font-semibold truncate">
-                            {u.subject || 'General'} {u.group ? `(${u.group})` : ''}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Residential Address (if available) */}
-                      {u.address && (
-                        <div className="flex items-start gap-2 p-2.5 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100/60 border border-slate-200 text-slate-800 shadow-2xs">
-                          <MapPin className="w-3.5 h-3.5 text-slate-600 shrink-0 mt-0.5" />
-                          <span className="text-[11px] truncate font-medium" title={u.address}>
-                            {u.address}
+                      {/* Institution & Subject */}
+                      {(u.college || u.subject) && (
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-purple-50/60 border border-purple-200/80 text-purple-950">
+                          <Building2 className="w-3 h-3 text-purple-600 shrink-0" />
+                          <span className="truncate text-[10.5px] font-semibold" title={`${u.college || ''} ${u.subject || ''}`}>
+                            {u.college || 'College unlisted'} {u.subject ? `• ${u.subject}` : ''}
                           </span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Card Actions Footer with Radiant Gradient Buttons */}
-                  <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between gap-2 flex-wrap relative z-10">
+                  {/* Compact Card Actions Footer */}
+                  <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between gap-1.5 relative z-10">
                     {/* Primary Approval / Revocation Button */}
-                    <div className="flex-1 min-w-[140px]">
+                    <div className="flex-1 min-w-[120px]">
                       {!isApproved ? (
                         isPending ? (
-                          <div className="flex items-center gap-1.5 w-full">
+                          <div className="flex items-center gap-1 w-full">
                             <button
                               type="button"
                               disabled={isBusy}
                               onClick={() => initiateApprove(u)}
-                              className="flex-1 py-2 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-[0_3px_12px_rgba(16,185,129,0.35)] active:scale-95 whitespace-nowrap"
+                              className="flex-1 py-1.5 px-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-95 whitespace-nowrap"
                             >
                               {isBusy ? (
-                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                <RefreshCw className="w-3 h-3 animate-spin" />
                               ) : (
-                                <UserCheck className="w-3.5 h-3.5" />
+                                <UserCheck className="w-3 h-3" />
                               )}
-                              <span>{u.sid ? 'Approve' : 'Assign SID & Approve'}</span>
+                              <span>{u.sid ? 'Approve' : 'Assign & Approve'}</span>
                             </button>
 
                             <button
                               type="button"
                               disabled={isBusy}
                               onClick={() => handleUpdateApproval(u, 'no')}
-                              className="py-2 px-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all shadow-[0_3px_12px_rgba(244,63,94,0.35)] active:scale-95 shrink-0"
-                              title="Reject registration for this student"
+                              className="py-1.5 px-2 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-0.5 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-95 shrink-0"
+                              title="Reject registration"
                             >
                               {isBusy ? (
-                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                <RefreshCw className="w-3 h-3 animate-spin" />
                               ) : (
-                                <UserX className="w-3.5 h-3.5" />
+                                <UserX className="w-3 h-3" />
                               )}
                               <span>Reject</span>
                             </button>
@@ -874,14 +832,14 @@ export default function UserLogDatasManager() {
                             type="button"
                             disabled={isBusy}
                             onClick={() => initiateApprove(u)}
-                            className="w-full py-2 px-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-[0_3px_12px_rgba(16,185,129,0.35)] active:scale-95"
+                            className="w-full py-1.5 px-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-95"
                           >
                             {isBusy ? (
-                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              <RefreshCw className="w-3 h-3 animate-spin" />
                             ) : (
-                              <UserCheck className="w-3.5 h-3.5" />
+                              <UserCheck className="w-3 h-3" />
                             )}
-                            <span>{u.sid ? 'Approve Access' : 'Assign SID & Approve'}</span>
+                            <span>{u.sid ? 'Approve' : 'Assign SID & Approve'}</span>
                           </button>
                         )
                       ) : (
@@ -889,13 +847,13 @@ export default function UserLogDatasManager() {
                           type="button"
                           disabled={isBusy}
                           onClick={() => handleUpdateApproval(u, 'no')}
-                          className="w-full py-2 px-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all shadow-[0_3px_12px_rgba(244,63,94,0.35)] active:scale-95"
+                          className="w-full py-1.5 px-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-95"
                           title="Revoke portal access for this student"
                         >
                           {isBusy ? (
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <RefreshCw className="w-3 h-3 animate-spin" />
                           ) : (
-                            <UserX className="w-3.5 h-3.5" />
+                            <UserX className="w-3 h-3" />
                           )}
                           <span>Revoke Access</span>
                         </button>
@@ -903,17 +861,17 @@ export default function UserLogDatasManager() {
                     </div>
 
                     {/* Secondary Actions (Reset, Edit, Delete) */}
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0">
                       {/* Reset to Pending (if already approved or revoked) */}
                       {!isPending && (
                         <button
                           type="button"
                           disabled={isBusy}
                           onClick={() => handleUpdateApproval(u, 'pending')}
-                          className="p-2 text-amber-900 bg-amber-100 hover:bg-amber-600 hover:text-white border border-amber-300 rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(245,158,11,0.3)] active:scale-95"
+                          className="p-1.5 text-amber-900 bg-amber-100 hover:bg-amber-600 hover:text-white border border-amber-300 rounded-lg cursor-pointer transition-all shadow-2xs active:scale-95"
                           title="Reset status back to Pending review"
                         >
-                          <Clock className="w-3.5 h-3.5" />
+                          <Clock className="w-3 h-3" />
                         </button>
                       )}
 
@@ -922,10 +880,10 @@ export default function UserLogDatasManager() {
                         type="button"
                         disabled={isBusy}
                         onClick={() => openEditModal(u)}
-                        className="p-2 text-indigo-900 bg-indigo-100 hover:bg-indigo-600 hover:text-white border border-indigo-300 rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(99,102,241,0.3)] active:scale-95"
-                        title="Edit Account Credentials & Info"
+                        className="p-1.5 text-indigo-900 bg-indigo-100 hover:bg-indigo-600 hover:text-white border border-indigo-300 rounded-lg cursor-pointer transition-all shadow-2xs active:scale-95"
+                        title="Edit Account Information"
                       >
-                        <Edit3 className="w-3.5 h-3.5" />
+                        <Edit3 className="w-3 h-3" />
                       </button>
 
                       {/* Delete Account */}
@@ -933,10 +891,10 @@ export default function UserLogDatasManager() {
                         type="button"
                         disabled={isBusy}
                         onClick={() => handleDeleteUser(u)}
-                        className="p-2 text-rose-900 bg-rose-100 hover:bg-rose-600 hover:text-white border border-rose-300 rounded-xl cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(244,63,94,0.3)] active:scale-95"
+                        className="p-1.5 text-rose-900 bg-rose-100 hover:bg-rose-600 hover:text-white border border-rose-300 rounded-lg cursor-pointer transition-all shadow-2xs active:scale-95"
                         title="Permanently Delete Account"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
                   </div>

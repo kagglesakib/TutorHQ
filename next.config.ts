@@ -3,6 +3,18 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   devIndicators: false,
+  productionBrowserSourceMaps: false,
+  typescript: {
+    // Speeds up Next.js build; TypeScript validity is strictly checked via `npm run lint` (tsc --noEmit)
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    // Radically speeds up compilation by tree-shaking barrel imports for large libraries
+    optimizePackageImports: ['lucide-react', 'recharts', 'motion'],
+  },
   async redirects() {
     return [
       {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import NavigationHeader from '@/app/_components/NavigationHeader';
 import Footer from '@/app/_components/Footer';
 import { AuthProvider, AuthGuard } from '../context/AuthContext';
-import '../index.css';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'TutorHQ',
