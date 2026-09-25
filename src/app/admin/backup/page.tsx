@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { BackupRestore } from '@/app/admin/_components';
-import { AlertTriangle, RefreshCcw, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCcw, RefreshCw, ShieldAlert, Database, Flame, Lock } from 'lucide-react';
 
 export default function AdminBackupPage() {
   const [counts, setCounts] = useState({ admins: 1, students: 0, activities: 0, exams: 0, payments: 0 });
@@ -86,24 +86,29 @@ export default function AdminBackupPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 space-y-4">
-        <RefreshCw className="w-8 h-8 text-emerald-500 animate-spin" />
-        <p className="text-xs text-slate-400 font-mono">Loading Backup Center & Record Counts...</p>
+      <div className="flex flex-col items-center justify-center py-20 space-y-3">
+        <div className="p-3 bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 rounded-2xl text-white shadow-lg animate-pulse">
+          <Database className="w-7 h-7" />
+        </div>
+        <p className="text-xs text-slate-500 font-mono font-bold flex items-center gap-1.5">
+          <RefreshCw className="w-3.5 h-3.5 text-amber-500 animate-spin" />
+          Loading Disaster Recovery &amp; Record Counts...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5 max-w-7xl w-full mx-auto px-0 sm:px-2 overflow-x-hidden">
       {error && (
-        <div className="bg-rose-50 border border-rose-100 py-3 px-4 rounded-2xl text-xs font-medium text-rose-700 flex items-center justify-between gap-2 shadow-xs">
+        <div className="bg-rose-950/90 border border-rose-800 py-2.5 px-3 rounded-2xl text-xs font-medium text-rose-200 flex items-center justify-between gap-2 shadow-sm">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
+            <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{error}</span>
           </div>
           <button
             onClick={fetchCounts}
-            className="underline hover:text-rose-900 font-bold ml-1 flex items-center gap-1 cursor-pointer"
+            className="px-2 py-0.5 bg-rose-800 hover:bg-rose-700 text-white rounded-lg font-bold flex items-center gap-1 cursor-pointer transition-colors"
           >
             <RefreshCcw className="w-3 h-3" /> Retry
           </button>

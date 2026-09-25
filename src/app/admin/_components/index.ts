@@ -15,3 +15,4 @@ export { default as BackupRestore } from './BackupRestore';
 export { default as UserLogDatasManager } from './UserLogDatasManager';
 export { default as SignupNotificationPanel } from './SignupNotificationPanel';
 export { default as LogDailyLessonModal } from './LogDailyLessonModal';
+export { default as AdminProfileModal } from './AdminProfileModal';

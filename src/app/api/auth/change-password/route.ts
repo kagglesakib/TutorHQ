@@ -61,12 +61,19 @@ export async function POST(req: NextRequest) {
     const isAdmin = session?.userType === 'admin' || userSid.toUpperCase() === 'ADMIN' || userEmail.toLowerCase() === 'sakib1514817122@gmail.com';
 
     if (isAdmin) {
-      const admin = await adminsCol.findOne({
-        $or: [
-          { email: userEmail.toLowerCase() },
-          { email: 'sakib1514817122@gmail.com' },
-        ],
-      });
+      let admin = null;
+      if (userEmail) {
+        admin = await adminsCol.findOne({
+          $or: [
+            { email: userEmail.toLowerCase() },
+            { email: { $regex: new RegExp(`^${escapeRegex(userEmail)}$`, 'i') } },
+            { email: 'sakib1514817122@gmail.com' },
+          ],
+        });
+      }
+      if (!admin) {
+        admin = await adminsCol.findOne({});
+      }
 
       if (!admin) {
         return NextResponse.json({ error: 'Admin account record not found.' }, { status: 404 });

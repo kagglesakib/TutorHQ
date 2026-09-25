@@ -47,6 +47,11 @@ const nextConfig: NextConfig = {
         destination: '/admin/backup',
         permanent: false,
       },
+      {
+        source: '/profile',
+        destination: '/admin/profile',
+        permanent: false,
+      },
     ];
   },
 };
