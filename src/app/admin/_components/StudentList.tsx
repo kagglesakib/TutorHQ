@@ -118,15 +118,15 @@ export default function StudentList({
   }, [actualStudents, statusFilter, searchTerm, batchFilter]);
 
   return (
-    <div className="bg-slate-200/70 rounded-2xl border border-slate-300/80 shadow-sm h-full flex flex-col overflow-hidden" id="student-list-container">
+    <div className="bg-slate-200/70 dark:bg-slate-950 rounded-2xl border border-slate-300/80 dark:border-slate-800/80 shadow-sm dark:shadow-[0_0_25px_rgba(0,0,0,0.5)] h-full flex flex-col overflow-hidden" id="student-list-container">
       {/* Search & Batch Filters Header */}
-      <div className="p-2.5 sm:p-3 border-b border-slate-300 space-y-2 shrink-0 bg-slate-100/90 text-slate-800">
+      <div className="p-2.5 sm:p-3 border-b border-slate-300 dark:border-slate-800/80 space-y-2 shrink-0 bg-slate-100/90 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <h3 className="font-display font-black text-slate-800 text-xs sm:text-sm tracking-tight flex items-center gap-1">
+            <h3 className="font-display font-black text-slate-800 dark:text-slate-100 text-xs sm:text-sm tracking-tight flex items-center gap-1">
               Student Directory
             </h3>
-            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-mono font-bold px-1.5 py-0.2 rounded border border-emerald-300">
+            <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-300 font-mono font-bold px-1.5 py-0.2 rounded border border-emerald-300 dark:border-emerald-800/80">
               {filteredStudents.length}/{actualStudents.length}
             </span>
           </div>
@@ -142,7 +142,7 @@ export default function StudentList({
         </div>
 
         {/* Search Bar */}
-        <div className="relative flex-grow bg-slate-50/90 rounded-lg border border-slate-300 p-0.5 focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-400 transition-all flex items-center">
+        <div className="relative flex-grow bg-slate-50/90 dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-700 p-0.5 focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-400 transition-all flex items-center">
           <div className="p-1 bg-emerald-600 text-white rounded-md shrink-0 ml-0.5 mr-1.5">
             <Search className="w-2.5 h-2.5" />
           </div>
@@ -151,13 +151,13 @@ export default function StudentList({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search name, SID, batch, college, phone..."
-            className="w-full py-0.5 pr-6 bg-transparent text-[11px] font-bold text-slate-800 placeholder-slate-400 focus:outline-hidden"
+            className="w-full py-0.5 pr-6 bg-transparent text-[11px] font-bold text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden"
           />
           {searchTerm && (
             <button
               type="button"
               onClick={() => setSearchTerm('')}
-              className="absolute right-1 px-1.5 py-0.2 bg-rose-200 text-rose-800 text-[9px] font-bold rounded cursor-pointer hover:bg-rose-300"
+              className="absolute right-1 px-1.5 py-0.2 bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-200 text-[9px] font-bold rounded cursor-pointer hover:bg-rose-300"
             >
               ×
             </button>
@@ -171,7 +171,7 @@ export default function StudentList({
             className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
               statusFilter === 'ACTIVE'
                 ? 'bg-emerald-700 text-white font-black shadow-xs'
-                : 'bg-emerald-100/90 text-emerald-800 border border-emerald-300 hover:bg-emerald-200'
+                : 'bg-emerald-100/90 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-200'
             }`}
           >
             Active ({activeStudents.length})
@@ -182,7 +182,7 @@ export default function StudentList({
               className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
                 statusFilter === 'PENDING'
                   ? 'bg-amber-600 text-white font-black shadow-xs'
-                  : 'bg-amber-100/90 text-amber-800 border border-amber-300 hover:bg-amber-200'
+                  : 'bg-amber-100/90 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 hover:bg-amber-200'
               }`}
             >
               Pending ({pendingStudents.length})
@@ -194,7 +194,7 @@ export default function StudentList({
               className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
                 statusFilter === 'REVOKED'
                   ? 'bg-rose-700 text-white font-black shadow-xs'
-                  : 'bg-rose-100 text-rose-800 border border-rose-300 hover:bg-rose-200'
+                  : 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 hover:bg-rose-200'
               }`}
             >
               Revoked ({revokedStudents.length})
@@ -204,8 +204,8 @@ export default function StudentList({
             onClick={() => setStatusFilter('ALL')}
             className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
               statusFilter === 'ALL'
-                ? 'bg-slate-700 text-white font-black shadow-xs'
-                : 'bg-slate-200/90 text-slate-700 hover:bg-slate-300 border border-slate-300'
+                ? 'bg-slate-700 dark:bg-slate-600 text-white font-black shadow-xs'
+                : 'bg-slate-200/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 border border-slate-300 dark:border-slate-700'
             }`}
           >
             All ({actualStudents.length})
@@ -214,17 +214,17 @@ export default function StudentList({
 
         {/* Batch Filter Controls */}
         {uniqueBatches.length > 0 && (
-          <div className="pt-1 border-t border-slate-200/80">
+          <div className="pt-1 border-t border-slate-200/80 dark:border-slate-800">
             {uniqueBatches.length > 3 ? (
               <div className="flex items-center gap-1.5 w-full">
-                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-0.5 shrink-0">
-                  <GraduationCap className="w-3 h-3 text-indigo-600" />
+                <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-0.5 shrink-0">
+                  <GraduationCap className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                   Batch:
                 </span>
                 <select
                   value={batchFilter}
                   onChange={(e) => setBatchFilter(e.target.value)}
-                  className="flex-1 bg-white border border-slate-300 text-slate-800 text-[11px] font-bold rounded-lg px-2 py-1 outline-hidden focus:border-indigo-500 cursor-pointer shadow-2xs"
+                  className="flex-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-[11px] font-bold rounded-lg px-2 py-1 outline-hidden focus:border-indigo-500 cursor-pointer shadow-2xs"
                 >
                   <option value="ALL">All Batches ({targetBatchPool.length})</option>
                   {uniqueBatches.map((batch) => (
@@ -237,7 +237,7 @@ export default function StudentList({
                   <button
                     type="button"
                     onClick={() => setBatchFilter('ALL')}
-                    className="px-1.5 py-1 text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg font-bold transition-colors cursor-pointer shrink-0"
+                    className="px-1.5 py-1 text-[10px] bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 rounded-lg font-bold transition-colors cursor-pointer shrink-0"
                     title="Reset to All"
                   >
                     Reset
@@ -251,8 +251,8 @@ export default function StudentList({
                   onClick={() => setBatchFilter('ALL')}
                   className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap ${
                     batchFilter === 'ALL'
-                      ? 'bg-indigo-600 text-white font-black shadow-xs'
-                      : 'bg-slate-200/90 text-slate-700 hover:bg-slate-300 border border-slate-300'
+                      ? 'bg-indigo-600 text-white font-black shadow-xs dark:shadow-[0_0_10px_rgba(99,102,241,0.4)]'
+                      : 'bg-slate-200/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700'
                   }`}
                 >
                   All ({actualStudents.length})
@@ -264,8 +264,8 @@ export default function StudentList({
                     onClick={() => setBatchFilter(batch)}
                     className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
                       batchFilter === batch
-                        ? 'bg-indigo-600 text-white font-black shadow-xs'
-                        : 'bg-indigo-100/90 text-indigo-800 border border-indigo-300/80 hover:bg-indigo-200'
+                        ? 'bg-indigo-600 text-white font-black shadow-xs dark:shadow-[0_0_10px_rgba(99,102,241,0.4)]'
+                        : 'bg-indigo-100/90 dark:bg-indigo-950/70 text-indigo-800 dark:text-indigo-300 border border-indigo-300/80 dark:border-indigo-800 hover:bg-indigo-200 dark:hover:bg-indigo-900/60'
                     }`}
                   >
                     <span>{formatBatch(batch, 'HSC')}</span>
@@ -293,12 +293,12 @@ export default function StudentList({
                 onClick={() => onSelectStudent(student.sid)}
                 className={`group relative p-2.5 sm:p-3 rounded-2xl cursor-pointer text-left transition-all duration-300 border-2 overflow-hidden ${
                   isSelected
-                    ? 'bg-gradient-to-br from-indigo-50/95 via-sky-50/80 to-teal-50/90 border-indigo-500 shadow-[0_4px_22px_-2px_rgba(99,102,241,0.32)] ring-2 ring-indigo-400/50 scale-[1.01]'
+                    ? 'bg-gradient-to-br from-indigo-50/95 via-sky-50/80 to-teal-50/90 dark:from-indigo-950/90 dark:via-slate-900/95 dark:to-teal-950/80 border-indigo-500 shadow-[0_4px_22px_-2px_rgba(99,102,241,0.32)] ring-2 ring-indigo-400/50 scale-[1.01]'
                     : isStudentRevoked
-                    ? 'bg-gradient-to-br from-rose-50/90 via-red-50/30 to-white border-rose-300 shadow-[0_2px_12px_-2px_rgba(244,63,94,0.15)] hover:shadow-[0_6px_22px_-2px_rgba(244,63,94,0.3)] hover:border-rose-500 hover:-translate-y-0.5'
+                    ? 'bg-gradient-to-br from-rose-50/90 via-red-50/30 to-white dark:from-rose-950/80 dark:via-red-950/50 dark:to-slate-900 border-rose-300 dark:border-rose-800 shadow-[0_2px_12px_-2px_rgba(244,63,94,0.15)] hover:shadow-[0_6px_22px_-2px_rgba(244,63,94,0.3)] hover:border-rose-500 hover:-translate-y-0.5'
                     : isStudentPending
-                    ? 'bg-gradient-to-br from-amber-50/90 via-orange-50/30 to-white border-amber-300 shadow-[0_2px_12px_-2px_rgba(245,158,11,0.15)] hover:shadow-[0_6px_22px_-2px_rgba(245,158,11,0.3)] hover:border-amber-500 hover:-translate-y-0.5'
-                    : 'bg-gradient-to-br from-white via-slate-50/95 to-indigo-50/30 border-slate-300/90 hover:border-indigo-400 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_-2px_rgba(99,102,241,0.22)] hover:-translate-y-0.5'
+                    ? 'bg-gradient-to-br from-amber-50/90 via-orange-50/30 to-white dark:from-amber-950/80 dark:via-amber-950/50 dark:to-slate-900 border-amber-300 dark:border-amber-800 shadow-[0_2px_12px_-2px_rgba(245,158,11,0.15)] hover:shadow-[0_6px_22px_-2px_rgba(245,158,11,0.3)] hover:border-amber-500 hover:-translate-y-0.5'
+                    : 'bg-gradient-to-br from-white via-slate-50/95 to-indigo-50/30 dark:from-slate-900/90 dark:via-slate-900 dark:to-indigo-950/60 border-slate-300/90 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_-2px_rgba(99,102,241,0.22)] hover:-translate-y-0.5'
                 }`}
               >
                 {/* Ambient glowing corner aura */}
@@ -339,7 +339,7 @@ export default function StudentList({
                           {(student.name || 'S').charAt(0).toUpperCase()}
                         </div>
                         <span
-                          className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white flex items-center justify-center ${
+                          className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 flex items-center justify-center ${
                             isStudentRevoked ? 'bg-rose-500' : isStudentPending ? 'bg-amber-500' : 'bg-emerald-500'
                           }`}
                         >
@@ -348,7 +348,7 @@ export default function StudentList({
                       </div>
 
                       <div className="min-w-0">
-                        <h4 className="font-sans font-extrabold text-slate-900 group-hover:text-indigo-950 transition-colors text-xs sm:text-sm leading-tight truncate">
+                        <h4 className="font-sans font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-indigo-950 dark:group-hover:text-indigo-300 transition-colors text-xs sm:text-sm leading-tight truncate">
                           {student.name}
                         </h4>
                         <div className="flex items-center gap-1.5 mt-0.5">
@@ -367,14 +367,14 @@ export default function StudentList({
                         {formatBatch(student.hscBatch, 'N/A')}
                       </span>
                       {isStudentRevoked && (
-                        <span className="text-[8.5px] font-black text-rose-700 bg-rose-100 border border-rose-300 px-1.5 py-0.2 rounded-md font-mono flex items-center gap-0.5">
-                          <XCircle className="w-2.5 h-2.5 text-rose-600" />
+                        <span className="text-[8.5px] font-black text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/80 border border-rose-300 dark:border-rose-800 px-1.5 py-0.2 rounded-md font-mono flex items-center gap-0.5">
+                          <XCircle className="w-2.5 h-2.5 text-rose-600 dark:text-rose-400" />
                           Revoked
                         </span>
                       )}
                       {isStudentPending && (
-                        <span className="text-[8.5px] font-black text-amber-700 bg-amber-100 border border-amber-300 px-1.5 py-0.2 rounded-md font-mono flex items-center gap-0.5 animate-pulse">
-                          <Clock className="w-2.5 h-2.5 text-amber-600" />
+                        <span className="text-[8.5px] font-black text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-1.5 py-0.2 rounded-md font-mono flex items-center gap-0.5 animate-pulse">
+                          <Clock className="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" />
                           Pending
                         </span>
                       )}
@@ -384,20 +384,20 @@ export default function StudentList({
                   {/* College, Subject, Group Tags with Rich Glowing Colors */}
                   <div className="flex flex-wrap gap-1.5 text-[10px]">
                     {student.college && (
-                      <span className="bg-gradient-to-r from-sky-50 to-blue-50 text-sky-900 border border-sky-300/90 px-2 py-0.5 rounded-lg truncate max-w-[150px] font-bold flex items-center gap-1 shadow-[0_2px_6px_rgba(14,165,233,0.12)]">
-                        <Building2 className="w-2.5 h-2.5 text-sky-600 shrink-0" />
+                      <span className="bg-gradient-to-r from-sky-50 to-blue-50 dark:from-sky-950/80 dark:to-blue-950/80 text-sky-900 dark:text-sky-200 border border-sky-300/90 dark:border-sky-800/80 px-2 py-0.5 rounded-lg truncate max-w-[150px] font-bold flex items-center gap-1 shadow-[0_2px_6px_rgba(14,165,233,0.12)]">
+                        <Building2 className="w-2.5 h-2.5 text-sky-600 dark:text-sky-400 shrink-0" />
                         <span className="truncate">{student.college}</span>
                       </span>
                     )}
                     {student.subject && (
-                      <span className="bg-gradient-to-r from-amber-50 to-orange-50 text-amber-900 border border-amber-300/90 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 shadow-[0_2px_6px_rgba(245,158,11,0.12)]">
-                        <BookOpen className="w-2.5 h-2.5 text-amber-600 shrink-0" />
+                      <span className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/80 dark:to-orange-950/80 text-amber-900 dark:text-amber-200 border border-amber-300/90 dark:border-amber-800/80 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 shadow-[0_2px_6px_rgba(245,158,11,0.12)]">
+                        <BookOpen className="w-2.5 h-2.5 text-amber-600 dark:text-amber-400 shrink-0" />
                         <span>{student.subject}</span>
                       </span>
                     )}
                     {student.group && (
-                      <span className="bg-gradient-to-r from-purple-50 to-violet-50 text-purple-900 border border-purple-300/90 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 shadow-[0_2px_6px_rgba(147,51,234,0.12)]">
-                        <Users className="w-2.5 h-2.5 text-purple-600 shrink-0" />
+                      <span className="bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/80 dark:to-violet-950/80 text-purple-900 dark:text-purple-200 border border-purple-300/90 dark:border-purple-800/80 px-2 py-0.5 rounded-lg font-bold flex items-center gap-1 shadow-[0_2px_6px_rgba(147,51,234,0.12)]">
+                        <Users className="w-2.5 h-2.5 text-purple-600 dark:text-purple-400 shrink-0" />
                         <span>{student.group}</span>
                       </span>
                     )}
@@ -405,16 +405,16 @@ export default function StudentList({
 
                   {/* Phone & Email Row with Glowing Badges */}
                   {(student.mobile || student.email) && (
-                    <div className="flex items-center justify-between gap-1.5 pt-1.5 mt-0.5 text-[9.5px] border-t border-slate-200/80 font-mono">
+                    <div className="flex items-center justify-between gap-1.5 pt-1.5 mt-0.5 text-[9.5px] border-t border-slate-200/80 dark:border-slate-800 font-mono">
                       {student.mobile ? (
-                        <span className="text-teal-900 bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-300/90 px-2 py-0.5 rounded-lg flex items-center gap-1 font-bold shadow-[0_2px_6px_rgba(20,184,166,0.12)]">
-                          <Phone className="w-2.5 h-2.5 text-teal-600" />
+                        <span className="text-teal-900 dark:text-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-950/80 dark:to-emerald-950/80 border border-teal-300/90 dark:border-teal-800/80 px-2 py-0.5 rounded-lg flex items-center gap-1 font-bold shadow-[0_2px_6px_rgba(20,184,166,0.12)]">
+                          <Phone className="w-2.5 h-2.5 text-teal-600 dark:text-teal-400" />
                           <span>{student.mobile}</span>
                         </span>
                       ) : <span />}
                       {student.email && (
-                        <span className="text-violet-900 bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-300/90 px-2 py-0.5 rounded-lg truncate max-w-[130px] flex items-center gap-1 font-bold shadow-[0_2px_6px_rgba(139,92,246,0.12)]" title={student.email}>
-                          <Mail className="w-2.5 h-2.5 text-violet-600 shrink-0" />
+                        <span className="text-violet-900 dark:text-violet-200 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/80 dark:to-purple-950/80 border border-violet-300/90 dark:border-violet-800/80 px-2 py-0.5 rounded-lg truncate max-w-[130px] flex items-center gap-1 font-bold shadow-[0_2px_6px_rgba(139,92,246,0.12)]" title={student.email}>
+                          <Mail className="w-2.5 h-2.5 text-violet-600 dark:text-violet-400 shrink-0" />
                           <span className="truncate">{student.email}</span>
                         </span>
                       )}
@@ -425,9 +425,9 @@ export default function StudentList({
             );
           })
         ) : (
-          <div className="py-8 px-2 text-center text-slate-500 space-y-1">
-            <p className="text-xs font-bold text-slate-600">No students found</p>
-            <p className="text-[10px] text-slate-500">Try adjusting your search query</p>
+          <div className="py-8 px-2 text-center text-slate-500 dark:text-slate-400 space-y-1">
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-300">No students found</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">Try adjusting your search query</p>
           </div>
         )}
       </div>

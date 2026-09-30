@@ -21,7 +21,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <NavigationHeader />
-            <main className="flex-grow max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-2.5 sm:py-6 flex flex-col min-h-0 relative">
+            <main className="flex-grow w-full flex flex-col relative">
               <AuthGuard>
                 {children}
               </AuthGuard>

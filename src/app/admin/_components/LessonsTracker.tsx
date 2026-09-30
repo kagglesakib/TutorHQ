@@ -23,6 +23,7 @@ import {
   FileText
 } from 'lucide-react';
 import { generateActivityId, formatAid } from '@/utils/id';
+import { formatDateWithDay } from '@/utils/dateFormat';
 import LogDailyLessonModal from './LogDailyLessonModal';
 
 interface LessonsTrackerProps {
@@ -120,24 +121,24 @@ export default function LessonsTracker({
   return (
     <div className="space-y-3 sm:space-y-4 animate-fadeIn" id="student-detail-lessons-tracker">
       {/* 1. Header Card with Telemetry */}
-      <div className="bg-gradient-to-br from-indigo-100/95 via-sky-100/80 to-purple-100/90 rounded-2xl p-3.5 sm:p-4 border-2 border-indigo-200/90 shadow-md relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-56 h-56 bg-gradient-to-bl from-indigo-200/40 via-purple-200/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-gradient-to-br from-indigo-100/95 via-sky-100/80 to-purple-100/90 dark:from-slate-900 dark:via-indigo-950/60 dark:to-slate-950 rounded-2xl p-3.5 sm:p-4 border-2 border-indigo-200/90 dark:border-indigo-800/80 shadow-md dark:shadow-[0_0_25px_rgba(99,102,241,0.2)] relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-56 h-56 bg-gradient-to-bl from-indigo-200/40 via-purple-200/30 to-transparent dark:from-indigo-500/10 dark:via-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-200/80 pb-3">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-200/80 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="p-2 bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-700 text-white rounded-xl shadow-md shadow-indigo-600/20 shrink-0 border border-white/40">
               <BookOpen className="w-5 h-5" />
             </div>
             <div className="space-y-0.5 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-display font-black text-slate-900 text-sm sm:text-base tracking-tight">
+                <h3 className="font-display font-black text-slate-900 dark:text-white text-sm sm:text-base tracking-tight">
                   Daily Study &amp; Lesson Logs
                 </h3>
-                <span className="text-[10px] bg-indigo-200/90 text-indigo-950 font-mono font-black px-2 py-0.5 rounded-md border border-indigo-300 shadow-2xs shrink-0">
+                <span className="text-[10px] bg-indigo-200/90 dark:bg-indigo-950/80 text-indigo-950 dark:text-indigo-200 font-mono font-black px-2 py-0.5 rounded-md border border-indigo-300 dark:border-indigo-800/80 shadow-2xs shrink-0">
                   {student.name}
                 </span>
               </div>
-              <p className="text-xs text-indigo-900/80 font-medium">
+              <p className="text-xs text-indigo-900/80 dark:text-indigo-300/80 font-medium">
                 Attendance records, topics taught, homework &amp; classwork marks.
               </p>
             </div>
@@ -171,38 +172,38 @@ export default function LessonsTracker({
 
         {/* Telemetry Summary Cards */}
         <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2.5">
-          <div className="bg-indigo-100/90 p-2 rounded-xl border border-indigo-300/90 shadow-2xs">
-            <span className="text-[8.5px] font-mono font-bold text-indigo-900 uppercase tracking-wider block">
+          <div className="bg-indigo-100/90 dark:bg-slate-950/80 p-2 rounded-xl border border-indigo-300/90 dark:border-indigo-800/80 shadow-2xs dark:shadow-[0_0_12px_rgba(99,102,241,0.15)]">
+            <span className="text-[8.5px] font-mono font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider block">
               Total Lessons
             </span>
-            <span className="text-xs sm:text-sm font-black font-mono text-indigo-950 block mt-0.5">
+            <span className="text-xs sm:text-sm font-black font-mono text-indigo-950 dark:text-white block mt-0.5">
               {totalLogs} Classes
             </span>
           </div>
 
-          <div className="bg-emerald-100/90 p-2 rounded-xl border border-emerald-300/90 shadow-2xs">
-            <span className="text-[8.5px] font-mono font-bold text-emerald-900 uppercase tracking-wider block">
+          <div className="bg-emerald-100/90 dark:bg-slate-950/80 p-2 rounded-xl border border-emerald-300/90 dark:border-emerald-800/80 shadow-2xs dark:shadow-[0_0_12px_rgba(16,185,129,0.15)]">
+            <span className="text-[8.5px] font-mono font-bold text-emerald-900 dark:text-emerald-300 uppercase tracking-wider block">
               Present
             </span>
-            <span className="text-xs sm:text-sm font-black font-mono text-emerald-950 block mt-0.5">
+            <span className="text-xs sm:text-sm font-black font-mono text-emerald-950 dark:text-white block mt-0.5">
               {presentCount} Days ({attendanceRate}%)
             </span>
           </div>
 
-          <div className="bg-amber-100/90 p-2 rounded-xl border border-amber-300/90 shadow-2xs">
-            <span className="text-[8.5px] font-mono font-bold text-amber-900 uppercase tracking-wider block">
+          <div className="bg-amber-100/90 dark:bg-slate-950/80 p-2 rounded-xl border border-amber-300/90 dark:border-amber-800/80 shadow-2xs dark:shadow-[0_0_12px_rgba(245,158,11,0.15)]">
+            <span className="text-[8.5px] font-mono font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider block">
               Avg Homework
             </span>
-            <span className="text-xs sm:text-sm font-black font-mono text-amber-950 block mt-0.5">
+            <span className="text-xs sm:text-sm font-black font-mono text-amber-950 dark:text-white block mt-0.5">
               {avgHw !== null ? `${avgHw} / 10` : '—'}
             </span>
           </div>
 
-          <div className="bg-sky-100/90 p-2 rounded-xl border border-sky-300/90 shadow-2xs">
-            <span className="text-[8.5px] font-mono font-bold text-sky-900 uppercase tracking-wider block">
+          <div className="bg-sky-100/90 dark:bg-slate-950/80 p-2 rounded-xl border border-sky-300/90 dark:border-sky-800/80 shadow-2xs dark:shadow-[0_0_12px_rgba(14,165,233,0.15)]">
+            <span className="text-[8.5px] font-mono font-bold text-sky-900 dark:text-sky-300 uppercase tracking-wider block">
               Avg Classwork
             </span>
-            <span className="text-xs sm:text-sm font-black font-mono text-sky-950 block mt-0.5">
+            <span className="text-xs sm:text-sm font-black font-mono text-sky-950 dark:text-white block mt-0.5">
               {avgCw !== null ? `${avgCw} / 10` : '—'}
             </span>
           </div>
@@ -218,10 +219,10 @@ export default function LessonsTracker({
       />
 
       {/* 2. Search, Filter & View Mode Controls */}
-      <div className="bg-gradient-to-r from-indigo-50/90 via-sky-50/70 to-emerald-50/80 p-3 sm:p-3.5 rounded-2xl border-2 border-indigo-200/90 shadow-[0_4px_20px_-4px_rgba(79,70,229,0.14)] space-y-2.5 sm:space-y-3 transition-all">
+      <div className="bg-gradient-to-r from-indigo-50/90 via-sky-50/70 to-emerald-50/80 dark:from-slate-900 dark:via-slate-900/95 dark:to-indigo-950/60 p-3 sm:p-3.5 rounded-2xl border-2 border-indigo-200/90 dark:border-indigo-800/80 shadow-[0_4px_20px_-4px_rgba(79,70,229,0.14)] dark:shadow-[0_0_20px_rgba(99,102,241,0.18)] space-y-2.5 sm:space-y-3 transition-all">
         {/* Search Input - Full Width */}
         <div className="relative min-w-0">
-          <div className="relative flex items-center bg-white border-2 border-indigo-200/90 focus-within:border-indigo-600 focus-within:ring-3 focus-within:ring-indigo-500/20 rounded-xl px-2.5 py-1.5 shadow-2xs transition-all">
+          <div className="relative flex items-center bg-white dark:bg-slate-950/90 border-2 border-indigo-200/90 dark:border-indigo-700/60 focus-within:border-indigo-600 dark:focus-within:border-indigo-400 focus-within:ring-3 focus-within:ring-indigo-500/20 rounded-xl px-2.5 py-1.5 shadow-2xs transition-all">
             <div className="p-1 bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-lg shrink-0 mr-2 shadow-2xs">
               <Search className="w-3.5 h-3.5" />
             </div>
@@ -230,13 +231,13 @@ export default function LessonsTracker({
               placeholder="Search topic, lesson ID, remarks, date..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-transparent text-xs font-bold text-slate-900 placeholder:text-indigo-900/40 focus:outline-none"
+              className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-indigo-900/40 dark:placeholder:text-indigo-300/40 focus:outline-none"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
-                className="ml-1 text-[10px] font-black bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-md cursor-pointer transition-colors shadow-2xs shrink-0 flex items-center gap-1"
+                className="ml-1 text-[10px] font-black bg-indigo-100 dark:bg-indigo-950 hover:bg-indigo-200 dark:hover:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-2 py-0.5 rounded-md cursor-pointer transition-colors shadow-2xs shrink-0 flex items-center gap-1"
               >
                 <X className="w-3 h-3" />
                 <span>Clear</span>
@@ -246,21 +247,21 @@ export default function LessonsTracker({
         </div>
 
         {/* Status Filter Segment - Full Width 3-Column Grid */}
-        <div className="grid grid-cols-3 bg-white/95 p-1 rounded-xl border border-indigo-200/90 shadow-2xs gap-1 w-full">
+        <div className="grid grid-cols-3 bg-white/95 dark:bg-slate-950/90 p-1 rounded-xl border border-indigo-200/90 dark:border-indigo-800/70 shadow-2xs gap-1 w-full">
           <button
             type="button"
             onClick={() => setFilterStatus('All')}
             className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
               filterStatus === 'All'
                 ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-[0_2px_8px_rgba(79,70,229,0.35)]'
-                : 'text-indigo-900/80 hover:text-indigo-950 hover:bg-indigo-50/80'
+                : 'text-indigo-900/80 dark:text-indigo-300 hover:text-indigo-950 dark:hover:text-white hover:bg-indigo-50/80 dark:hover:bg-slate-800'
             }`}
           >
-            <Sparkles className={`w-3 h-3 shrink-0 ${filterStatus === 'All' ? 'text-amber-300' : 'text-indigo-500'}`} />
+            <Sparkles className={`w-3 h-3 shrink-0 ${filterStatus === 'All' ? 'text-amber-300' : 'text-indigo-500 dark:text-indigo-400'}`} />
             <span>All</span>
             <span
               className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
-                filterStatus === 'All' ? 'bg-indigo-800/80 text-white' : 'bg-indigo-100 text-indigo-800'
+                filterStatus === 'All' ? 'bg-indigo-800/80 dark:bg-indigo-950 text-white' : 'bg-indigo-100 dark:bg-slate-800 text-indigo-800 dark:text-indigo-300'
               }`}
             >
               {activities.length}
@@ -273,14 +274,14 @@ export default function LessonsTracker({
             className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
               filterStatus === 'Present'
                 ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-[0_2px_8px_rgba(16,185,129,0.35)]'
-                : 'text-emerald-800 hover:text-emerald-950 hover:bg-emerald-50/80'
+                : 'text-emerald-800 dark:text-emerald-400 hover:text-emerald-950 dark:hover:text-emerald-200 hover:bg-emerald-50/80 dark:hover:bg-slate-800'
             }`}
           >
             <CheckCircle2 className={`w-3 h-3 shrink-0 ${filterStatus === 'Present' ? 'text-emerald-200' : 'text-emerald-500'}`} />
             <span>Present</span>
             <span
               className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
-                filterStatus === 'Present' ? 'bg-emerald-700/80 text-white' : 'bg-emerald-100 text-emerald-800'
+                filterStatus === 'Present' ? 'bg-emerald-700/80 dark:bg-emerald-950 text-white' : 'bg-emerald-100 dark:bg-slate-800 text-emerald-800 dark:text-emerald-300'
               }`}
             >
               {activities.filter((a) => a.status !== 'Absent').length}
@@ -293,14 +294,14 @@ export default function LessonsTracker({
             className={`py-1.5 px-2 rounded-lg text-[10px] sm:text-[10.5px] font-black transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
               filterStatus === 'Absent'
                 ? 'bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-[0_2px_8px_rgba(244,63,94,0.35)]'
-                : 'text-rose-800 hover:text-rose-950 hover:bg-rose-50/80'
+                : 'text-rose-800 dark:text-rose-400 hover:text-rose-950 dark:hover:text-rose-200 hover:bg-rose-50/80 dark:hover:bg-slate-800'
             }`}
           >
             <XCircle className={`w-3 h-3 shrink-0 ${filterStatus === 'Absent' ? 'text-rose-200' : 'text-rose-500'}`} />
             <span>Absent</span>
             <span
               className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md ${
-                filterStatus === 'Absent' ? 'bg-rose-700/80 text-white' : 'bg-rose-100 text-rose-800'
+                filterStatus === 'Absent' ? 'bg-rose-700/80 dark:bg-rose-950 text-white' : 'bg-rose-100 dark:bg-slate-800 text-rose-800 dark:text-rose-300'
               }`}
             >
               {activities.filter((a) => a.status === 'Absent').length}
@@ -309,25 +310,25 @@ export default function LessonsTracker({
         </div>
 
         {/* Sort Controls & View Switcher Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-indigo-200/80 text-xs">
-          <span className="text-[10px] font-bold text-indigo-950 font-mono bg-white/90 border border-indigo-200/90 px-2 py-0.5 rounded-md shadow-2xs self-start sm:self-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-indigo-200/80 dark:border-slate-800 text-xs">
+          <span className="text-[10px] font-bold text-indigo-950 dark:text-indigo-200 font-mono bg-white/90 dark:bg-slate-800/90 border border-indigo-200/90 dark:border-indigo-800/80 px-2 py-0.5 rounded-md shadow-2xs self-start sm:self-auto">
             Showing {sortedActivities.length} of {activities.length} lesson records
           </span>
 
           <div className="flex items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto">
             {/* Sort Selector */}
-            <div className="flex items-center gap-1.5 bg-white/95 px-2.5 py-1 rounded-xl border border-indigo-200/90 shadow-2xs shrink-0">
+            <div className="flex items-center gap-1.5 bg-white/95 dark:bg-slate-800/90 px-2.5 py-1 rounded-xl border border-indigo-200/90 dark:border-indigo-800/80 shadow-2xs shrink-0">
               <div className="p-1 bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-md shadow-2xs">
                 <ArrowUpDown className="w-3 h-3" />
               </div>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-transparent border-none text-[11px] font-extrabold text-slate-800 focus:outline-none cursor-pointer tracking-wide"
+                className="bg-transparent border-none text-[11px] font-extrabold text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer tracking-wide"
               >
-                <option value="date">Date</option>
-                <option value="hw">HW Score</option>
-                <option value="cw">CW Score</option>
+                <option value="date" className="dark:bg-slate-800">Date</option>
+                <option value="hw" className="dark:bg-slate-800">HW Score</option>
+                <option value="cw" className="dark:bg-slate-800">CW Score</option>
               </select>
               <button
                 type="button"
@@ -341,14 +342,14 @@ export default function LessonsTracker({
             </div>
 
             {/* View Mode Switcher (Cards / Table) */}
-            <div className="flex bg-white/95 p-1 rounded-xl border border-indigo-200/90 shadow-2xs gap-0.5 shrink-0">
+            <div className="flex bg-white/95 dark:bg-slate-800/90 p-1 rounded-xl border border-indigo-200/90 dark:border-indigo-800/80 shadow-2xs gap-0.5 shrink-0">
               <button
                 type="button"
                 onClick={() => setViewMode('cards')}
                 className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                   viewMode === 'cards'
                     ? 'bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-[0_2px_8px_rgba(79,70,229,0.35)]'
-                    : 'text-indigo-400 hover:text-indigo-700 hover:bg-indigo-50/80'
+                    : 'text-indigo-400 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-200 hover:bg-indigo-50/80 dark:hover:bg-slate-700'
                 }`}
                 title="Card View"
               >
@@ -360,7 +361,7 @@ export default function LessonsTracker({
                 className={`p-1.5 rounded-lg transition-all cursor-pointer ${
                   viewMode === 'table'
                     ? 'bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-[0_2px_8px_rgba(79,70,229,0.35)]'
-                    : 'text-indigo-400 hover:text-indigo-700 hover:bg-indigo-50/80'
+                    : 'text-indigo-400 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-200 hover:bg-indigo-50/80 dark:hover:bg-slate-700'
                 }`}
                 title="Table View"
               >
@@ -384,18 +385,18 @@ export default function LessonsTracker({
                 return (
                   <div
                     key={act.aid}
-                    className="sm:col-span-2 bg-white border-2 border-indigo-400/90 ring-4 ring-indigo-500/10 rounded-2xl p-3.5 sm:p-4 space-y-3.5 shadow-lg transition-all animate-in fade-in duration-150"
+                    className="sm:col-span-2 bg-white dark:bg-slate-900 border-2 border-indigo-400/90 dark:border-indigo-600 ring-4 ring-indigo-500/10 dark:ring-indigo-500/20 rounded-2xl p-3.5 sm:p-4 space-y-3.5 shadow-lg dark:shadow-[0_0_30px_rgba(99,102,241,0.25)] transition-all animate-in fade-in duration-150"
                   >
-                    <div className="flex items-center justify-between pb-2.5 border-b border-indigo-100">
+                    <div className="flex items-center justify-between pb-2.5 border-b border-indigo-100 dark:border-slate-800">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg">
+                        <div className="p-1.5 bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 rounded-lg">
                           <Edit2 className="w-3.5 h-3.5" />
                         </div>
                         <div>
-                          <span className="text-xs font-black text-indigo-950 font-display">
+                          <span className="text-xs font-black text-indigo-950 dark:text-white font-display">
                             Editing Lesson Record
                           </span>
-                          <span className="ml-2 text-[10px] font-mono font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.2 rounded">
+                          <span className="ml-2 text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/80 px-1.5 py-0.2 rounded">
                             {formatAid(act.aid)}
                           </span>
                         </div>
@@ -403,7 +404,7 @@ export default function LessonsTracker({
                       <button
                         type="button"
                         onClick={() => setEditingAid(null)}
-                        className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                        className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                         title="Cancel Edit"
                       >
                         <X className="w-4 h-4" />
@@ -412,24 +413,24 @@ export default function LessonsTracker({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[10.5px] font-black text-slate-700 uppercase tracking-wider block mb-1 flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-indigo-600" />
+                        <label className="text-[10.5px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1 flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                           <span>Lesson Date</span>
                         </label>
                         <input
                           type="date"
                           value={editFormData.date}
                           onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-xs font-bold text-slate-900 transition-all"
+                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 transition-all"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[10.5px] font-black text-slate-700 uppercase tracking-wider block mb-1 flex items-center gap-1">
+                        <label className="text-[10.5px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1 flex items-center gap-1">
                           {editFormData.status === 'Present' ? (
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                           ) : (
-                            <XCircle className="w-3 h-3 text-rose-600" />
+                            <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                           )}
                           <span>Attendance Status</span>
                         </label>
@@ -438,18 +439,18 @@ export default function LessonsTracker({
                           onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
                           className={`w-full px-3 py-2 border rounded-xl text-xs font-bold transition-all ${
                             editFormData.status === 'Present'
-                              ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950 focus:ring-2 focus:ring-emerald-500/20'
-                              : 'bg-rose-50/80 border-rose-300 text-rose-950 focus:ring-2 focus:ring-rose-500/20'
+                              ? 'bg-emerald-50/80 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200 focus:ring-2 focus:ring-emerald-500/20'
+                              : 'bg-rose-50/80 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800 text-rose-950 dark:text-rose-200 focus:ring-2 focus:ring-rose-500/20'
                           }`}
                         >
-                          <option value="Present">✓ Present</option>
-                          <option value="Absent">✕ Absent</option>
+                          <option value="Present" className="dark:bg-slate-900">✓ Present</option>
+                          <option value="Absent" className="dark:bg-slate-900">✕ Absent</option>
                         </select>
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="text-[10.5px] font-black text-slate-700 uppercase tracking-wider block mb-1 flex items-center gap-1">
-                          <BookOpen className="w-3 h-3 text-indigo-600" />
+                        <label className="text-[10.5px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1 flex items-center gap-1">
+                          <BookOpen className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                           <span>Subject &amp; Chapter / Topic Covered</span>
                         </label>
                         <input
@@ -457,14 +458,14 @@ export default function LessonsTracker({
                           placeholder="e.g. Chemistry – Environmental Chemistry – Revision"
                           value={editFormData.subjectTuitioned || ''}
                           onChange={(e) => setEditFormData({ ...editFormData, subjectTuitioned: e.target.value })}
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-xs font-bold text-slate-900 transition-all"
+                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 transition-all"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[10.5px] font-black text-amber-900 uppercase tracking-wider block mb-1 flex items-center justify-between">
+                        <label className="text-[10.5px] font-black text-amber-900 dark:text-amber-300 uppercase tracking-wider block mb-1 flex items-center justify-between">
                           <span>Homework Marks (HW)</span>
-                          <span className="text-[9px] font-mono text-amber-700 font-bold bg-amber-100 px-1.5 py-0.2 rounded">
+                          <span className="text-[9px] font-mono text-amber-700 dark:text-amber-300 font-bold bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-1.5 py-0.2 rounded">
                             Max: 10
                           </span>
                         </label>
@@ -479,14 +480,14 @@ export default function LessonsTracker({
                               hwMarks: e.target.value === '' ? undefined : Number(e.target.value),
                             })
                           }
-                          className="w-full px-3 py-2 bg-amber-50/50 border border-amber-300 focus:bg-white focus:border-amber-600 focus:ring-2 focus:ring-amber-500/20 rounded-xl text-xs font-mono font-bold text-amber-950 transition-all"
+                          className="w-full px-3 py-2 bg-amber-50/50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 focus:bg-white dark:focus:bg-slate-900 focus:border-amber-600 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 rounded-xl text-xs font-mono font-bold text-amber-950 dark:text-amber-200 transition-all"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[10.5px] font-black text-sky-900 uppercase tracking-wider block mb-1 flex items-center justify-between">
+                        <label className="text-[10.5px] font-black text-sky-900 dark:text-sky-300 uppercase tracking-wider block mb-1 flex items-center justify-between">
                           <span>Classwork Marks (CW)</span>
-                          <span className="text-[9px] font-mono text-sky-700 font-bold bg-sky-100 px-1.5 py-0.2 rounded">
+                          <span className="text-[9px] font-mono text-sky-700 dark:text-sky-300 font-bold bg-sky-100 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-800 px-1.5 py-0.2 rounded">
                             Max: 10
                           </span>
                         </label>
@@ -501,13 +502,13 @@ export default function LessonsTracker({
                               cwMarks: e.target.value === '' ? undefined : Number(e.target.value),
                             })
                           }
-                          className="w-full px-3 py-2 bg-sky-50/50 border border-sky-300 focus:bg-white focus:border-sky-600 focus:ring-2 focus:ring-sky-500/20 rounded-xl text-xs font-mono font-bold text-sky-950 transition-all"
+                          className="w-full px-3 py-2 bg-sky-50/50 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-800 focus:bg-white dark:focus:bg-slate-900 focus:border-sky-600 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 rounded-xl text-xs font-mono font-bold text-sky-950 dark:text-sky-200 transition-all"
                         />
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="text-[10.5px] font-black text-slate-700 uppercase tracking-wider block mb-1 flex items-center gap-1">
-                          <MessageSquare className="w-3 h-3 text-indigo-600" />
+                        <label className="text-[10.5px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1 flex items-center gap-1">
+                          <MessageSquare className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
                           <span>Teacher Remarks &amp; Observations</span>
                         </label>
                         <input
@@ -515,16 +516,16 @@ export default function LessonsTracker({
                           placeholder="e.g. Attentive, finished class practice on time."
                           value={editFormData.comment || ''}
                           onChange={(e) => setEditFormData({ ...editFormData, comment: e.target.value })}
-                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 focus:bg-white focus:border-indigo-600 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-xs font-semibold text-slate-900 transition-all"
+                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:bg-white dark:focus:bg-slate-900 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 transition-all"
                         />
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                       <button
                         type="button"
                         onClick={() => setEditingAid(null)}
-                        className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                        className="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -550,24 +551,24 @@ export default function LessonsTracker({
               return (
                 <div
                   key={act.aid}
-                  className={`group relative rounded-2xl p-3.5 sm:p-4 transition-all duration-300 flex flex-col justify-between gap-3.5 border-2 min-w-0 overflow-hidden ${
+                  className={`group relative rounded-2xl p-3.5 sm:p-4 transition-all duration-300 flex flex-col justify-between gap-3.5 border-2 min-w-0 overflow-hidden h-full ${
                     isPresent
-                      ? 'bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white border-emerald-300 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.18)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.32)] hover:border-emerald-500 hover:-translate-y-0.5'
-                      : 'bg-gradient-to-br from-rose-50/90 via-pink-50/40 to-white border-rose-300 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.18)] hover:shadow-[0_8px_30px_-4px_rgba(244,63,94,0.32)] hover:border-rose-500 hover:-translate-y-0.5'
+                      ? 'bg-gradient-to-br from-emerald-50/90 via-teal-50/40 to-white dark:from-slate-900 dark:via-emerald-950/20 dark:to-slate-900 border-emerald-300 dark:border-slate-800 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.18)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.5)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.32)] dark:hover:shadow-[0_0_30px_rgba(16,185,129,0.35)] hover:border-emerald-500 dark:hover:border-emerald-500 hover:-translate-y-0.5'
+                      : 'bg-gradient-to-br from-rose-50/90 via-pink-50/40 to-white dark:from-slate-900 dark:via-rose-950/20 dark:to-slate-900 border-rose-300 dark:border-slate-800 shadow-[0_4px_20px_-4px_rgba(244,63,94,0.18)] dark:shadow-[0_4px_25px_rgba(0,0,0,0.5)] hover:shadow-[0_8px_30px_-4px_rgba(244,63,94,0.32)] dark:hover:shadow-[0_0_30px_rgba(244,63,94,0.35)] hover:border-rose-500 dark:hover:border-rose-500 hover:-translate-y-0.5'
                   }`}
                 >
                   {/* Subtle glowing corner */}
                   <div
-                    className={`absolute -top-1 -right-1 w-12 h-12 rounded-full blur-xl pointer-events-none opacity-40 transition-opacity group-hover:opacity-80 ${
-                      isPresent ? 'bg-emerald-400' : 'bg-rose-400'
+                    className={`absolute -top-1 -right-1 w-14 h-14 rounded-full blur-xl pointer-events-none opacity-40 dark:opacity-60 transition-opacity group-hover:opacity-90 ${
+                      isPresent ? 'bg-emerald-400 dark:bg-emerald-500' : 'bg-rose-400 dark:bg-rose-500'
                     }`}
                   />
 
                   {/* Card Header: 2 Clean Rows to Guarantee Zero Overlap & Strict Margin Containment */}
-                  <div className="space-y-2 border-b border-indigo-100/80 pb-2.5 relative z-10 min-w-0">
+                  <div className="space-y-2 border-b border-indigo-100/80 dark:border-slate-800 pb-2.5 relative z-10 min-w-0">
                     {/* Row 1: ID on left, Attendance Status on right */}
                     <div className="flex items-center justify-between gap-2 min-w-0">
-                      <span className="text-[10px] font-mono font-bold text-white bg-indigo-600 px-2.5 py-0.5 rounded-lg shadow-[0_2px_6px_rgba(79,70,229,0.3)] flex items-center gap-1.5 min-w-0 max-w-[130px] sm:max-w-[170px]">
+                      <span className="text-[10px] font-mono font-bold text-white bg-indigo-600 px-2.5 py-0.5 rounded-lg shadow-[0_2px_6px_rgba(79,70,229,0.3)] dark:shadow-[0_0_10px_rgba(99,102,241,0.5)] flex items-center gap-1.5 min-w-0 max-w-[130px] sm:max-w-[170px]">
                         <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
                         <span className="truncate">{formatAid(act.aid)}</span>
                       </span>
@@ -575,8 +576,8 @@ export default function LessonsTracker({
                       <span
                         className={`px-2.5 sm:px-3 py-1 rounded-full text-[10px] font-extrabold uppercase border shadow-xs tracking-wide flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                           isAbsent
-                            ? 'bg-rose-500 text-white border-rose-400 shadow-[0_2px_8px_rgba(244,63,94,0.35)]'
-                            : 'bg-emerald-500 text-white border-emerald-400 shadow-[0_2px_8px_rgba(16,185,129,0.35)]'
+                            ? 'bg-rose-500 text-white border-rose-400 shadow-[0_2px_8px_rgba(244,63,94,0.35)] dark:shadow-[0_0_12px_rgba(244,63,94,0.45)]'
+                            : 'bg-emerald-500 text-white border-emerald-400 shadow-[0_2px_8px_rgba(16,185,129,0.35)] dark:shadow-[0_0_12px_rgba(16,185,129,0.45)]'
                         }`}
                       >
                         {isAbsent ? (
@@ -590,16 +591,16 @@ export default function LessonsTracker({
 
                     {/* Row 2: Date on left, Edit & Delete actions on right */}
                     <div className="flex items-center justify-between gap-2 min-w-0 pt-0.5">
-                      <span className="text-[10px] font-bold text-slate-700 font-mono flex items-center gap-1.5 bg-white border border-indigo-200/80 px-2 py-0.5 rounded-md shadow-2xs shrink-0">
-                        <Calendar className="w-3 h-3 text-indigo-600 shrink-0" />
-                        <span>{act.date}</span>
-                      </span>
+                      <div className="text-[10px] font-bold text-slate-700 dark:text-slate-200 font-mono flex items-center gap-1.5 bg-white dark:bg-slate-950 border border-indigo-200/80 dark:border-slate-800 px-2.5 py-1 rounded-md shadow-2xs min-w-0 truncate">
+                        <Calendar className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <span className="truncate">{formatDateWithDay(act.date)}</span>
+                      </div>
 
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
                           onClick={() => handleStartEdit(act)}
-                          className="p-1.5 text-indigo-700 hover:text-white bg-indigo-100 hover:bg-indigo-600 border border-indigo-300 rounded-lg cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(99,102,241,0.3)] active:scale-95"
+                          className="p-1.5 text-indigo-700 dark:text-indigo-300 hover:text-white bg-indigo-100 dark:bg-slate-800 hover:bg-indigo-600 dark:hover:bg-indigo-600 border border-indigo-300 dark:border-slate-700 rounded-lg cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(99,102,241,0.3)] active:scale-95"
                           title="Edit Record"
                         >
                           <Edit2 className="w-3 h-3" />
@@ -607,7 +608,7 @@ export default function LessonsTracker({
                         <button
                           type="button"
                           onClick={() => onDeleteActivity(act.aid)}
-                          className="p-1.5 text-rose-700 hover:text-white bg-rose-100 hover:bg-rose-600 border border-rose-300 rounded-lg cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(244,63,94,0.3)] active:scale-95"
+                          className="p-1.5 text-rose-700 dark:text-rose-400 hover:text-white bg-rose-100 dark:bg-slate-800 hover:bg-rose-600 dark:hover:bg-rose-600 border border-rose-300 dark:border-slate-700 rounded-lg cursor-pointer transition-all shadow-2xs hover:shadow-[0_2px_8px_rgba(244,63,94,0.3)] active:scale-95"
                           title="Delete Record"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -617,12 +618,12 @@ export default function LessonsTracker({
                   </div>
 
                   {/* Topic Covered Section */}
-                  <div className="bg-gradient-to-br from-indigo-50/90 via-sky-50/60 to-white border border-indigo-200/90 rounded-xl p-3 space-y-1.5 relative z-10 shadow-2xs">
-                    <div className="flex items-center gap-1.5 text-[9.5px] font-mono font-extrabold text-indigo-700 uppercase tracking-wider">
-                      <BookOpen className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                  <div className="bg-gradient-to-br from-indigo-50/90 via-sky-50/60 to-white dark:from-slate-950 dark:via-indigo-950/40 dark:to-slate-950 border border-indigo-200/90 dark:border-slate-800 rounded-xl p-3 space-y-1.5 relative z-10 shadow-2xs">
+                    <div className="flex items-center gap-1.5 text-[9.5px] font-mono font-extrabold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider">
+                      <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                       <span>Topic &amp; Study Coverage</span>
                     </div>
-                    <div className="text-xs sm:text-[13px] font-extrabold text-slate-900 leading-snug break-words">
+                    <div className="text-xs sm:text-[13px] font-extrabold text-slate-900 dark:text-white leading-snug break-words">
                       {isAbsent ? (
                         <span className="text-slate-400 italic font-normal">No Lesson Conducted (Absent)</span>
                       ) : (
@@ -635,24 +636,24 @@ export default function LessonsTracker({
                   {!isAbsent ? (
                     <div className="grid grid-cols-2 gap-2.5 relative z-10">
                       {/* Homework */}
-                      <div className="bg-gradient-to-br from-amber-50 via-amber-100/50 to-white border-2 border-amber-300/90 rounded-xl p-2.5 shadow-[0_2px_10px_-2px_rgba(245,158,11,0.2)] hover:border-amber-400 transition-all">
-                        <div className="flex items-center justify-between text-[10px] font-black text-amber-900 uppercase tracking-wide mb-1">
+                      <div className="bg-gradient-to-br from-amber-50 via-amber-100/50 to-white dark:from-slate-950 dark:via-amber-950/30 dark:to-slate-950 border-2 border-amber-300/90 dark:border-amber-900/60 rounded-xl p-2.5 shadow-[0_2px_10px_-2px_rgba(245,158,11,0.2)] hover:border-amber-400 transition-all">
+                        <div className="flex items-center justify-between text-[10px] font-black text-amber-900 dark:text-amber-400 uppercase tracking-wide mb-1">
                           <span className="flex items-center gap-1">
-                            <FileText className="w-3 h-3 text-amber-600" />
+                            <FileText className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                             HW
                           </span>
-                          <span className="text-[8.5px] text-amber-700 font-mono">Homework</span>
+                          <span className="text-[8.5px] text-amber-700 dark:text-amber-400 font-mono">Homework</span>
                         </div>
                         <div className="flex items-baseline justify-between">
-                          <span className="text-sm font-mono font-black text-amber-950">
+                          <span className="text-sm font-mono font-black text-amber-950 dark:text-amber-200">
                             {isHwNull ? (
                               <span className="text-slate-400 font-bold text-xs not-italic">N/A</span>
                             ) : (
-                              <span>{hwNum}<span className="text-xs text-amber-700 font-medium">/10</span></span>
+                              <span>{hwNum}<span className="text-xs text-amber-700 dark:text-amber-400 font-medium">/10</span></span>
                             )}
                           </span>
                           {!isHwNull && (
-                            <span className="text-[9px] font-mono font-extrabold text-amber-900 bg-amber-200/90 border border-amber-300 px-1.5 py-0.2 rounded-md">
+                            <span className="text-[9px] font-mono font-extrabold text-amber-900 dark:text-amber-200 bg-amber-200/90 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-1.5 py-0.2 rounded-md">
                               {Math.round(((hwNum as number) / 10) * 100)}%
                             </span>
                           )}
@@ -660,24 +661,24 @@ export default function LessonsTracker({
                       </div>
 
                       {/* Classwork */}
-                      <div className="bg-gradient-to-br from-sky-50 via-cyan-100/50 to-white border-2 border-sky-300/90 rounded-xl p-2.5 shadow-[0_2px_10px_-2px_rgba(14,165,233,0.2)] hover:border-sky-400 transition-all">
-                        <div className="flex items-center justify-between text-[10px] font-black text-sky-900 uppercase tracking-wide mb-1">
+                      <div className="bg-gradient-to-br from-sky-50 via-cyan-100/50 to-white dark:from-slate-950 dark:via-sky-950/30 dark:to-slate-950 border-2 border-sky-300/90 dark:border-sky-900/60 rounded-xl p-2.5 shadow-[0_2px_10px_-2px_rgba(14,165,233,0.2)] hover:border-sky-400 transition-all">
+                        <div className="flex items-center justify-between text-[10px] font-black text-sky-900 dark:text-sky-400 uppercase tracking-wide mb-1">
                           <span className="flex items-center gap-1">
-                            <ClipboardList className="w-3 h-3 text-sky-600" />
+                            <ClipboardList className="w-3 h-3 text-sky-600 dark:text-sky-400" />
                             CW
                           </span>
-                          <span className="text-[8.5px] text-sky-700 font-mono">Classwork</span>
+                          <span className="text-[8.5px] text-sky-700 dark:text-sky-400 font-mono">Classwork</span>
                         </div>
                         <div className="flex items-baseline justify-between">
-                          <span className="text-sm font-mono font-black text-sky-950">
+                          <span className="text-sm font-mono font-black text-sky-950 dark:text-sky-200">
                             {isCwNull ? (
                               <span className="text-slate-400 font-bold text-xs not-italic">N/A</span>
                             ) : (
-                              <span>{cwNum}<span className="text-xs text-sky-700 font-medium">/10</span></span>
+                              <span>{cwNum}<span className="text-xs text-sky-700 dark:text-sky-400 font-medium">/10</span></span>
                             )}
                           </span>
                           {!isCwNull && (
-                            <span className="text-[9px] font-mono font-extrabold text-sky-900 bg-sky-200/90 border border-sky-300 px-1.5 py-0.2 rounded-md">
+                            <span className="text-[9px] font-mono font-extrabold text-sky-900 dark:text-sky-200 bg-sky-200/90 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-800 px-1.5 py-0.2 rounded-md">
                               {Math.round(((cwNum as number) / 10) * 100)}%
                             </span>
                           )}
@@ -685,7 +686,7 @@ export default function LessonsTracker({
                       </div>
                     </div>
                   ) : (
-                    <div className="px-3 py-2.5 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-800 font-bold italic flex items-center justify-center gap-1.5 relative z-10">
+                    <div className="px-3 py-2.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-[11px] text-rose-800 dark:text-rose-300 font-bold italic flex items-center justify-center gap-1.5 relative z-10">
                       <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
                       <span>Absent — No Marks Logged</span>
                     </div>
@@ -693,8 +694,8 @@ export default function LessonsTracker({
 
                   {/* Remarks / Comments Section */}
                   {act.comment && (
-                    <div className="text-xs text-purple-950 italic bg-gradient-to-r from-purple-50 via-fuchsia-50/40 to-white border border-purple-200/90 rounded-xl p-2.5 flex items-start gap-2 shadow-[0_2px_8px_-2px_rgba(168,85,247,0.18)] relative z-10">
-                      <MessageSquare className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                    <div className="text-xs text-purple-950 dark:text-purple-300 italic bg-gradient-to-r from-purple-50 via-fuchsia-50/40 to-white dark:from-slate-950 dark:via-purple-950/30 dark:to-slate-950 border border-purple-200/90 dark:border-slate-800 rounded-xl p-2.5 flex items-start gap-2 shadow-[0_2px_8px_-2px_rgba(168,85,247,0.18)] relative z-10">
+                      <MessageSquare className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                       <span className="font-medium line-clamp-2">&ldquo;{act.comment}&rdquo;</span>
                     </div>
                   )}
@@ -702,23 +703,23 @@ export default function LessonsTracker({
               );
             })
           ) : (
-            <div className="sm:col-span-2 py-8 text-center text-slate-500 border-2 border-dashed border-indigo-300 rounded-2xl bg-gradient-to-br from-indigo-100/60 via-purple-50 to-teal-100/60 shadow-2xs space-y-2">
-              <div className="p-2.5 bg-indigo-200 text-indigo-800 rounded-xl w-10 h-10 mx-auto flex items-center justify-center border border-indigo-300 shadow-2xs">
+            <div className="sm:col-span-2 py-8 text-center text-slate-500 dark:text-slate-400 border-2 border-dashed border-indigo-300 dark:border-slate-800 rounded-2xl bg-gradient-to-br from-indigo-100/60 via-purple-50 to-teal-100/60 dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900 shadow-2xs space-y-2">
+              <div className="p-2.5 bg-indigo-200 dark:bg-slate-800 text-indigo-800 dark:text-indigo-300 rounded-xl w-10 h-10 mx-auto flex items-center justify-center border border-indigo-300 dark:border-slate-700 shadow-2xs">
                 <BookOpen className="w-5 h-5" />
               </div>
               <div className="space-y-0.5">
-                <p className="text-xs font-extrabold text-slate-900">No Lesson Records Found</p>
-                <p className="text-[11px] text-slate-600 font-medium">No lesson entries match your filter or search.</p>
+                <p className="text-xs font-extrabold text-slate-900 dark:text-white">No Lesson Records Found</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">No lesson entries match your filter or search.</p>
               </div>
             </div>
           )}
         </div>
       ) : (
         /* TABLE VIEW (ALTERNATIVE) */
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xs">
           <div className="overflow-x-auto max-h-[500px]">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 uppercase font-mono text-[10px] sticky top-0 z-10">
+              <thead className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 uppercase font-mono text-[10px] sticky top-0 z-10">
                 <tr>
                   <th className="p-2.5">ID</th>
                   <th className="p-2.5">Date</th>
@@ -730,44 +731,44 @@ export default function LessonsTracker({
                   <th className="p-2.5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium text-slate-800 dark:text-slate-200">
                 {sortedActivities.length > 0 ? (
                   sortedActivities.map((act) => (
-                    <tr key={act.aid} className="hover:bg-indigo-50/30 transition-colors">
-                      <td className="p-2.5 font-mono text-indigo-900 font-bold">{formatAid(act.aid)}</td>
-                      <td className="p-2.5 font-mono text-slate-600 whitespace-nowrap">{act.date}</td>
+                    <tr key={act.aid} className="hover:bg-indigo-50/30 dark:hover:bg-slate-800/50 transition-colors">
+                      <td className="p-2.5 font-mono text-indigo-900 dark:text-indigo-400 font-bold">{formatAid(act.aid)}</td>
+                      <td className="p-2.5 font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap font-semibold">{formatDateWithDay(act.date)}</td>
                       <td className="p-2.5">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                             act.status === 'Present'
-                              ? 'bg-emerald-100 text-emerald-900'
-                              : 'bg-rose-100 text-rose-900'
+                              ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800'
+                              : 'bg-rose-100 dark:bg-rose-950/80 text-rose-900 dark:text-rose-300 border border-rose-300/80 dark:border-rose-800'
                           }`}
                         >
                           {act.status}
                         </span>
                       </td>
-                      <td className="p-2.5 font-bold text-slate-900">{act.subjectTuitioned || '—'}</td>
-                      <td className="p-2.5 text-center font-mono font-bold text-amber-900">
+                      <td className="p-2.5 font-bold text-slate-900 dark:text-slate-100">{act.subjectTuitioned || '—'}</td>
+                      <td className="p-2.5 text-center font-mono font-bold text-amber-900 dark:text-amber-300">
                         {act.hwMarks !== undefined ? act.hwMarks : '—'}
                       </td>
-                      <td className="p-2.5 text-center font-mono font-bold text-sky-900">
+                      <td className="p-2.5 text-center font-mono font-bold text-sky-900 dark:text-sky-300">
                         {act.cwMarks !== undefined ? act.cwMarks : '—'}
                       </td>
-                      <td className="p-2.5 text-slate-600 italic truncate max-w-xs">{act.comment || '—'}</td>
+                      <td className="p-2.5 text-slate-600 dark:text-slate-400 italic truncate max-w-xs">{act.comment || '—'}</td>
                       <td className="p-2.5 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             type="button"
                             onClick={() => handleStartEdit(act)}
-                            className="p-1 text-indigo-700 hover:bg-indigo-100 rounded"
+                            className="p-1 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-800 rounded"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             type="button"
                             onClick={() => onDeleteActivity(act.aid)}
-                            className="p-1 text-rose-700 hover:bg-rose-100 rounded"
+                            className="p-1 text-rose-700 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-slate-800 rounded"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -777,7 +778,7 @@ export default function LessonsTracker({
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="p-6 text-center text-slate-500">
+                    <td colSpan={8} className="p-6 text-center text-slate-500 dark:text-slate-400">
                       No lesson entries found.
                     </td>
                   </tr>

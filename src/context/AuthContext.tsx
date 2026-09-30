@@ -15,7 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   expiresAt: number | null;
   timeLeftMs: number;
-  login: (identifier: string, pass: string, role?: 'admin' | 'student') => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, pass: string, role?: 'admin' | 'student') => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 }
@@ -103,12 +103,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [expiresAt]);
 
-  const login = async (identifier: string, pass: string, role?: 'admin' | 'student') => {
+  const login = async (email: string, pass: string, role?: 'admin' | 'student') => {
     try {
+      const cleanEmail = email.trim();
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, sid: identifier, email: identifier, password: pass, role }),
+        body: JSON.stringify({ email: cleanEmail, identifier: cleanEmail, password: pass, role }),
       });
 
       const resText = await res.text();
@@ -242,7 +243,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       return null;
     }
 
-    return <>{children}</>;
+    return (
+      <div className="max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-2.5 sm:py-6 flex flex-col flex-grow">
+        {children}
+      </div>
+    );
   }
 
   // 2. Admin View logic (userType === 'admin')
@@ -250,5 +255,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <div className="max-w-7xl w-full mx-auto px-2 sm:px-6 lg:px-8 py-2.5 sm:py-6 flex flex-col flex-grow">
+      {children}
+    </div>
+  );
 }

@@ -51,6 +51,8 @@ import {
   ComposedChart,
 } from 'recharts';
 import { formatBatch } from '@/utils/formatBatch';
+import { formatDateWithDay, formatBillingMonth } from '@/utils/dateFormat';
+import { useTheme } from '@/context/ThemeContext';
 import {
   isActiveEnrolledStudent,
   isAdminStudent,
@@ -74,26 +76,26 @@ interface AdminPortalProps {
 
 // Chart Palette Colors
 const COLORS = {
-  emerald: '#059669',
-  teal: '#0d9488',
-  indigo: '#4f46e5',
-  purple: '#7c3aed',
-  amber: '#d97706',
-  orange: '#ea580c',
-  rose: '#e11d48',
-  sky: '#0284c7',
-  slate: '#64748b',
+  emerald: '#10b981',
+  teal: '#14b8a6',
+  indigo: '#6366f1',
+  purple: '#8b5cf6',
+  amber: '#f59e0b',
+  orange: '#f97316',
+  rose: '#f43f5e',
+  sky: '#0ea5e9',
+  slate: '#94a3b8',
 };
 
 const PIE_PALETTE = [
-  '#4f46e5',
-  '#059669',
-  '#d97706',
-  '#7c3aed',
-  '#0284c7',
-  '#e11d48',
-  '#0d9488',
+  '#6366f1',
+  '#10b981',
   '#f59e0b',
+  '#8b5cf6',
+  '#0ea5e9',
+  '#f43f5e',
+  '#14b8a6',
+  '#ec4899',
 ];
 
 export default function AdminPortal({
@@ -104,6 +106,21 @@ export default function AdminPortal({
   onRefreshData,
   onSelectStudent,
 }: AdminPortalProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
+  const chartGridStroke = isDark ? 'rgba(255, 255, 255, 0.07)' : '#f1f5f9';
+  const chartAxisLine = isDark ? 'rgba(255, 255, 255, 0.12)' : '#e2e8f0';
+  const chartTickFill = isDark ? '#94a3b8' : '#64748b';
+  const chartTooltipStyle = {
+    backgroundColor: isDark ? '#0f172a' : '#0f172a',
+    border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : 'none',
+    borderRadius: '12px',
+    color: '#fff',
+    fontSize: '11px',
+    boxShadow: isDark ? '0 15px 35px -5px rgba(0, 0, 0, 0.7)' : '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+  };
+
   // Mounting state to prevent Recharts SSR hydration calculation errors
   const [isMounted, setIsMounted] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -557,22 +574,22 @@ export default function AdminPortal({
   }, [filteredStudents, exams, activities]);
 
   return (
-    <div className="space-y-3 pb-6 w-full max-w-full overflow-hidden">
+    <div className="space-y-3 pb-6 w-full max-w-full">
       {/* 1. Header & Dynamic Filters Toolbar (Sleek Box Structure) */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 text-white rounded-2xl p-2.5 sm:p-3.5 border border-slate-800 shadow-md w-full overflow-hidden space-y-2.5">
+      <div className="bg-gradient-to-br from-indigo-50/90 via-white to-sky-50/80 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white rounded-2xl p-2.5 sm:p-3.5 border border-indigo-200/80 dark:border-slate-800 shadow-sm w-full space-y-2.5 relative z-30">
         {/* Top Row: Title, Student Counter & Sync Action */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 via-teal-400 to-emerald-400 p-0.5 shadow-sm shrink-0 flex items-center justify-center">
-              <div className="w-full h-full bg-slate-950/20 rounded-[10px] flex items-center justify-center text-white">
+              <div className="w-full h-full bg-white/40 dark:bg-slate-950/20 rounded-[10px] flex items-center justify-center text-teal-800 dark:text-white">
                 <BarChart3 className="w-4 h-4" />
               </div>
             </div>
             <div className="min-w-0 flex items-center gap-2 flex-wrap">
-              <h1 className="text-xs sm:text-sm font-display font-black tracking-tight text-white truncate">
+              <h1 className="text-xs sm:text-sm font-display font-black tracking-tight text-slate-900 dark:text-white truncate">
                 Analytics Hub
               </h1>
-              <span className="text-[9.5px] sm:text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono font-bold shrink-0">
+              <span className="text-[9.5px] sm:text-[10px] bg-indigo-100 dark:bg-indigo-500/20 text-indigo-900 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 px-2 py-0.5 rounded-full font-mono font-bold shrink-0">
                 {filteredStudents.length} Students
               </span>
             </div>
@@ -592,11 +609,11 @@ export default function AdminPortal({
         </div>
 
         {/* Bottom Row: Unified Filter Matrix (Batch + Period) */}
-        <div className="pt-2 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+        <div className="pt-2 border-t border-slate-200 dark:border-slate-800/80 grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
           {/* Left / Batch Filter (sm: 7 cols) */}
           <div className="sm:col-span-7 flex items-center gap-1.5 flex-wrap min-w-0">
-            <span className="text-[9.5px] font-bold text-slate-400 font-mono uppercase tracking-wider flex items-center gap-1 shrink-0">
-              <GraduationCap className="w-3 h-3 text-indigo-400" />
+            <span className="text-[9.5px] font-bold text-slate-600 dark:text-slate-400 font-mono uppercase tracking-wider flex items-center gap-1 shrink-0">
+              <GraduationCap className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
               Batch:
             </span>
 
@@ -610,7 +627,7 @@ export default function AdminPortal({
               className={`px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-bold transition-all cursor-pointer shrink-0 ${
                 selectedBatch === 'all'
                   ? 'bg-indigo-600 text-white font-black shadow-xs ring-1 ring-indigo-400/40'
-                  : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
+                  : 'bg-white hover:bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white border border-slate-200 dark:border-slate-700 shadow-2xs'
               }`}
             >
               All ({activeStudents.length})
@@ -621,23 +638,23 @@ export default function AdminPortal({
               <button
                 type="button"
                 onClick={() => setIsBatchDropdownOpen(!isBatchDropdownOpen)}
-                className={`px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1.5 border ${
+                className={`px-2 py-1 rounded-lg text-[10px] sm:text-[10.5px] font-bold transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs ${
                   selectedBatch !== 'all'
-                    ? 'bg-indigo-600/30 text-indigo-200 border-indigo-500 shadow-xs ring-1 ring-indigo-500/40'
-                    : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700'
+                    ? 'bg-indigo-50 text-indigo-900 border-indigo-300 dark:bg-indigo-600/30 dark:text-indigo-200 dark:border-indigo-500 ring-1 ring-indigo-500/40'
+                    : 'bg-white hover:bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white border-slate-200 dark:border-slate-700'
                 }`}
                 title="Select Academic Batch"
               >
-                <Filter className="w-2.5 h-2.5 text-indigo-400 shrink-0" />
+                <Filter className="w-2.5 h-2.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span className="max-w-[110px] sm:max-w-[140px] truncate">
                   {selectedBatch === 'all' ? `Batches (${uniqueBatches.length})` : formatBatch(selectedBatch)}
                 </span>
-                <ChevronDown className={`w-3 h-3 transition-transform text-slate-400 ${isBatchDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3 h-3 transition-transform text-slate-500 dark:text-slate-400 ${isBatchDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Popover Dropdown Panel */}
               {isBatchDropdownOpen && (
-                <div className="absolute left-0 mt-1 w-52 bg-slate-900/98 backdrop-blur-xl border border-slate-700 rounded-xl shadow-2xl z-50 p-1.5 space-y-1 text-xs animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute left-0 mt-1 w-52 bg-white dark:bg-slate-900/98 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 p-1.5 space-y-1 text-xs animate-in fade-in zoom-in-95 duration-150">
                   {uniqueBatches.length > 4 && (
                     <div className="relative mb-1">
                       <Search className="w-3 h-3 text-slate-400 absolute left-2 top-2" />
@@ -646,7 +663,7 @@ export default function AdminPortal({
                         placeholder="Search batch..."
                         value={batchSearchTerm}
                         onChange={(e) => setBatchSearchTerm(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-7 pr-2 py-1 text-[10px] text-white placeholder-slate-500 focus:outline-hidden focus:border-indigo-500"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-7 pr-2 py-1 text-[10px] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden focus:border-indigo-500"
                         autoFocus
                       />
                     </div>
@@ -662,11 +679,11 @@ export default function AdminPortal({
                       className={`w-full px-2 py-1.5 rounded-lg flex items-center justify-between text-left transition-colors cursor-pointer text-[10.5px] ${
                         selectedBatch === 'all'
                           ? 'bg-indigo-600 text-white font-bold'
-                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                          : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
                       <span className="font-semibold">All Batches</span>
-                      <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-black/25 font-bold">
+                      <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-slate-200 dark:bg-black/25 text-slate-800 dark:text-white font-bold">
                         {activeStudents.length}
                       </span>
                     </button>
@@ -686,13 +703,13 @@ export default function AdminPortal({
                             className={`w-full px-2 py-1.5 rounded-lg flex items-center justify-between text-left transition-colors cursor-pointer text-[10.5px] ${
                               isSelected
                                 ? 'bg-indigo-600 text-white font-bold'
-                                : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                             }`}
                           >
                             <span className="font-semibold truncate">{formatBatch(b, 'HSC')}</span>
                             <span
                               className={`text-[9px] font-mono px-1 py-0.2 rounded font-bold shrink-0 ${
-                                isSelected ? 'bg-black/25 text-white' : 'bg-slate-800 text-indigo-300 border border-slate-700'
+                                isSelected ? 'bg-black/25 text-white' : 'bg-slate-100 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border border-slate-200 dark:border-slate-700'
                               }`}
                             >
                               {count}
@@ -712,7 +729,7 @@ export default function AdminPortal({
               <button
                 type="button"
                 onClick={() => setSelectedBatch('all')}
-                className="p-1 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-lg shrink-0 transition-colors cursor-pointer"
+                className="p-1 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 rounded-lg shrink-0 transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
                 title="Reset batch filter"
               >
                 <X className="w-3 h-3" />
@@ -722,7 +739,7 @@ export default function AdminPortal({
 
           {/* Right / Timeline Segment (sm: 5 cols, full-width grid on mobile) */}
           <div className="sm:col-span-5 sm:justify-self-end w-full sm:w-auto">
-            <div className="grid grid-cols-4 sm:flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-xl border border-slate-800 w-full sm:w-auto">
+            <div className="grid grid-cols-4 sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-950/80 p-0.5 rounded-xl border border-slate-200 dark:border-slate-800 w-full sm:w-auto">
               {(
                 [
                   { id: 'all', label: 'All' },
@@ -738,7 +755,7 @@ export default function AdminPortal({
                   className={`py-1 sm:py-0.5 px-2.5 rounded-lg text-[10px] sm:text-[10.5px] font-bold text-center transition-all cursor-pointer ${
                     timeRange === t.id
                       ? 'bg-indigo-600 text-white font-black shadow-xs'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/50'
                   }`}
                 >
                   {t.label}
@@ -752,30 +769,30 @@ export default function AdminPortal({
       {/* 2. Executive Metric Matrix Cards (Ultra-Compact) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 w-full">
         {/* Total Students */}
-        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-emerald-100/95 via-teal-50/80 to-emerald-100/80 border border-emerald-300/80 rounded-xl shadow-2xs">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-emerald-100/95 via-teal-50/80 to-emerald-100/80 dark:from-emerald-950/70 dark:via-slate-900 dark:to-teal-950/60 border border-emerald-300/80 dark:border-emerald-800/60 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[9px] sm:text-[10px] font-black text-emerald-900 uppercase tracking-tight font-mono truncate">
+            <span className="text-[9px] sm:text-[10px] font-black text-emerald-900 dark:text-emerald-300 uppercase tracking-tight font-mono truncate">
               Students
             </span>
             <div className="p-1 bg-emerald-600 text-white rounded-md shadow-2xs shrink-0">
               <Users className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             </div>
           </div>
-          <p className="text-base sm:text-xl font-display font-black text-emerald-950 mt-0.5 font-mono">
+          <p className="text-base sm:text-xl font-display font-black text-emerald-950 dark:text-emerald-200 mt-0.5 font-mono">
             {filteredStudents.length}
           </p>
-          <div className="flex items-center justify-between text-[8.5px] text-emerald-800 font-semibold mt-0.5 pt-0.5 border-t border-emerald-200/80">
+          <div className="flex items-center justify-between text-[8.5px] text-emerald-800 dark:text-emerald-300 font-semibold mt-0.5 pt-0.5 border-t border-emerald-200/80 dark:border-emerald-800/60">
             <span className="truncate">{uniqueBatches.length} Batches</span>
-            <span className="font-mono bg-emerald-200/80 px-1 py-0.1 rounded text-emerald-950">
+            <span className="font-mono bg-emerald-200/80 dark:bg-emerald-900/60 px-1 py-0.1 rounded text-emerald-950 dark:text-emerald-200">
               Active
             </span>
           </div>
         </div>
 
         {/* Exam Score Index */}
-        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-amber-100/95 via-orange-50/80 to-amber-100/80 border border-amber-300/80 rounded-xl shadow-2xs">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-amber-100/95 via-orange-50/80 to-amber-100/80 dark:from-amber-950/70 dark:via-slate-900 dark:to-amber-950/60 border border-amber-300/80 dark:border-amber-800/60 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[9px] sm:text-[10px] font-black text-amber-900 uppercase tracking-tight font-mono truncate">
+            <span className="text-[9px] sm:text-[10px] font-black text-amber-900 dark:text-amber-300 uppercase tracking-tight font-mono truncate">
               Exam Avg
             </span>
             <div className="p-1 bg-amber-600 text-white rounded-md shadow-2xs shrink-0">
@@ -783,44 +800,44 @@ export default function AdminPortal({
             </div>
           </div>
           <div className="flex items-baseline gap-1 mt-0.5">
-            <p className="text-base sm:text-xl font-display font-black text-amber-950 font-mono">
+            <p className="text-base sm:text-xl font-display font-black text-amber-950 dark:text-amber-200 font-mono">
               {examStats.avgScorePct > 0 ? `${examStats.avgScorePct}%` : '—'}
             </p>
-            <span className="text-[9px] font-bold text-amber-800 hidden sm:inline">avg</span>
+            <span className="text-[9px] font-bold text-amber-800 dark:text-amber-300 hidden sm:inline">avg</span>
           </div>
-          <div className="flex items-center justify-between text-[8.5px] text-amber-800 font-semibold mt-0.5 pt-0.5 border-t border-amber-200/80">
+          <div className="flex items-center justify-between text-[8.5px] text-amber-800 dark:text-amber-300 font-semibold mt-0.5 pt-0.5 border-t border-amber-200/80 dark:border-amber-800/60">
             <span className="truncate">Peak {examStats.highestScorePct}%</span>
-            <span className="font-mono bg-amber-200/80 px-1 py-0.1 rounded text-amber-950">
+            <span className="font-mono bg-amber-200/80 dark:bg-amber-900/60 px-1 py-0.1 rounded text-amber-950 dark:text-amber-200">
               {examStats.totalEvaluated} Tests
             </span>
           </div>
         </div>
 
         {/* Tuition Revenue Received */}
-        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-teal-100/95 via-emerald-50/80 to-teal-100/80 border border-teal-300/80 rounded-xl shadow-2xs">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-teal-100/95 via-emerald-50/80 to-teal-100/80 dark:from-teal-950/70 dark:via-slate-900 dark:to-emerald-950/60 border border-teal-300/80 dark:border-teal-800/60 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[9px] sm:text-[10px] font-black text-teal-900 uppercase tracking-tight font-mono truncate">
+            <span className="text-[9px] sm:text-[10px] font-black text-teal-900 dark:text-teal-300 uppercase tracking-tight font-mono truncate">
               Revenue
             </span>
             <div className="p-1 bg-teal-600 text-white rounded-md shadow-2xs shrink-0">
               <Banknote className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
             </div>
           </div>
-          <p className="text-base sm:text-xl font-display font-black text-teal-950 mt-0.5 font-mono truncate">
+          <p className="text-base sm:text-xl font-display font-black text-teal-950 dark:text-teal-200 mt-0.5 font-mono truncate">
             ৳{totalRevenue.toLocaleString()}
           </p>
-          <div className="flex items-center justify-between text-[8.5px] text-teal-800 font-semibold mt-0.5 pt-0.5 border-t border-teal-200/80">
+          <div className="flex items-center justify-between text-[8.5px] text-teal-800 dark:text-teal-300 font-semibold mt-0.5 pt-0.5 border-t border-teal-200/80 dark:border-teal-800/60">
             <span>{filteredPayments.length} Txns</span>
-            <span className="font-mono bg-teal-200/80 px-1 py-0.1 rounded text-teal-950">
+            <span className="font-mono bg-teal-200/80 dark:bg-teal-900/60 px-1 py-0.1 rounded text-teal-950 dark:text-teal-200">
               Paid
             </span>
           </div>
         </div>
 
         {/* Daily Lesson Attendance & Homework */}
-        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-100/95 via-sky-50/80 to-indigo-100/80 border border-indigo-300/80 rounded-xl shadow-2xs">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-100/95 via-sky-50/80 to-indigo-100/80 dark:from-indigo-950/70 dark:via-slate-900 dark:to-sky-950/60 border border-indigo-300/80 dark:border-indigo-800/60 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-[9px] sm:text-[10px] font-black text-indigo-900 uppercase tracking-tight font-mono truncate">
+            <span className="text-[9px] sm:text-[10px] font-black text-indigo-900 dark:text-indigo-300 uppercase tracking-tight font-mono truncate">
               Attendance
             </span>
             <div className="p-1 bg-indigo-600 text-white rounded-md shadow-2xs shrink-0">
@@ -828,14 +845,14 @@ export default function AdminPortal({
             </div>
           </div>
           <div className="flex items-baseline gap-1 mt-0.5">
-            <p className="text-base sm:text-xl font-display font-black text-indigo-950 font-mono">
+            <p className="text-base sm:text-xl font-display font-black text-indigo-950 dark:text-indigo-200 font-mono">
               {lessonStats.attendanceRate}%
             </p>
-            <span className="text-[9px] font-bold text-indigo-800 hidden sm:inline">rate</span>
+            <span className="text-[9px] font-bold text-indigo-800 dark:text-indigo-300 hidden sm:inline">rate</span>
           </div>
-          <div className="flex items-center justify-between text-[8.5px] text-indigo-800 font-semibold mt-0.5 pt-0.5 border-t border-indigo-200/80">
+          <div className="flex items-center justify-between text-[8.5px] text-indigo-800 dark:text-indigo-300 font-semibold mt-0.5 pt-0.5 border-t border-indigo-200/80 dark:border-indigo-800/60">
             <span>HW: {lessonStats.avgHwMarks}/10</span>
-            <span className="font-mono bg-indigo-200/80 px-1 py-0.1 rounded text-indigo-950">
+            <span className="font-mono bg-indigo-200/80 dark:bg-indigo-900/60 px-1 py-0.1 rounded text-indigo-950 dark:text-indigo-200">
               {lessonStats.totalLessons} Logs
             </span>
           </div>
@@ -845,22 +862,22 @@ export default function AdminPortal({
       {/* 3. ROW 1 CHARTS: Financial Revenue & Monthly Trajectory */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3 w-full">
         {/* Monthly Revenue Bar + Line Composed Chart */}
-        <div className="lg:col-span-8 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-2">
+        <div className="lg:col-span-8 bg-white dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 dark:border-slate-800/80 pb-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-1.5 bg-teal-100 text-teal-700 rounded-lg shrink-0">
+              <div className="p-1.5 bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 rounded-lg shrink-0">
                 <TrendingUp className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
+                <h3 className="font-display font-black text-slate-900 dark:text-slate-100 text-xs sm:text-sm truncate">
                   Monthly Tuition Collections &amp; Inflow Trajectory
                 </h3>
-                <p className="text-[10.5px] text-slate-500 font-medium truncate">
+                <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
                   Monthly fee collection amount (৳) and transaction frequency
                 </p>
               </div>
             </div>
-            <span className="text-[10px] sm:text-[11px] font-mono font-bold bg-teal-50 text-teal-800 border border-teal-200 px-2 py-0.5 rounded-md self-start sm:self-auto shrink-0">
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold bg-teal-50 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800/70 px-2 py-0.5 rounded-md self-start sm:self-auto shrink-0">
               Total ৳{totalRevenue.toLocaleString()}
             </span>
           </div>
@@ -878,36 +895,31 @@ export default function AdminPortal({
                       <stop offset="95%" stopColor="#059669" stopOpacity={0.2} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridStroke} />
                   <XAxis
                     dataKey="month"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 9.5, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
+                    tickFormatter={(val) => formatBillingMonth(val, { shortMonth: true, compact: true })}
                   />
                   <YAxis
                     yAxisId="left"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 10, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
                     tickFormatter={(val) => `৳${val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val}`}
                   />
                   <YAxis
                     yAxisId="right"
                     orientation="right"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 10, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '11px',
-                      border: 'none',
-                      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
-                    }}
+                    contentStyle={chartTooltipStyle}
+                    labelFormatter={(label) => formatBillingMonth(String(label ?? ''))}
                     formatter={(value: any, name: any) => {
                       if (name === 'Revenue') return [`৳${Number(value).toLocaleString()}`, 'Total Tuition'];
                       return [value, 'Transactions'];
@@ -948,17 +960,17 @@ export default function AdminPortal({
         </div>
 
         {/* Revenue Share by HSC Batch Donut Chart */}
-        <div className="lg:col-span-4 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 flex flex-col justify-between w-full min-w-0 overflow-hidden">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+        <div className="lg:col-span-4 bg-white dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 flex flex-col justify-between w-full min-w-0 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg shrink-0">
+              <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-lg shrink-0">
                 <PieChartIcon className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
+                <h3 className="font-display font-black text-slate-900 dark:text-slate-100 text-xs sm:text-sm truncate">
                   Revenue by Batch
                 </h3>
-                <p className="text-[10px] sm:text-[10.5px] text-slate-500 truncate">Distribution of tuition receipts</p>
+                <p className="text-[10px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 truncate">Distribution of tuition receipts</p>
               </div>
             </div>
           </div>
@@ -982,13 +994,7 @@ export default function AdminPortal({
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '11px',
-                      border: 'none',
-                    }}
+                    contentStyle={chartTooltipStyle}
                     formatter={(value: any) => [`৳${Number(value).toLocaleString()}`, 'Tuition Paid']}
                   />
                 </PieChart>
@@ -1001,15 +1007,15 @@ export default function AdminPortal({
           </div>
 
           {/* Legend Badges */}
-          <div className="grid grid-cols-2 gap-1 pt-1.5 border-t border-slate-100 text-[9.5px]">
+          <div className="grid grid-cols-2 gap-1 pt-1.5 border-t border-slate-100 dark:border-slate-800/80 text-[9.5px]">
             {revenueByBatchChartData.map((item, idx) => (
-              <div key={item.name} className="flex items-center gap-1 p-1 rounded-md bg-slate-50 border border-slate-200/60 min-w-0">
+              <div key={item.name} className="flex items-center gap-1 p-1 rounded-md bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60 min-w-0">
                 <div
                   className="w-2 h-2 rounded-full shrink-0"
                   style={{ backgroundColor: PIE_PALETTE[idx % PIE_PALETTE.length] }}
                 />
-                <span className="font-bold text-slate-700 truncate">{item.name}</span>
-                <span className="font-mono text-slate-900 font-black ml-auto shrink-0">
+                <span className="font-bold text-slate-700 dark:text-slate-300 truncate">{item.name}</span>
+                <span className="font-mono text-slate-900 dark:text-slate-100 font-black ml-auto shrink-0">
                   ৳{item.value.toLocaleString()}
                 </span>
               </div>
@@ -1021,27 +1027,27 @@ export default function AdminPortal({
       {/* 4. ROW 2 CHARTS: Examination Analytics & Scorecard Distributions */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3 w-full">
         {/* Exam Score Trajectory (Area Chart with Benchmarks) */}
-        <div className="lg:col-span-7 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-2">
+        <div className="lg:col-span-7 bg-white dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 dark:border-slate-800/80 pb-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-1.5 bg-amber-100 text-amber-700 rounded-lg shrink-0">
+              <div className="p-1.5 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 rounded-lg shrink-0">
                 <LineChartIcon className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
+                <h3 className="font-display font-black text-slate-900 dark:text-slate-100 text-xs sm:text-sm truncate">
                   Chronological Examination Score Trends (%)
                 </h3>
-                <p className="text-[10.5px] text-slate-500 font-medium truncate">
+                <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
                   Score progression with distinction benchmarks
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-[9.5px] sm:text-[10px] font-bold shrink-0">
-              <span className="flex items-center gap-1 text-emerald-700">
+              <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 Distinction (80%)
               </span>
-              <span className="flex items-center gap-1 text-amber-700">
+              <span className="flex items-center gap-1 text-amber-700 dark:text-amber-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                 Pass (50%)
               </span>
@@ -1061,50 +1067,46 @@ export default function AdminPortal({
                       <stop offset="95%" stopColor="#d97706" stopOpacity={0.05} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridStroke} />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 9.5, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
+                    tickFormatter={(val) => formatDateWithDay(val, { includeYear: false })}
                   />
                   <YAxis
                     domain={[0, 100]}
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 10, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
                     tickFormatter={(val) => `${val}%`}
                   />
                   <ReferenceLine
                     y={80}
-                    stroke="#059669"
+                    stroke="#10b981"
                     strokeDasharray="3 3"
-                    label={{ value: '80%', fill: '#059669', fontSize: 9, position: 'insideTopRight' }}
+                    label={{ value: '80%', fill: '#10b981', fontSize: 9, position: 'insideTopRight' }}
                   />
                   <ReferenceLine
                     y={50}
-                    stroke="#ea580c"
+                    stroke="#f97316"
                     strokeDasharray="3 3"
-                    label={{ value: '50%', fill: '#ea580c', fontSize: 9, position: 'insideBottomRight' }}
+                    label={{ value: '50%', fill: '#f97316', fontSize: 9, position: 'insideBottomRight' }}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '11px',
-                      border: 'none',
-                    }}
+                    contentStyle={chartTooltipStyle}
+                    labelFormatter={(label) => formatDateWithDay(String(label ?? ''), { fullDay: true })}
                     formatter={(value: any) => [`${value}%`, 'Average Score']}
                   />
                   <Area
                     type="monotone"
                     dataKey="avgScore"
                     name="Average Score"
-                    stroke="#d97706"
+                    stroke="#f59e0b"
                     strokeWidth={2.5}
                     fill="url(#examScoreGrad)"
-                    dot={{ fill: '#d97706', r: 3 }}
+                    dot={{ fill: '#f59e0b', r: 3 }}
                     activeDot={{ r: 5 }}
                   />
                 </AreaChart>
@@ -1119,17 +1121,17 @@ export default function AdminPortal({
         </div>
 
         {/* Grade Tier Distribution (Bar Chart) */}
-        <div className="lg:col-span-5 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+        <div className="lg:col-span-5 bg-white dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-1.5 bg-purple-100 text-purple-700 rounded-lg shrink-0">
+              <div className="p-1.5 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-lg shrink-0">
                 <BarChart3 className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
+                <h3 className="font-display font-black text-slate-900 dark:text-slate-100 text-xs sm:text-sm truncate">
                   Score Grade Distribution
                 </h3>
-                <p className="text-[10.5px] text-slate-500 font-medium truncate">Evaluation breakdown by grade band</p>
+                <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium truncate">Evaluation breakdown by grade band</p>
               </div>
             </div>
           </div>
@@ -1141,40 +1143,34 @@ export default function AdminPortal({
                   data={examGradeDistributionData}
                   margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridStroke} />
                   <XAxis
                     dataKey="grade"
-                    tick={{ fontSize: 9, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 9, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
                     angle={-20}
                     textAnchor="end"
                   />
                   <YAxis
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 10, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
                     allowDecimals={false}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '11px',
-                      border: 'none',
-                    }}
+                    contentStyle={chartTooltipStyle}
                     formatter={(val: any) => [val, 'Exam Attempts']}
                   />
                   <Bar dataKey="count" name="Exams" radius={[5, 5, 0, 0]}>
                     {examGradeDistributionData.map((entry, index) => {
-                      let color = '#7c3aed';
-                      if (entry.grade.includes('A+')) color = '#059669';
-                      else if (entry.grade.includes('A (')) color = '#0284c7';
-                      else if (entry.grade.includes('B (')) color = '#4f46e5';
-                      else if (entry.grade.includes('C (')) color = '#d97706';
-                      else if (entry.grade.includes('Needs')) color = '#ea580c';
-                      else if (entry.grade.includes('Absent')) color = '#e11d48';
+                      let color = '#8b5cf6';
+                      if (entry.grade.includes('A+')) color = '#10b981';
+                      else if (entry.grade.includes('A (')) color = '#0ea5e9';
+                      else if (entry.grade.includes('B (')) color = '#6366f1';
+                      else if (entry.grade.includes('C (')) color = '#f59e0b';
+                      else if (entry.grade.includes('Needs')) color = '#f97316';
+                      else if (entry.grade.includes('Absent')) color = '#f43f5e';
 
                       return <Cell key={`grade-cell-${index}`} fill={color} />;
                     })}
@@ -1193,27 +1189,27 @@ export default function AdminPortal({
       {/* 5. ROW 3 CHARTS: Daily Lessons, Homework (HW) vs Classwork (CW) & Batch Comparison */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3 w-full">
         {/* Homework (HW) vs Classwork (CW) Mastery Trends */}
-        <div className="lg:col-span-6 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-2">
+        <div className="lg:col-span-6 bg-white dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 dark:border-slate-800/80 pb-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg shrink-0">
+              <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-lg shrink-0">
                 <BookOpen className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
+                <h3 className="font-display font-black text-slate-900 dark:text-slate-100 text-xs sm:text-sm truncate">
                   HW vs. CW Performance Trends
                 </h3>
-                <p className="text-[10.5px] text-slate-500 font-medium truncate">
+                <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
                   Average daily scores out of 10
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-[9.5px] sm:text-[10px] font-bold shrink-0">
-              <span className="flex items-center gap-1 text-amber-700 font-mono">
+              <span className="flex items-center gap-1 text-amber-700 dark:text-amber-400 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                 HW: {lessonStats.avgHwMarks}/10
               </span>
-              <span className="flex items-center gap-1 text-sky-700 font-mono">
+              <span className="flex items-center gap-1 text-sky-700 dark:text-sky-400 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
                 CW: {lessonStats.avgCwMarks}/10
               </span>
@@ -1227,28 +1223,24 @@ export default function AdminPortal({
                   data={hwCwTrendsChartData}
                   margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridStroke} />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 9.5, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
+                    tickFormatter={(val) => formatDateWithDay(val, { includeYear: false })}
                   />
                   <YAxis
                     domain={[0, 10]}
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 10, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
                     tickFormatter={(v) => `${v}/10`}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '11px',
-                      border: 'none',
-                    }}
+                    contentStyle={chartTooltipStyle}
+                    labelFormatter={(label) => formatDateWithDay(String(label ?? ''), { fullDay: true })}
                     formatter={(val: any, name: any) => [
                       `${val} / 10`,
                       name === 'avgHw' ? 'Homework Avg' : 'Classwork Avg',
@@ -1272,9 +1264,9 @@ export default function AdminPortal({
                     type="monotone"
                     dataKey="avgCw"
                     name="Classwork (CW)"
-                    stroke="#0284c7"
+                    stroke="#0ea5e9"
                     strokeWidth={2.5}
-                    dot={{ fill: '#0284c7', r: 3 }}
+                    dot={{ fill: '#0ea5e9', r: 3 }}
                     activeDot={{ r: 4.5 }}
                   />
                 </LineChart>
@@ -1289,17 +1281,17 @@ export default function AdminPortal({
         </div>
 
         {/* Batch-by-Batch Multi-Metric Comparison */}
-        <div className="lg:col-span-6 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 pb-2">
+        <div className="lg:col-span-6 bg-white dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-slate-100 dark:border-slate-800/80 pb-2">
             <div className="flex items-center gap-2 min-w-0">
-              <div className="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg shrink-0">
+              <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-lg shrink-0">
                 <Layers className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
+                <h3 className="font-display font-black text-slate-900 dark:text-slate-100 text-xs sm:text-sm truncate">
                   Batch Academic Benchmark Matrix
                 </h3>
-                <p className="text-[10.5px] text-slate-500 font-medium truncate">
+                <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
                   Exam Score %, Attendance %, and HW Mastery %
                 </p>
               </div>
@@ -1313,28 +1305,22 @@ export default function AdminPortal({
                   data={batchComparisonData}
                   margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridStroke} />
                   <XAxis
                     dataKey="name"
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 10, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
                   />
                   <YAxis
                     domain={[0, 100]}
-                    tick={{ fontSize: 10, fill: '#64748b' }}
-                    axisLine={{ stroke: '#e2e8f0' }}
+                    tick={{ fontSize: 10, fill: chartTickFill }}
+                    axisLine={{ stroke: chartAxisLine }}
                     tickLine={false}
                     tickFormatter={(v) => `${v}%`}
                   />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '11px',
-                      border: 'none',
-                    }}
+                    contentStyle={chartTooltipStyle}
                     formatter={(v: any) => [`${v}%`]}
                   />
                   <Legend
@@ -1345,13 +1331,13 @@ export default function AdminPortal({
                   <Bar
                     dataKey="examAvgPct"
                     name="Exam Score %"
-                    fill="#7c3aed"
+                    fill="#8b5cf6"
                     radius={[5, 5, 0, 0]}
                   />
                   <Bar
                     dataKey="attendanceRatePct"
                     name="Attendance %"
-                    fill="#059669"
+                    fill="#10b981"
                     radius={[5, 5, 0, 0]}
                   />
                   <Bar
@@ -1374,24 +1360,24 @@ export default function AdminPortal({
       {/* 6. ROW 4: Academic Leaderboard & Insights Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-3 items-stretch w-full">
         {/* Top Academic Performers Leaderboard */}
-        <div className="lg:col-span-8 bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+        <div className="lg:col-span-8 bg-white dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800/80 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-2xs space-y-2 w-full min-w-0 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2">
             <div className="flex items-center gap-2 min-w-0">
               <div className="p-1.5 bg-gradient-to-tr from-amber-500 to-orange-500 text-white rounded-lg shadow-xs shrink-0">
                 <Award className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm truncate">
+                <h3 className="font-display font-black text-slate-900 dark:text-slate-100 text-xs sm:text-sm truncate">
                   Top Academic Performers (Overall Index)
                 </h3>
-                <p className="text-[10px] sm:text-[10.5px] text-slate-500 font-medium truncate">
+                <p className="text-[10px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 font-medium truncate">
                   Ranked by combined exam score %, attendance consistency, and HW
                 </p>
               </div>
             </div>
             <Link
               href="/admin/students"
-              className="text-[10px] sm:text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5 shrink-0"
+              className="text-[10px] sm:text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-0.5 shrink-0"
             >
               <span>Manage All</span>
               <ChevronRight className="w-3 h-3" />
@@ -1404,7 +1390,7 @@ export default function AdminPortal({
                 <div
                   key={student.sid}
                   onClick={() => onSelectStudent(student.sid)}
-                  className="p-2 bg-gradient-to-r from-slate-50 via-white to-indigo-50/40 border border-slate-200/80 hover:border-indigo-300 hover:shadow-xs rounded-xl flex items-center justify-between gap-2 cursor-pointer transition-all group min-w-0"
+                  className="p-2 bg-gradient-to-r from-slate-50 via-white to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/60 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-xs rounded-xl flex items-center justify-between gap-2 cursor-pointer transition-all group min-w-0"
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <div
@@ -1415,7 +1401,7 @@ export default function AdminPortal({
                           ? 'bg-slate-300 text-slate-900'
                           : idx === 2
                           ? 'bg-orange-300 text-orange-950'
-                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                       }`}
                     >
                       #{idx + 1}
@@ -1423,17 +1409,17 @@ export default function AdminPortal({
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-xs sm:text-sm font-black text-slate-900 truncate group-hover:text-indigo-600 transition-colors">
+                        <span className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           {student.name}
                         </span>
-                        <span className="text-[9px] font-mono font-bold bg-indigo-100 text-indigo-800 border border-indigo-200 px-1 py-0.1 rounded">
+                        <span className="text-[9px] font-mono font-bold bg-indigo-100 dark:bg-indigo-950/90 text-indigo-800 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/80 px-1 py-0.1 rounded">
                           {student.sid}
                         </span>
-                        <span className="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-1 py-0.1 rounded truncate">
+                        <span className="text-[9px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/90 px-1 py-0.1 rounded truncate border border-transparent dark:border-emerald-800/60">
                           {formatBatch(student.hscBatch, 'N/A')}
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                         🎓 {student.college || 'College N/A'} • 📚 {student.subject || 'General'}
                       </p>
                     </div>
@@ -1441,15 +1427,15 @@ export default function AdminPortal({
 
                   <div className="flex items-center gap-2 shrink-0 text-right">
                     <div className="hidden sm:block">
-                      <span className="text-[8.5px] font-mono text-slate-400 uppercase block">Exams</span>
-                      <span className="text-xs font-black font-mono text-slate-800">
+                      <span className="text-[8.5px] font-mono text-slate-400 dark:text-slate-400 uppercase block">Exams</span>
+                      <span className="text-xs font-black font-mono text-slate-800 dark:text-slate-200">
                         {student.examAvg !== null ? `${student.examAvg}%` : '—'}
                       </span>
                     </div>
 
                     <div className="hidden sm:block">
-                      <span className="text-[8.5px] font-mono text-slate-400 uppercase block">Attendance</span>
-                      <span className="text-xs font-black font-mono text-slate-800">
+                      <span className="text-[8.5px] font-mono text-slate-400 dark:text-slate-400 uppercase block">Attendance</span>
+                      <span className="text-xs font-black font-mono text-slate-800 dark:text-slate-200">
                         {student.attendanceRate !== null ? `${student.attendanceRate}%` : '—'}
                       </span>
                     </div>
@@ -1472,63 +1458,63 @@ export default function AdminPortal({
         </div>
 
         {/* Actionable Insights & Operations Hub */}
-        <div className="lg:col-span-4 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-md flex flex-col justify-between space-y-3 w-full min-w-0 overflow-hidden">
+        <div className="lg:col-span-4 bg-gradient-to-br from-indigo-50/90 via-sky-50/60 to-purple-50/80 dark:from-indigo-900 dark:via-indigo-950 dark:to-slate-950 text-slate-900 dark:text-white rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-sm border border-indigo-200/80 dark:border-indigo-900/60 flex flex-col justify-between space-y-3 w-full min-w-0 overflow-hidden">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-indigo-500 text-white rounded-lg shadow-xs shrink-0">
+              <div className="p-1.5 bg-indigo-600 text-white rounded-lg shadow-xs shrink-0">
                 <Zap className="w-3.5 h-3.5 text-amber-300" />
               </div>
-              <h3 className="font-display font-black text-white text-xs sm:text-sm">
+              <h3 className="font-display font-black text-slate-900 dark:text-white text-xs sm:text-sm">
                 Operational Insights
               </h3>
             </div>
 
-            <div className="space-y-2 text-xs text-indigo-100">
-              <div className="p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 backdrop-blur-xs">
-                <div className="flex items-center justify-between text-[10.5px] font-black text-amber-300">
+            <div className="space-y-2 text-xs">
+              <div className="p-2 rounded-xl bg-white dark:bg-slate-950/40 border border-indigo-100 dark:border-indigo-500/20 space-y-0.5 shadow-2xs">
+                <div className="flex items-center justify-between text-[10.5px] font-black text-amber-700 dark:text-amber-300">
                   <span className="flex items-center gap-1">
                     <Target className="w-3 h-3" />
                     Overall Academic Health
                   </span>
-                  <span>{examStats.avgScorePct >= 70 ? 'Optimal' : 'Attention'}</span>
+                  <span className="bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.2 rounded font-mono">{examStats.avgScorePct >= 70 ? 'Optimal' : 'Attention'}</span>
                 </div>
-                <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-snug">
-                  Average exam score is <strong className="text-white">{examStats.avgScorePct}%</strong> with lesson attendance at <strong className="text-white">{lessonStats.attendanceRate}%</strong>.
+                <p className="text-[10px] sm:text-[10.5px] text-slate-600 dark:text-slate-300 leading-snug">
+                  Average exam score is <strong className="text-slate-900 dark:text-white">{examStats.avgScorePct}%</strong> with lesson attendance at <strong className="text-slate-900 dark:text-white">{lessonStats.attendanceRate}%</strong>.
                 </p>
               </div>
 
-              <div className="p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 backdrop-blur-xs">
-                <div className="flex items-center justify-between text-[10.5px] font-black text-emerald-300">
+              <div className="p-2 rounded-xl bg-white dark:bg-slate-950/40 border border-indigo-100 dark:border-indigo-500/20 space-y-0.5 shadow-2xs">
+                <div className="flex items-center justify-between text-[10.5px] font-black text-emerald-700 dark:text-emerald-300">
                   <span className="flex items-center gap-1">
                     <Banknote className="w-3 h-3" />
                     Cashflow Stability
                   </span>
-                  <span>৳{totalRevenue.toLocaleString()}</span>
+                  <span className="font-mono bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.2 rounded">৳{totalRevenue.toLocaleString()}</span>
                 </div>
-                <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-snug">
-                  <strong className="text-white">{filteredPayments.length}</strong> tuition receipts recorded across <strong className="text-white">{uniqueBatches.length}</strong> active batches.
+                <p className="text-[10px] sm:text-[10.5px] text-slate-600 dark:text-slate-300 leading-snug">
+                  <strong className="text-slate-900 dark:text-white">{filteredPayments.length}</strong> tuition receipts recorded across <strong className="text-slate-900 dark:text-white">{uniqueBatches.length}</strong> active batches.
                 </p>
               </div>
 
-              <div className="p-2 rounded-xl bg-white/10 border border-white/10 space-y-0.5 backdrop-blur-xs">
-                <div className="flex items-center justify-between text-[10.5px] font-black text-sky-300">
+              <div className="p-2 rounded-xl bg-white dark:bg-slate-950/40 border border-indigo-100 dark:border-indigo-500/20 space-y-0.5 shadow-2xs">
+                <div className="flex items-center justify-between text-[10.5px] font-black text-sky-700 dark:text-sky-300">
                   <span className="flex items-center gap-1">
                     <BookOpen className="w-3 h-3" />
                     Continuous HW Completion
                   </span>
-                  <span>{lessonStats.avgHwMarks}/10</span>
+                  <span className="font-mono bg-sky-100 dark:bg-sky-950/60 px-1.5 py-0.2 rounded">{lessonStats.avgHwMarks}/10</span>
                 </div>
-                <p className="text-[10px] sm:text-[10.5px] text-slate-300 leading-snug">
-                  Homework average across {lessonStats.totalLessons} recorded classroom sessions is <strong className="text-white">{lessonStats.avgHwMarks}/10</strong>.
+                <p className="text-[10px] sm:text-[10.5px] text-slate-600 dark:text-slate-300 leading-snug">
+                  Homework average across {lessonStats.totalLessons} recorded classroom sessions is <strong className="text-slate-900 dark:text-white">{lessonStats.avgHwMarks}/10</strong>.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-indigo-800/80">
+          <div className="pt-2 border-t border-indigo-200 dark:border-indigo-800/80">
             <Link
               href="/admin/students"
-              className="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-[11px] sm:text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95"
+              className="w-full py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-[11px] sm:text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95"
             >
               <span>Enroll &amp; Manage Students</span>
               <ArrowRight className="w-3 h-3" />

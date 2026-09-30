@@ -5,5 +5,10 @@
 @layer base {
   html {
     transition: background-color 0.25s ease, color 0.25s ease;
+    overflow-x: hidden;
+  }
+  body {
+    overflow-x: hidden;
   }
 }
+

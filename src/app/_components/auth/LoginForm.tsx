@@ -6,7 +6,7 @@ import {
   EyeOff, Eye, Loader2, ArrowRight, ShieldCheck, User,
   Clock, RefreshCw, BookOpen, Sparkles, 
   Phone, Mail, Building, Calendar, Layers, PhoneCall, KeyRound,
-  LogOut
+  LogOut, MessageSquare, Linkedin, Facebook, ExternalLink
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useAuth } from '@/context/AuthContext';
@@ -28,11 +28,11 @@ export function LoginForm() {
   const [rememberMe, setRememberMe] = useState(true);
 
   // Student Login State
-  const [studentIdentifier, setStudentIdentifier] = useState('');
+  const [studentEmail, setStudentEmail] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
 
   // Admin Login State
-  const [adminIdentifier, setAdminIdentifier] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
 
   // Student Signup State
@@ -108,13 +108,13 @@ export function LoginForm() {
     setError(null);
     setSuccessMsg(null);
 
-    if (!studentIdentifier.trim() || !studentPassword.trim()) {
-      setError('Please enter your Student ID or Email and Password.');
+    if (!studentEmail.trim() || !studentPassword.trim()) {
+      setError('Please enter your registered student email and password.');
       return;
     }
 
     setIsSubmitting(true);
-    const result = await login(studentIdentifier.trim(), studentPassword.trim(), 'student');
+    const result = await login(studentEmail.trim(), studentPassword.trim(), 'student');
     setIsSubmitting(false);
 
     if (!result.success) {
@@ -130,13 +130,13 @@ export function LoginForm() {
     setError(null);
     setSuccessMsg(null);
 
-    if (!adminIdentifier.trim() || !adminPassword.trim()) {
+    if (!adminEmail.trim() || !adminPassword.trim()) {
       setError('Please enter your Administrator Email and Password.');
       return;
     }
 
     setIsSubmitting(true);
-    const result = await login(adminIdentifier.trim(), adminPassword.trim(), 'admin');
+    const result = await login(adminEmail.trim(), adminPassword.trim(), 'admin');
     setIsSubmitting(false);
 
     if (!result.success) {
@@ -187,7 +187,7 @@ export function LoginForm() {
       }
 
       setSuccessMsg(`Student registration submitted for ${studentSignupData.name}! Your account is pending admin approval.`);
-      setStudentIdentifier(studentSignupData.email);
+      setStudentEmail(studentSignupData.email);
       setStudentPassword(studentSignupData.password);
       setAuthMode('login');
       setActiveRole('student');
@@ -245,7 +245,7 @@ export function LoginForm() {
       }
 
       setSuccessMsg(`Administrator account registered for ${adminSignupData.name}! You can now sign in.`);
-      setAdminIdentifier(adminSignupData.email);
+      setAdminEmail(adminSignupData.email);
       setAdminPassword(adminSignupData.password);
       setAuthMode('login');
       setActiveRole('admin');
@@ -258,7 +258,7 @@ export function LoginForm() {
   const isStudent = activeRole === 'student';
 
   return (
-    <div className="relative min-h-[calc(100vh-20px)] sm:min-h-screen w-full flex flex-col justify-between -mt-2.5 sm:-mt-6 -mx-2 sm:-mx-6 lg:-mx-8 font-sans text-xs overflow-x-hidden select-none transition-colors duration-500">
+    <div className="relative min-h-screen w-full flex flex-col justify-between font-sans text-xs select-none transition-colors duration-500">
       
       {/* ========================================================================= */}
       {/* 1. DUAL-THEME SCENIC VECTOR ART ENVIRONMENT                               */}
@@ -439,7 +439,7 @@ export function LoginForm() {
               </h1>
               <p className="text-[10.5px] sm:text-[11px] text-slate-600 dark:text-purple-200/80 font-medium">
                 {isStudent 
-                  ? (authMode === 'login' ? 'Enter your Student ID / Email and password' : 'Enter your academic details to submit registration') 
+                  ? (authMode === 'login' ? 'Enter your registered email address and password' : 'Enter your academic details to submit registration') 
                   : (authMode === 'login' ? 'Enter master administrator credentials' : 'Register a verified administrator profile')}
               </p>
             </div>
@@ -473,23 +473,23 @@ export function LoginForm() {
             {/* =================================================================== */}
             {isStudent && authMode === 'login' && (
               <form onSubmit={handleStudentLogin} className="space-y-3 sm:space-y-3.5">
-                {/* Field 1: Student ID / Email */}
+                {/* Field 1: Student Email */}
                 <div className="space-y-1">
                   <label className="flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-bold text-slate-700 dark:text-purple-200">
-                    <User className="w-3.5 h-3.5 text-emerald-600 dark:text-purple-300 shrink-0" />
-                    <span>Student ID (SID) or Email Address</span>
+                    <Mail className="w-3.5 h-3.5 text-emerald-600 dark:text-purple-300 shrink-0" />
+                    <span>Student Email Address</span>
                   </label>
                   <div className="relative flex items-center">
                     <input
-                      type="text"
+                      type="email"
                       required
-                      placeholder="e.g. 2701244 or student@email.com"
-                      value={studentIdentifier}
-                      onChange={(e) => setStudentIdentifier(e.target.value)}
+                      placeholder="e.g. student@email.com"
+                      value={studentEmail}
+                      onChange={(e) => setStudentEmail(e.target.value)}
                       className="w-full bg-white dark:bg-white/10 hover:bg-white focus:bg-white dark:hover:bg-white/15 dark:focus:bg-white/20 border border-slate-300 dark:border-white/30 focus:border-emerald-500 dark:focus:border-white rounded-xl py-2.5 px-3.5 sm:px-4 pr-10 text-xs font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/60 outline-hidden transition-all duration-200 shadow-2xs"
                     />
                     <div className="absolute right-3.5 text-slate-400 dark:text-white/70 pointer-events-none">
-                      <User className="w-4 h-4" />
+                      <Mail className="w-4 h-4" />
                     </div>
                   </div>
                 </div>
@@ -802,8 +802,8 @@ export function LoginForm() {
                       type="email"
                       required
                       placeholder="admin@tutorhq.com"
-                      value={adminIdentifier}
-                      onChange={(e) => setAdminIdentifier(e.target.value)}
+                      value={adminEmail}
+                      onChange={(e) => setAdminEmail(e.target.value)}
                       className="w-full bg-white dark:bg-white/10 hover:bg-white focus:bg-white dark:hover:bg-white/15 dark:focus:bg-white/20 border border-slate-300 dark:border-white/30 focus:border-emerald-500 dark:focus:border-white rounded-xl py-2.5 px-3.5 sm:px-4 pr-10 text-xs font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/60 outline-hidden transition-all duration-200 shadow-2xs"
                     />
                     <div className="absolute right-3.5 text-slate-400 dark:text-white/70 pointer-events-none">
@@ -1039,15 +1039,118 @@ export function LoginForm() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. BOTTOM CREDITS BAR                                                    */}
+      {/* 4. FULL PORTAL FOOTER IN LOGIN PAGE                                      */}
       {/* ========================================================================= */}
-      <div className="relative z-40 max-w-5xl mx-auto w-full px-3 sm:px-4 pb-3 sm:pb-4 flex flex-col xs:flex-row items-center justify-between text-center xs:text-left gap-1 sm:gap-2 text-[9.5px] sm:text-[10px] text-slate-700 dark:text-white/60">
-        <span className="font-semibold">© {new Date().getFullYear()} TutorHQ Academic Management Portal</span>
-        <span className="flex items-center justify-center gap-1.5 text-slate-800 dark:text-white/80 font-bold">
-          <Sparkles className="w-3 h-3 text-emerald-600 dark:text-purple-300 animate-pulse" />
-          <span>Encrypted Sessions • Multi-Role Access</span>
-        </span>
-      </div>
+      <footer className="relative z-40 max-w-5xl mx-auto w-full px-2.5 sm:px-6 pb-4 sm:pb-6 pt-2 font-sans text-[11px]">
+        <div className="bg-white/80 dark:bg-black/40 backdrop-blur-xl border border-white/75 dark:border-white/20 rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-lg text-slate-800 dark:text-slate-200 space-y-2.5">
+          
+          {/* Top Row: Brand Info + Contacts + Socials */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-3 items-center">
+            
+            {/* Brand & Purpose Box */}
+            <div className="md:col-span-5 flex flex-col sm:flex-row sm:items-center gap-2 bg-slate-50/80 dark:bg-white/5 p-2 sm:p-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 shadow-2xs">
+              <div className="min-w-0 space-y-0.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-black font-display text-slate-900 dark:text-white tracking-tight">
+                    Academic Portal
+                  </span>
+                  <span className="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60 rounded text-[9px] font-mono font-bold uppercase tracking-wider">
+                    Official Ledger
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 bg-teal-100 dark:bg-teal-950/60 text-teal-900 dark:text-teal-300 border border-teal-300 dark:border-teal-800/60 rounded">
+                    <ShieldCheck className="w-2.5 h-2.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                    <span>Verified</span>
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-600 dark:text-purple-200/80 leading-tight">
+                  Academic tracking, daily study logs, exam results &amp; payments.
+                </p>
+              </div>
+            </div>
+
+            {/* Direct Contact */}
+            <div className="md:col-span-4 grid grid-cols-2 gap-1.5">
+              {/* WhatsApp */}
+              <a
+                href="https://wa.me/8801516518418"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-white/90 dark:bg-white/10 border border-slate-200 dark:border-white/15 hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-white/15 text-slate-900 dark:text-white transition-all text-[10px] group shadow-2xs truncate"
+                title="WhatsApp: 01516518418"
+              >
+                <div className="p-1 rounded-md bg-emerald-600 text-white shrink-0">
+                  <MessageSquare className="w-3 h-3" />
+                </div>
+                <div className="flex flex-col min-w-0 leading-tight">
+                  <span className="text-[8px] text-slate-500 dark:text-purple-300 font-bold uppercase">WhatsApp</span>
+                  <span className="font-bold text-slate-900 dark:text-white text-[10px] truncate">01516518418</span>
+                </div>
+              </a>
+
+              {/* Email */}
+              <a
+                href="mailto:sakibhasan.office@gmail.com"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-white/90 dark:bg-white/10 border border-slate-200 dark:border-white/15 hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-white/15 text-slate-900 dark:text-white transition-all text-[10px] group shadow-2xs truncate"
+                title="Email: sakibhasan.office@gmail.com"
+              >
+                <div className="p-1 rounded-md bg-sky-600 text-white shrink-0">
+                  <Mail className="w-3 h-3" />
+                </div>
+                <div className="flex flex-col min-w-0 leading-tight">
+                  <span className="text-[8px] text-slate-500 dark:text-purple-300 font-bold uppercase">Email</span>
+                  <span className="font-bold text-slate-900 dark:text-white text-[10px] truncate">sakibhasan</span>
+                </div>
+              </a>
+            </div>
+
+            {/* Social Profiles */}
+            <div className="md:col-span-3 grid grid-cols-2 gap-1.5">
+              {/* Facebook */}
+              <a
+                href="https://www.facebook.com/Sakib.2004043/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg bg-white/90 dark:bg-white/10 border border-slate-200 dark:border-white/15 hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-white/15 text-slate-900 dark:text-white transition-all text-[10px] font-semibold shadow-2xs"
+              >
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="p-1 rounded-md bg-blue-600 text-white shrink-0">
+                    <Facebook className="w-3 h-3" />
+                  </div>
+                  <span className="font-bold text-slate-900 dark:text-white text-[10px] truncate">Facebook</span>
+                </div>
+                <ExternalLink className="w-2.5 h-2.5 text-slate-400 dark:text-purple-300 shrink-0" />
+              </a>
+
+              {/* LinkedIn */}
+              <a
+                href="https://www.linkedin.com/in/sakibul-hasan-ab9526318"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg bg-white/90 dark:bg-white/10 border border-slate-200 dark:border-white/15 hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-white/15 text-slate-900 dark:text-white transition-all text-[10px] font-semibold shadow-2xs"
+              >
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="p-1 rounded-md bg-indigo-600 text-white shrink-0">
+                    <Linkedin className="w-3 h-3" />
+                  </div>
+                  <span className="font-bold text-slate-900 dark:text-white text-[10px] truncate">LinkedIn</span>
+                </div>
+                <ExternalLink className="w-2.5 h-2.5 text-slate-400 dark:text-purple-300 shrink-0" />
+              </a>
+            </div>
+
+          </div>
+
+          {/* Bottom Sub-bar */}
+          <div className="pt-2 border-t border-slate-200/80 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-1 text-[9.5px] sm:text-[10px] text-slate-600 dark:text-purple-200/80 font-medium">
+            <p>© {new Date().getFullYear()} TutorHQ Academic Management Portal. All rights reserved.</p>
+            <p className="flex items-center gap-1.5 text-slate-800 dark:text-white font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Built for Academic Excellence</span>
+            </p>
+          </div>
+
+        </div>
+      </footer>
 
     </div>
   );

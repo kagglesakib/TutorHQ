@@ -104,27 +104,27 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-3 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto">
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 10 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 10 }}
         transition={{ duration: 0.2 }}
-        className="bg-white rounded-3xl max-w-lg w-full p-4 sm:p-5 shadow-2xl border border-slate-200 space-y-4 relative my-auto overflow-hidden"
+        className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-4 sm:p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 relative my-auto overflow-hidden"
       >
         {/* Top Header Row */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="p-2 bg-gradient-to-tr from-emerald-600 to-teal-500 text-white rounded-2xl shadow-sm shrink-0">
               <User className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm sm:text-base font-display font-black text-slate-900 tracking-tight flex items-center gap-1.5 truncate">
+              <h3 className="text-sm sm:text-base font-display font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-1.5 truncate">
                 <span>Administrator Profile</span>
-                <span className="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-mono font-bold px-1.5 py-0.2 rounded-full shrink-0">
+                <span className="text-[9px] bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-mono font-bold px-1.5 py-0.2 rounded-full shrink-0">
                   Master
                 </span>
               </h3>
-              <p className="text-[11px] text-slate-500 font-medium truncate">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
                 System Credentials &amp; Password Management
               </p>
             </div>
@@ -133,7 +133,7 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
           <button
             type="button"
             onClick={handleClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer shrink-0"
+            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer shrink-0"
             title="Close Profile"
           >
             <X className="w-4 h-4" />
@@ -183,16 +183,16 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
         </div>
 
         {/* 2. Change Password Form (Using Old Password) */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 sm:p-3.5 space-y-3">
-          <div className="flex items-center gap-2 border-b border-slate-200/80 pb-2">
-            <div className="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg shrink-0">
+        <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 sm:p-3.5 space-y-3">
+          <div className="flex items-center gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
+            <div className="p-1.5 bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 rounded-lg shrink-0">
               <KeyRound className="w-3.5 h-3.5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-black text-slate-900 font-display">
+              <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-slate-100 font-display">
                 Change Password
               </h4>
-              <p className="text-[10px] text-slate-500 font-medium">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                 Authenticate with your current password to set a new key
               </p>
             </div>
@@ -200,15 +200,15 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
 
           {/* Status Notifications */}
           {errorMsg && (
-            <div className="p-2 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-[11px] font-bold text-rose-800 animate-in fade-in">
-              <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+            <div className="p-2 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl flex items-center gap-2 text-[11px] font-bold text-rose-800 dark:text-rose-200 animate-in fade-in">
+              <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-[11px] font-bold text-emerald-800 animate-in fade-in">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center gap-2 text-[11px] font-bold text-emerald-800 dark:text-emerald-200 animate-in fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}
@@ -216,9 +216,9 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
           <form onSubmit={handleSubmit} className="space-y-2.5">
             {/* Old / Current Password */}
             <div className="space-y-1">
-              <label className="text-[10.5px] font-bold text-slate-700 flex items-center justify-between">
+              <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
                 <span>Current (Old) Password:</span>
-                <span className="text-[9px] text-slate-400 font-normal">Required for verification</span>
+                <span className="text-[9px] text-slate-400 dark:text-slate-500 font-normal">Required for verification</span>
               </label>
               <div className="relative">
                 <input
@@ -227,12 +227,12 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
                   onChange={(e) => setOldPassword(e.target.value)}
                   placeholder="Enter current password..."
                   required
-                  className="w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 pr-9 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono"
+                  className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 pr-9 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono"
                 />
                 <button
                   type="button"
                   onClick={() => setShowOld(!showOld)}
-                  className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
                   title={showOld ? 'Hide password' : 'Show password'}
                 >
                   {showOld ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -244,7 +244,7 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {/* New Password */}
               <div className="space-y-1">
-                <label className="text-[10.5px] font-bold text-slate-700 block">
+                <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block">
                   New Password:
                 </label>
                 <div className="relative">
@@ -255,12 +255,12 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
                     placeholder="Min 4 characters..."
                     required
                     minLength={4}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 pr-9 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 pr-9 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNew(!showNew)}
-                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
                     title={showNew ? 'Hide password' : 'Show password'}
                   >
                     {showNew ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -270,7 +270,7 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
 
               {/* Confirm New Password */}
               <div className="space-y-1">
-                <label className="text-[10.5px] font-bold text-slate-700 block">
+                <label className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300 block">
                   Confirm New Password:
                 </label>
                 <div className="relative">
@@ -281,12 +281,12 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
                     placeholder="Repeat new password..."
                     required
                     minLength={4}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-1.5 pr-9 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono"
+                    className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 pr-9 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all font-mono"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
                     title={showConfirm ? 'Hide password' : 'Show password'}
                   >
                     {showConfirm ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -300,7 +300,7 @@ export default function AdminProfileModal({ isOpen, onClose }: AdminProfileModal
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-200/60 transition-colors cursor-pointer"
+                className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Close
               </button>

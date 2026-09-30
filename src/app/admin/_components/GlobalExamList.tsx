@@ -25,6 +25,7 @@ import {
   LayoutList,
 } from 'lucide-react';
 import { formatEid, generateExamId } from '@/utils/id';
+import { formatDateWithDay } from '@/utils/dateFormat';
 
 interface GlobalExamListProps {
   exams: Exam[];
@@ -231,25 +232,25 @@ export default function GlobalExamList({
   return (
     <div className="space-y-3 sm:space-y-4 max-w-5xl mx-auto animate-fadeIn" id="admin-exams-view-panel">
       {/* 1. Top Identity & Telemetry Header Card (Exact Student Portal Match) */}
-      <div className="bg-gradient-to-br from-indigo-100/95 via-sky-100/80 to-purple-100/90 rounded-2xl p-3.5 sm:p-5 border-2 border-indigo-200/90 shadow-md relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-purple-200/40 via-indigo-200/30 to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-tr from-sky-200/40 via-teal-200/30 to-transparent rounded-full blur-2xl pointer-events-none" />
+      <div className="bg-gradient-to-br from-indigo-100/95 via-sky-100/80 to-purple-100/90 dark:from-indigo-950/90 dark:via-slate-900/95 dark:to-purple-950/80 rounded-2xl p-3.5 sm:p-5 border-2 border-indigo-200/90 dark:border-indigo-800/80 shadow-md relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-purple-200/40 dark:from-purple-600/10 via-indigo-200/30 dark:via-indigo-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-tr from-sky-200/40 dark:from-sky-600/10 via-teal-200/30 dark:via-teal-600/10 to-transparent rounded-full blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-200/80 pb-3 sm:pb-4">
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-200/80 dark:border-indigo-800/60 pb-3 sm:pb-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 sm:p-2.5 bg-gradient-to-tr from-purple-600 via-indigo-600 to-indigo-700 text-white rounded-2xl shadow-md shadow-indigo-600/20 shrink-0 border border-white/40">
               <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="space-y-0.5 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-display font-black text-slate-900 text-base sm:text-lg tracking-tight">
+                <h1 className="font-display font-black text-slate-900 dark:text-slate-100 text-base sm:text-lg tracking-tight">
                   Academic Examinations & Evaluation Scorecards
                 </h1>
-                <span className="text-[10px] bg-purple-200/90 text-purple-950 font-mono font-black px-2 py-0.5 rounded-md border border-purple-300 shadow-2xs shrink-0">
+                <span className="text-[10px] bg-purple-200/90 dark:bg-purple-950/70 text-purple-950 dark:text-purple-300 font-mono font-black px-2 py-0.5 rounded-md border border-purple-300 dark:border-purple-800 shadow-2xs shrink-0">
                   Official Ledger
                 </span>
               </div>
-              <p className="text-xs text-indigo-900/80 font-medium">
+              <p className="text-xs text-indigo-900/80 dark:text-indigo-300/80 font-medium">
                 Comprehensive marks ledger, syllabus assessment topics, and cross-student historical performance tracking.
               </p>
             </div>
@@ -287,41 +288,41 @@ export default function GlobalExamList({
         {/* 4 Summary Telemetry Cards (Exact Student Portal Match) */}
         <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3">
           {/* Evaluated Exams */}
-          <div className="bg-indigo-100/90 p-2.5 rounded-xl border border-indigo-300/90 shadow-2xs">
-            <span className="text-[9px] font-mono font-bold text-indigo-900 uppercase tracking-wider block">
+          <div className="bg-indigo-100/90 dark:bg-indigo-950/40 p-2.5 rounded-xl border border-indigo-300/90 dark:border-indigo-800/60 shadow-2xs">
+            <span className="text-[9px] font-mono font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider block">
               Evaluated Exams
             </span>
-            <span className="text-sm sm:text-base font-black font-mono text-indigo-950 block mt-0.5">
+            <span className="text-sm sm:text-base font-black font-mono text-indigo-950 dark:text-indigo-200 block mt-0.5">
               {presentCount} Completed
             </span>
           </div>
 
           {/* Average Score */}
-          <div className="bg-purple-100/90 p-2.5 rounded-xl border border-purple-300/90 shadow-2xs">
-            <span className="text-[9px] font-mono font-bold text-purple-900 uppercase tracking-wider block">
+          <div className="bg-purple-100/90 dark:bg-purple-950/40 p-2.5 rounded-xl border border-purple-300/90 dark:border-purple-800/60 shadow-2xs">
+            <span className="text-[9px] font-mono font-bold text-purple-900 dark:text-purple-300 uppercase tracking-wider block">
               Cumulative Average
             </span>
-            <span className="text-sm sm:text-base font-black font-mono text-purple-950 block mt-0.5">
+            <span className="text-sm sm:text-base font-black font-mono text-purple-950 dark:text-purple-200 block mt-0.5">
               {avgExamPct !== null ? `${avgExamPct}%` : '—'}
             </span>
           </div>
 
           {/* Top Score */}
-          <div className="bg-emerald-100/90 p-2.5 rounded-xl border border-emerald-300/90 shadow-2xs">
-            <span className="text-[9px] font-mono font-bold text-emerald-900 uppercase tracking-wider block">
+          <div className="bg-emerald-100/90 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-300/90 dark:border-emerald-800/60 shadow-2xs">
+            <span className="text-[9px] font-mono font-bold text-emerald-900 dark:text-emerald-300 uppercase tracking-wider block">
               Highest Benchmark
             </span>
-            <span className="text-sm sm:text-base font-black font-mono text-emerald-950 block mt-0.5">
+            <span className="text-sm sm:text-base font-black font-mono text-emerald-950 dark:text-emerald-200 block mt-0.5">
               {highestPct !== null ? `${highestPct}%` : '—'}
             </span>
           </div>
 
           {/* Missed / Absent */}
-          <div className="bg-rose-100/90 p-2.5 rounded-xl border border-rose-300/90 shadow-2xs">
-            <span className="text-[9px] font-mono font-bold text-rose-900 uppercase tracking-wider block">
+          <div className="bg-rose-100/90 dark:bg-rose-950/40 p-2.5 rounded-xl border border-rose-300/90 dark:border-rose-800/60 shadow-2xs">
+            <span className="text-[9px] font-mono font-bold text-rose-900 dark:text-rose-300 uppercase tracking-wider block">
               Missed / Absent
             </span>
-            <span className="text-sm sm:text-base font-black font-mono text-rose-950 block mt-0.5">
+            <span className="text-sm sm:text-base font-black font-mono text-rose-950 dark:text-rose-200 block mt-0.5">
               {absentCount} Tests
             </span>
           </div>
@@ -329,10 +330,10 @@ export default function GlobalExamList({
       </div>
 
       {/* 2. Filter & Search Toolbar (Exact Student Portal Match + Student Filter) */}
-      <div className="bg-gradient-to-r from-purple-100/90 via-indigo-100/90 to-teal-100/90 border border-purple-300/90 rounded-xl p-2.5 sm:p-3 shadow-2xs space-y-2.5">
+      <div className="bg-gradient-to-r from-purple-100/90 via-indigo-100/90 to-teal-100/90 dark:from-slate-900 dark:via-purple-950/40 dark:to-slate-900 border border-purple-300/90 dark:border-slate-800 rounded-xl p-2.5 sm:p-3 shadow-2xs space-y-2.5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {/* Topic & Subject Search */}
-          <div className="relative flex items-center bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 border border-purple-300/90 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-purple-500/40 focus-within:border-purple-500 shadow-2xs transition-all min-w-0">
+          <div className="relative flex items-center bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 border border-purple-300/90 dark:border-slate-700 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-purple-500/40 focus-within:border-purple-500 shadow-2xs transition-all min-w-0">
             <div className="p-1 bg-purple-700 text-white rounded-md shrink-0 mr-2 shadow-2xs">
               <Search className="w-2.5 h-2.5" />
             </div>
@@ -341,13 +342,13 @@ export default function GlobalExamList({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search topic, student, SID..."
-              className="w-full bg-transparent text-xs font-semibold text-purple-950 placeholder:text-purple-700/60 focus:outline-hidden"
+              className="w-full bg-transparent text-xs font-semibold text-purple-950 dark:text-purple-100 placeholder:text-purple-700/60 dark:placeholder:text-purple-300/50 focus:outline-hidden"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
-                className="ml-1 text-[10px] font-black bg-purple-200 hover:bg-purple-300 text-purple-900 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
+                className="ml-1 text-[10px] font-black bg-purple-200 dark:bg-purple-900 text-purple-900 dark:text-purple-200 px-1.5 py-0.5 rounded cursor-pointer transition-colors"
               >
                 Clear
               </button>
@@ -355,18 +356,18 @@ export default function GlobalExamList({
           </div>
 
           {/* Student Selector */}
-          <div className="relative flex items-center bg-gradient-to-r from-indigo-50 via-sky-50 to-indigo-50 border border-indigo-300/90 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-indigo-500/40 focus-within:border-indigo-500 shadow-2xs transition-all min-w-0">
+          <div className="relative flex items-center bg-gradient-to-r from-indigo-50 via-sky-50 to-indigo-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 border border-indigo-300/90 dark:border-slate-700 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-indigo-500/40 focus-within:border-indigo-500 shadow-2xs transition-all min-w-0">
             <div className="p-1 bg-indigo-700 text-white rounded-md shrink-0 mr-2 shadow-2xs">
               <User className="w-2.5 h-2.5" />
             </div>
             <select
               value={selectedStudentFilter}
               onChange={(e) => setSelectedStudentFilter(e.target.value)}
-              className="w-full bg-transparent text-xs font-semibold text-indigo-950 focus:outline-hidden cursor-pointer"
+              className="w-full bg-transparent text-xs font-semibold text-indigo-950 dark:text-indigo-100 focus:outline-hidden cursor-pointer"
             >
-              <option value="All">All Students ({activeStudents.length})</option>
+              <option value="All" className="dark:bg-slate-900">All Students ({activeStudents.length})</option>
               {activeStudents.map((s) => (
-                <option key={s.sid} value={s.sid}>
+                <option key={s.sid} value={s.sid} className="dark:bg-slate-900">
                   {s.name} ({s.sid})
                 </option>
               ))}
@@ -374,7 +375,7 @@ export default function GlobalExamList({
           </div>
 
           {/* Month Filter */}
-          <div className="relative flex items-center bg-gradient-to-r from-indigo-50 via-sky-50 to-indigo-50 border border-indigo-300/90 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-indigo-500/40 focus-within:border-indigo-500 shadow-2xs transition-all min-w-0">
+          <div className="relative flex items-center bg-gradient-to-r from-indigo-50 via-sky-50 to-indigo-50 dark:from-slate-800 dark:via-slate-800/80 dark:to-slate-800 border border-indigo-300/90 dark:border-slate-700 rounded-lg px-2.5 h-8.5 focus-within:ring-2 focus-within:ring-indigo-500/40 focus-within:border-indigo-500 shadow-2xs transition-all min-w-0">
             <div className="p-1 bg-indigo-700 text-white rounded-md shrink-0 mr-2 shadow-2xs">
               <Calendar className="w-2.5 h-2.5" />
             </div>
@@ -382,13 +383,13 @@ export default function GlobalExamList({
               type="month"
               value={filterMonth}
               onChange={(e) => setFilterMonth(e.target.value)}
-              className="w-full bg-transparent text-xs font-semibold text-indigo-950 focus:outline-hidden cursor-pointer"
+              className="w-full bg-transparent text-xs font-semibold text-indigo-950 dark:text-indigo-100 focus:outline-hidden cursor-pointer"
             />
             {filterMonth && (
               <button
                 type="button"
                 onClick={() => setFilterMonth('')}
-                className="ml-1 text-[10px] font-black bg-indigo-200 hover:bg-indigo-300 text-indigo-900 px-1.5 py-0.5 rounded cursor-pointer shrink-0 transition-colors"
+                className="ml-1 text-[10px] font-black bg-indigo-200 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-200 px-1.5 py-0.5 rounded cursor-pointer shrink-0 transition-colors"
               >
                 Clear
               </button>
@@ -396,7 +397,7 @@ export default function GlobalExamList({
           </div>
 
           {/* Attendance Status Filter Pills */}
-          <div className="flex items-center bg-purple-100 p-0.5 rounded-lg border border-purple-300 shadow-2xs justify-between min-w-0">
+          <div className="flex items-center bg-purple-100 dark:bg-slate-800 p-0.5 rounded-lg border border-purple-300 dark:border-slate-700 shadow-2xs justify-between min-w-0">
             <button
               type="button"
               onClick={() => setFilterStatus('All')}
@@ -441,14 +442,14 @@ export default function GlobalExamList({
 
           <div className="flex items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto flex-wrap">
             {/* View Mode Toggle: Cards vs Table */}
-            <div className="flex items-center bg-purple-100 p-0.5 rounded-lg border border-purple-300">
+            <div className="flex items-center bg-purple-100 dark:bg-slate-800 p-0.5 rounded-lg border border-purple-300 dark:border-slate-700">
               <button
                 type="button"
                 onClick={() => setViewMode('cards')}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-black transition-all cursor-pointer ${
                   viewMode === 'cards'
                     ? 'bg-purple-700 text-white shadow-2xs'
-                    : 'text-purple-900 hover:text-purple-950'
+                    : 'text-purple-900 dark:text-purple-300 hover:text-purple-950 dark:hover:text-white'
                 }`}
                 title="Card Grid View"
               >
@@ -461,7 +462,7 @@ export default function GlobalExamList({
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-black transition-all cursor-pointer ${
                   viewMode === 'table'
                     ? 'bg-purple-700 text-white shadow-2xs'
-                    : 'text-purple-900 hover:text-purple-950'
+                    : 'text-purple-900 dark:text-purple-300 hover:text-purple-950 dark:hover:text-white'
                 }`}
                 title="Table View"
               >
@@ -471,11 +472,11 @@ export default function GlobalExamList({
             </div>
 
             <div className="flex items-center gap-1 flex-1 sm:flex-initial min-w-0">
-              <label className="text-[10px] font-bold text-purple-950 mr-0.5 font-mono shrink-0">Sort by:</label>
+              <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 mr-0.5 font-mono shrink-0">Sort by:</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="h-8 px-2 bg-purple-100 hover:bg-purple-200/90 border border-purple-400/90 rounded-lg text-xs font-bold text-purple-950 focus:outline-hidden cursor-pointer shadow-2xs transition-colors flex-1 sm:flex-initial"
+                className="h-8 px-2 bg-purple-100 dark:bg-slate-800 hover:bg-purple-200/90 dark:hover:bg-slate-700 border border-purple-400/90 dark:border-slate-700 rounded-lg text-xs font-bold text-purple-950 dark:text-purple-200 focus:outline-hidden cursor-pointer shadow-2xs transition-colors flex-1 sm:flex-initial"
               >
                 <option value="date">Date</option>
                 <option value="marks">Marks</option>
@@ -523,27 +524,27 @@ export default function GlobalExamList({
 
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                     <div>
-                      <label className="text-[10px] font-bold text-purple-950 font-mono">Date</label>
+                      <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Date</label>
                       <input
                         type="date"
                         value={editFormData.date}
                         onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
-                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900"
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-slate-100"
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-bold text-purple-950 font-mono">Subject & Topic</label>
+                      <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Subject & Topic</label>
                       <input
                         type="text"
                         value={editFormData.subjectAndTopic}
                         onChange={(e) =>
                           setEditFormData({ ...editFormData, subjectAndTopic: e.target.value })
                         }
-                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900"
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-slate-100"
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-purple-950 font-mono">Status</label>
+                      <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Status</label>
                       <select
                         value={editFormData.status}
                         onChange={(e) =>
@@ -552,25 +553,25 @@ export default function GlobalExamList({
                             status: e.target.value as 'Present' | 'Absent',
                           })
                         }
-                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900"
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-slate-100"
                       >
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
+                        <option value="Present" className="dark:bg-slate-800">Present</option>
+                        <option value="Absent" className="dark:bg-slate-800">Absent</option>
                       </select>
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-purple-950 font-mono">Total Marks</label>
+                      <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Total Marks</label>
                       <input
                         type="number"
                         value={editFormData.totalMarks}
                         onChange={(e) =>
                           setEditFormData({ ...editFormData, totalMarks: Number(e.target.value) })
                         }
-                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-slate-900"
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-mono font-bold text-slate-900 dark:text-slate-100"
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-purple-950 font-mono">Obtained Marks</label>
+                      <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Obtained Marks</label>
                       <input
                         type="number"
                         value={editFormData.obtainedMarks ?? ''}
@@ -581,16 +582,16 @@ export default function GlobalExamList({
                           })
                         }
                         disabled={editFormData.status === 'Absent'}
-                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-slate-900 disabled:bg-slate-100"
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-mono font-bold text-slate-900 dark:text-slate-100 disabled:bg-slate-100 dark:disabled:bg-slate-900"
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="text-[10px] font-bold text-purple-950 font-mono">Remarks / Feedback</label>
+                      <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Remarks / Feedback</label>
                       <input
                         type="text"
                         value={editFormData.remarks || ''}
                         onChange={(e) => setEditFormData({ ...editFormData, remarks: e.target.value })}
-                        className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-medium text-slate-900"
+                        className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-slate-100"
                       />
                     </div>
                   </div>
@@ -650,105 +651,110 @@ export default function GlobalExamList({
             return (
               <div
                 key={exam.eid ? `${exam.eid}-${index}` : `exam-${index}`}
-                className={`border rounded-2xl p-3.5 transition-all flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md hover:border-purple-300 ${
+                className={`border rounded-2xl p-3.5 transition-all flex flex-col justify-between gap-3 shadow-2xs hover:shadow-md hover:border-purple-300 dark:hover:border-purple-600 h-full min-w-0 ${
                   isAbsent
-                    ? 'bg-gradient-to-br from-rose-50/90 via-orange-50/50 to-white border-rose-200'
-                    : 'bg-gradient-to-br from-white via-purple-50/40 to-indigo-50/50 border-purple-200/90'
+                    ? 'bg-gradient-to-br from-rose-50/90 via-orange-50/50 to-white dark:from-rose-950/40 dark:via-slate-900 dark:to-slate-950 border-rose-200 dark:border-rose-900/60'
+                    : 'bg-gradient-to-br from-white via-purple-50/40 to-indigo-50/50 dark:from-slate-900 dark:via-purple-950/30 dark:to-slate-950 border-purple-200/90 dark:border-slate-800'
                 }`}
               >
-                {/* 1. TOP ROW: Exam ID & Date (Left) | Edit & Delete Actions (Right) */}
-                <div className="flex items-center justify-between gap-2 border-b border-purple-100 pb-2.5">
-                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                    <span className="text-[10px] font-mono font-bold text-purple-950 bg-purple-100/90 px-2 py-0.5 rounded-md border border-purple-300/80 shadow-2xs flex items-center gap-1 shrink-0">
-                      <ShieldCheck className="w-3 h-3 text-purple-700 shrink-0" />
-                      <span>{formatEid(exam.eid)}</span>
+                {/* 1. TOP HEADER: 2 Clean Standardized Rows for Perfect Height Alignment & Responsiveness */}
+                <div className="space-y-2 border-b border-purple-100 dark:border-purple-900/40 pb-2.5 min-w-0">
+                  {/* Row 1: Exam ID on left | Status & Grade on right */}
+                  <div className="flex items-center justify-between gap-2 min-w-0">
+                    <span className="text-[10px] font-mono font-bold text-purple-950 dark:text-purple-300 bg-purple-100/90 dark:bg-purple-950/70 px-2.5 py-0.5 rounded-md border border-purple-300/80 dark:border-purple-800/60 shadow-2xs flex items-center gap-1 min-w-0 max-w-[190px]">
+                      <ShieldCheck className="w-3 h-3 text-purple-700 dark:text-purple-400 shrink-0" />
+                      <span className="truncate">{formatEid(exam.eid)}</span>
                     </span>
-                    <span className="text-[10px] font-bold text-slate-700 font-mono flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 shrink-0">
-                      <Calendar className="w-3 h-3 text-slate-500 shrink-0" />
-                      <span>{exam.date}</span>
-                    </span>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {pct !== null && (
+                        <span
+                          className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-2xs ${badgeColor}`}
+                        >
+                          {gradeLabel}
+                        </span>
+                      )}
+
+                      <span
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border shadow-2xs flex items-center gap-1 ${
+                          isAbsent
+                            ? 'bg-rose-100 dark:bg-rose-950/70 text-rose-900 dark:text-rose-200 border-rose-300 dark:border-rose-800'
+                            : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800'
+                        }`}
+                      >
+                        {isAbsent ? (
+                          <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+                        ) : (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        )}
+                        <span>{exam.status}</span>
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleStartEdit(exam)}
-                      className="p-1.5 text-purple-700 hover:text-purple-950 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
-                      title="Edit Exam Record"
-                    >
-                      <Edit2 className="w-3 h-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm(`Delete exam record ${formatEid(exam.eid)}?`)) {
-                          onDeleteExam(exam.eid);
-                        }
-                      }}
-                      className="p-1.5 text-rose-700 hover:text-rose-950 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg cursor-pointer transition-colors shadow-2xs"
-                      title="Delete Exam Record"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
+                  {/* Row 2: Date with Day Name on left | Actions on right */}
+                  <div className="flex items-center justify-between gap-2 min-w-0 pt-0.5">
+                    <div className="text-[10px] font-bold text-slate-700 dark:text-slate-300 font-mono flex items-center gap-1.5 bg-slate-100/90 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700 min-w-0 truncate">
+                      <Calendar className="w-3 h-3 text-slate-500 dark:text-slate-400 shrink-0" />
+                      <span className="truncate">{formatDateWithDay(exam.date)}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleStartEdit(exam)}
+                        className="p-1.5 text-purple-700 dark:text-purple-300 hover:text-purple-950 dark:hover:text-white bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 rounded-lg cursor-pointer transition-colors shadow-2xs active:scale-95"
+                        title="Edit Exam Record"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Delete exam record ${formatEid(exam.eid)}?`)) {
+                            onDeleteExam(exam.eid);
+                          }
+                        }}
+                        className="p-1.5 text-rose-700 dark:text-rose-400 hover:text-rose-950 dark:hover:text-white bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-800 rounded-lg cursor-pointer transition-colors shadow-2xs active:scale-95"
+                        title="Delete Exam Record"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* 2. STUDENT & STATUS ROW */}
-                <div className="flex items-center justify-between gap-2">
+                {/* 2. STUDENT ROW */}
+                <div className="flex items-center justify-between gap-2 min-w-0">
                   <button
                     type="button"
                     onClick={() => onSelectStudent(exam.studentSid)}
-                    className="text-left group flex items-center gap-2 p-1 -ml-1 rounded-lg hover:bg-purple-100/60 transition-colors cursor-pointer min-w-0"
+                    className="text-left group flex items-center gap-2 p-1 -ml-1 rounded-lg hover:bg-purple-100/60 dark:hover:bg-slate-800 transition-colors cursor-pointer min-w-0 w-full"
                     title="View Student Profile"
                   >
                     <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-purple-700 to-indigo-600 text-white flex items-center justify-center text-xs font-black shrink-0 shadow-2xs">
                       {(student?.name || exam.studentSid).charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <div className="text-xs font-bold text-slate-900 group-hover:text-purple-700 truncate transition-colors">
+                      <div className="text-xs font-bold text-slate-900 dark:text-slate-100 group-hover:text-purple-700 dark:group-hover:text-purple-300 truncate transition-colors">
                         {student?.name || exam.studentSid}
                       </div>
-                      <div className="text-[10px] font-mono text-purple-700 font-bold">
+                      <div className="text-[10px] font-mono text-purple-700 dark:text-purple-400 font-bold">
                         SID: {exam.studentSid}
                       </div>
                     </div>
                   </button>
-
-                  <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                    {pct !== null && (
-                      <span
-                        className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-2xs ${badgeColor}`}
-                      >
-                        {gradeLabel}
-                      </span>
-                    )}
-
-                    <span
-                      className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase border shadow-2xs flex items-center gap-1 ${
-                        isAbsent
-                          ? 'bg-rose-100 text-rose-900 border-rose-300'
-                          : 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                      }`}
-                    >
-                      {isAbsent ? (
-                        <XCircle className="w-3 h-3 text-rose-600 shrink-0" />
-                      ) : (
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                      )}
-                      <span>{exam.status}</span>
-                    </span>
-                  </div>
                 </div>
 
                 {/* 3. FULL-WIDTH TOPIC & SYLLABUS BOX */}
-                <div className="bg-purple-50/80 border border-purple-200/80 rounded-xl p-2.5 space-y-1">
-                  <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold text-purple-800 uppercase tracking-wider">
-                    <ClipboardList className="w-3 h-3 text-purple-600 shrink-0" />
+                <div className="bg-purple-50/80 dark:bg-slate-800/80 border border-purple-200/80 dark:border-slate-700 rounded-xl p-2.5 space-y-1">
+                  <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
+                    <ClipboardList className="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" />
                     <span>Topic / Syllabus</span>
                   </div>
-                  <div className="text-xs font-bold text-slate-900 leading-snug break-words">
+                  <div className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-snug break-words">
                     {isAbsent ? (
-                      <span className="text-slate-400 italic font-normal">No Exam Taken (Absent)</span>
+                      <span className="text-slate-400 dark:text-slate-500 italic font-normal">No Exam Taken (Absent)</span>
                     ) : (
                       exam.subjectAndTopic
                     )}
@@ -757,7 +763,7 @@ export default function GlobalExamList({
 
                 {/* 4. SCORE & PROGRESS BAR */}
                 {!isAbsent ? (
-                  <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 p-2.5 rounded-xl border border-purple-800/40 text-white shadow-2xs space-y-1.5">
+                  <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 dark:from-purple-950 dark:via-slate-900 dark:to-purple-950 p-2.5 rounded-xl border border-purple-800/40 text-white shadow-2xs space-y-1.5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-[9px] font-bold text-purple-200 uppercase font-mono">Score:</span>
@@ -767,7 +773,7 @@ export default function GlobalExamList({
                         </span>
                       </div>
                       {pct !== null && (
-                        <span className="text-[10px] font-black font-mono px-2 py-0.5 rounded bg-white text-purple-950 shadow-2xs">
+                        <span className="text-[10px] font-black font-mono px-2 py-0.5 rounded bg-white dark:bg-slate-800 text-purple-950 dark:text-purple-200 border border-transparent dark:border-purple-700 shadow-2xs">
                           {pct}%
                         </span>
                       )}
@@ -783,7 +789,7 @@ export default function GlobalExamList({
                     )}
                   </div>
                 ) : (
-                  <div className="px-3 py-2 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-800 font-bold italic flex items-center justify-center gap-1.5">
+                  <div className="px-3 py-2 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl text-[11px] text-rose-800 dark:text-rose-300 font-bold italic flex items-center justify-center gap-1.5">
                     <XCircle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
                     <span>Absent — No Marks Recorded</span>
                   </div>
@@ -791,20 +797,20 @@ export default function GlobalExamList({
 
                 {/* 5. REMARKS & COMMENTS */}
                 {(exam.remarks || exam.comment) && (
-                  <div className="space-y-1.5 pt-1 border-t border-purple-100 text-[11px]">
+                  <div className="space-y-1.5 pt-1 border-t border-purple-100 dark:border-purple-900/40 text-[11px]">
                     {exam.remarks && (
-                      <div className="flex items-center gap-1 text-[10px] text-purple-900 font-bold">
-                        <span className="px-2 py-0.5 bg-purple-100 border border-purple-200 rounded-md font-mono flex items-center gap-1 shadow-2xs">
-                          <Sparkles className="w-2.5 h-2.5 text-purple-600 shrink-0" />
+                      <div className="flex items-center gap-1 text-[10px] text-purple-900 dark:text-purple-200 font-bold">
+                        <span className="px-2 py-0.5 bg-purple-100 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 rounded-md font-mono flex items-center gap-1 shadow-2xs">
+                          <Sparkles className="w-2.5 h-2.5 text-purple-600 dark:text-purple-400 shrink-0" />
                           <span>Tag: {exam.remarks}</span>
                         </span>
                       </div>
                     )}
                     {exam.comment && (
-                      <div className="text-[11px] text-amber-950 font-medium italic bg-amber-50/90 px-2.5 py-1.5 rounded-lg border border-amber-200/90 flex items-start gap-1.5 leading-tight shadow-2xs">
-                        <span className="text-amber-600 font-serif text-sm leading-none shrink-0">&ldquo;</span>
+                      <div className="text-[11px] text-amber-950 dark:text-amber-200 font-medium italic bg-amber-50/90 dark:bg-amber-950/40 px-2.5 py-1.5 rounded-lg border border-amber-200/90 dark:border-amber-800/60 flex items-start gap-1.5 leading-tight shadow-2xs">
+                        <span className="text-amber-600 dark:text-amber-400 font-serif text-sm leading-none shrink-0">&ldquo;</span>
                         <span className="break-words flex-1">{exam.comment}</span>
-                        <span className="text-amber-600 font-serif text-sm leading-none shrink-0">&rdquo;</span>
+                        <span className="text-amber-600 dark:text-amber-400 font-serif text-sm leading-none shrink-0">&rdquo;</span>
                       </div>
                     )}
                   </div>
@@ -817,9 +823,9 @@ export default function GlobalExamList({
         /* ========================================================= */
         /* TABLE VIEW OPTION                                         */
         /* ========================================================= */
-        <div className="overflow-x-auto bg-white rounded-2xl border border-purple-200 shadow-2xs">
-          <table className="w-full text-left text-xs text-slate-800">
-            <thead className="bg-purple-100/90 border-b border-purple-200 text-[11px] font-black text-purple-950 uppercase tracking-wider">
+        <div className="overflow-x-auto bg-white dark:bg-slate-900 rounded-2xl border border-purple-200 dark:border-slate-800 shadow-2xs">
+          <table className="w-full text-left text-xs text-slate-800 dark:text-slate-200">
+            <thead className="bg-purple-100/90 dark:bg-slate-800 border-b border-purple-200 dark:border-slate-700 text-[11px] font-black text-purple-950 dark:text-purple-200 uppercase tracking-wider">
               <tr>
                 <th className="py-2.5 px-3">Exam / Date</th>
                 <th className="py-2.5 px-3">Student Profile</th>
@@ -830,7 +836,7 @@ export default function GlobalExamList({
                 <th className="py-2.5 px-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-purple-100/60">
+            <tbody className="divide-y divide-purple-100/60 dark:divide-slate-800">
               {sortedExams.map((exam, index) => {
                 const student = studentMap.get(exam.studentSid);
                 const isAbsent = exam.status === 'Absent';
@@ -843,58 +849,58 @@ export default function GlobalExamList({
                     : null;
 
                 return (
-                  <tr key={exam.eid || index} className="hover:bg-purple-50/50 transition-colors">
+                  <tr key={exam.eid || index} className="hover:bg-purple-50/50 dark:hover:bg-slate-800/60 transition-colors">
                     <td className="py-2.5 px-3">
                       <div className="space-y-0.5">
-                        <span className="font-mono font-bold text-purple-900 bg-purple-100 border border-purple-300 px-1.5 py-0.5 rounded text-[10px]">
+                        <span className="font-mono font-bold text-purple-900 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/80 border border-purple-300 dark:border-purple-800 px-1.5 py-0.5 rounded text-[10px]">
                           {formatEid(exam.eid)}
                         </span>
-                        <div className="text-[10px] text-slate-500 font-mono">{exam.date}</div>
+                        <div className="text-[10px] text-slate-600 dark:text-slate-300 font-mono font-semibold">{formatDateWithDay(exam.date)}</div>
                       </div>
                     </td>
                     <td className="py-2.5 px-3">
                       <button
                         type="button"
                         onClick={() => onSelectStudent(exam.studentSid)}
-                        className="text-left font-bold text-slate-900 hover:text-indigo-800 cursor-pointer"
+                        className="text-left font-bold text-slate-900 dark:text-slate-100 hover:text-indigo-800 dark:hover:text-indigo-400 cursor-pointer"
                       >
                         <div className="text-xs">{student?.name || exam.studentSid}</div>
-                        <div className="text-[10px] font-mono text-indigo-700">
+                        <div className="text-[10px] font-mono text-indigo-700 dark:text-indigo-400">
                           SID: {exam.studentSid}
                         </div>
                       </button>
                     </td>
-                    <td className="py-2.5 px-3 font-semibold text-slate-900 max-w-[180px] truncate">
-                      {isAbsent ? <span className="text-rose-600 italic">Absent</span> : exam.subjectAndTopic}
+                    <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100 max-w-[180px] truncate">
+                      {isAbsent ? <span className="text-rose-600 dark:text-rose-400 italic">Absent</span> : exam.subjectAndTopic}
                     </td>
                     <td className="py-2.5 px-3">
                       {!isAbsent ? (
                         <div className="flex items-center gap-1.5">
-                          <span className="font-mono font-bold text-slate-900">
+                          <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                             {exam.obtainedMarks ?? 0}/{exam.totalMarks}
                           </span>
                           {pct !== null && (
-                            <span className="font-mono font-bold text-[10px] px-1.5 py-0.5 bg-purple-100 text-purple-950 border border-purple-300 rounded">
+                            <span className="font-mono font-bold text-[10px] px-1.5 py-0.5 bg-purple-100 dark:bg-purple-950 text-purple-950 dark:text-purple-200 border border-purple-300 dark:border-purple-800 rounded">
                               {pct}%
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-rose-600 font-bold text-[10px]">Absent</span>
+                        <span className="text-rose-600 dark:text-rose-400 font-bold text-[10px]">Absent</span>
                       )}
                     </td>
                     <td className="py-2.5 px-3">
                       <span
                         className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-bold border ${
                           isAbsent
-                            ? 'bg-rose-100 text-rose-950 border-rose-300'
-                            : 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                            ? 'bg-rose-100 dark:bg-rose-950/70 text-rose-950 dark:text-rose-200 border-rose-300 dark:border-rose-800'
+                            : 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-950 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800'
                         }`}
                       >
                         {exam.status}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-slate-700 italic text-[11px] max-w-[150px] truncate">
+                    <td className="py-2.5 px-3 text-slate-700 dark:text-slate-300 italic text-[11px] max-w-[150px] truncate">
                       {exam.remarks || exam.comment || '—'}
                     </td>
                     <td className="py-2.5 px-3 text-right">
@@ -902,7 +908,7 @@ export default function GlobalExamList({
                         <button
                           type="button"
                           onClick={() => handleStartEdit(exam)}
-                          className="p-1.5 text-purple-800 hover:bg-purple-100 rounded-lg cursor-pointer"
+                          className="p-1.5 text-purple-800 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors"
                           title="Edit Exam"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -914,7 +920,7 @@ export default function GlobalExamList({
                               onDeleteExam(exam.eid);
                             }
                           }}
-                          className="p-1.5 text-rose-800 hover:bg-rose-100 rounded-lg cursor-pointer"
+                          className="p-1.5 text-rose-800 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer transition-colors"
                           title="Delete Exam"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -944,8 +950,8 @@ export default function GlobalExamList({
 
       {/* 5. Quick Add Exam Modal (styled in the same purple-indigo-teal aesthetic) */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-2xl border-2 border-indigo-300 shadow-2xl w-full max-w-lg overflow-hidden animate-scaleIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-slate-900/60 dark:bg-black/70 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-indigo-300 dark:border-indigo-700 shadow-2xl w-full max-w-lg overflow-hidden animate-scaleIn">
             <div className="p-3.5 sm:p-4 bg-gradient-to-r from-purple-700 via-indigo-700 to-indigo-800 text-white flex items-center justify-between border-b border-purple-400/30">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-white/20 rounded-lg">
@@ -967,15 +973,15 @@ export default function GlobalExamList({
 
             <form onSubmit={handleAddSubmit} className="p-4 sm:p-5 space-y-3.5">
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-700 font-mono">Student *</label>
+                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Student *</label>
                 <select
                   required
                   value={newExamData.studentSid}
                   onChange={(e) => setNewExamData({ ...newExamData, studentSid: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
                 >
                   {activeStudents.map((s) => (
-                    <option key={s.sid} value={s.sid}>
+                    <option key={s.sid} value={s.sid} className="dark:bg-slate-800">
                       {s.name} ({s.sid})
                     </option>
                   ))}
@@ -984,17 +990,17 @@ export default function GlobalExamList({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 font-mono">Exam Date *</label>
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Exam Date *</label>
                   <input
                     type="date"
                     required
                     value={newExamData.date}
                     onChange={(e) => setNewExamData({ ...newExamData, date: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 font-mono">Attendance Status</label>
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Attendance Status</label>
                   <select
                     value={newExamData.status}
                     onChange={(e) =>
@@ -1003,40 +1009,40 @@ export default function GlobalExamList({
                         status: e.target.value as 'Present' | 'Absent',
                       })
                     }
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
                   >
-                    <option value="Present">Present</option>
-                    <option value="Absent">Absent</option>
+                    <option value="Present" className="dark:bg-slate-800">Present</option>
+                    <option value="Absent" className="dark:bg-slate-800">Absent</option>
                   </select>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-700 font-mono">Subject & Topic / Syllabus *</label>
+                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Subject & Topic / Syllabus *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Physics - Dynamics & Momentum Test"
                   value={newExamData.subjectAndTopic}
                   onChange={(e) => setNewExamData({ ...newExamData, subjectAndTopic: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 font-mono">Total Marks *</label>
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Total Marks *</label>
                   <input
                     type="number"
                     required
                     min={1}
                     value={newExamData.totalMarks}
                     onChange={(e) => setNewExamData({ ...newExamData, totalMarks: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 font-mono">Obtained Marks</label>
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Obtained Marks</label>
                   <input
                     type="number"
                     min={0}
@@ -1048,39 +1054,39 @@ export default function GlobalExamList({
                       })
                     }
                     disabled={newExamData.status === 'Absent'}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 disabled:bg-slate-100 disabled:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-slate-100 disabled:bg-slate-100 dark:disabled:bg-slate-900 disabled:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 font-mono">Remarks Tag</label>
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Remarks Tag</label>
                   <input
                     type="text"
                     placeholder="e.g. Excellent / Good / Needs Focus"
                     value={newExamData.remarks}
                     onChange={(e) => setNewExamData({ ...newExamData, remarks: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 font-mono">Feedback Comment</label>
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Feedback Comment</label>
                   <input
                     type="text"
                     placeholder="e.g. Strong conceptual grasp"
                     value={newExamData.comment}
                     onChange={(e) => setNewExamData({ ...newExamData, comment: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>

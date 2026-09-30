@@ -85,12 +85,12 @@ export default function AdminTrackingPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
-        <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-2xl shadow-2xs">
-          <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin" />
+        <div className="p-3 bg-indigo-50 dark:bg-slate-900 border border-indigo-200 dark:border-slate-800 rounded-2xl shadow-2xs">
+          <RefreshCw className="w-8 h-8 text-indigo-600 dark:text-indigo-400 animate-spin" />
         </div>
         <div className="text-center space-y-1">
-          <p className="text-sm font-bold text-slate-800">Loading Daily Study Logs & Tracking...</p>
-          <p className="text-xs text-slate-500 font-medium">Synchronizing student records and attendance ledger</p>
+          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Loading Daily Study Logs & Tracking...</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Synchronizing student records and attendance ledger</p>
         </div>
       </div>
     );
@@ -100,15 +100,15 @@ export default function AdminTrackingPage() {
     <div className="space-y-3 max-w-7xl w-full mx-auto px-0 sm:px-2 overflow-x-hidden">
       {/* Error notification banner if any */}
       {error && (
-        <div className="bg-rose-50 border border-rose-200 py-2.5 px-3.5 rounded-2xl text-xs font-medium text-rose-800 flex items-center justify-between gap-2 shadow-2xs">
+        <div className="bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 py-2.5 px-3.5 rounded-2xl text-xs font-medium text-rose-800 dark:text-rose-200 flex items-center justify-between gap-2 shadow-2xs">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
             <span>{error}</span>
           </div>
           <button
             type="button"
             onClick={() => fetchData(true)}
-            className="underline hover:text-rose-950 font-bold ml-1 flex items-center gap-1 cursor-pointer"
+            className="underline hover:text-rose-950 dark:hover:text-white font-bold ml-1 flex items-center gap-1 cursor-pointer"
           >
             <RefreshCcw className="w-3 h-3" /> Retry
           </button>

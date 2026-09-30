@@ -10,45 +10,42 @@ function escapeRegex(str: string) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { identifier, sid: inputSid, email: inputEmail, password, role } = body;
+    const { email: inputEmail, identifier, password, role } = body;
 
-    const cleanIdentifier = String(identifier || inputSid || inputEmail || '').trim();
+    const cleanEmail = String(inputEmail || identifier || '').trim();
     const cleanPassword = String(password || '').trim();
     const requestedRole: 'admin' | 'student' | undefined = role === 'admin' || role === 'student' ? role : undefined;
 
-    if (!cleanIdentifier || !cleanPassword) {
+    if (!cleanEmail || !cleanPassword) {
       return NextResponse.json(
         { 
           success: false, 
           error: requestedRole === 'admin'
-            ? 'Administrator Email/ID and password are required.'
-            : 'Student ID (SID) / Email and password are required.' 
+            ? 'Administrator Email and password are required.'
+            : 'Student Email and password are required.' 
         },
         { status: 200 }
       );
     }
 
-    const lowerIdentifier = cleanIdentifier.toLowerCase();
-    const upperIdentifier = cleanIdentifier.toUpperCase();
+    const lowerEmail = cleanEmail.toLowerCase();
     const db = await getMongoDb();
     const adminsCol = db.collection('admins');
     const studentsCol = db.collection('students');
 
-    // Helper: Find admin
+    // Helper: Find admin strictly by email
     const findAdmin = async () => {
       let found = await (adminsCol as any).findOne({
         $or: [
-          { email: lowerIdentifier },
-          { email: cleanIdentifier },
-          { _id: upperIdentifier },
-          { _id: cleanIdentifier },
+          { email: lowerEmail },
+          { email: { $regex: new RegExp(`^${escapeRegex(cleanEmail)}$`, 'i') } },
         ],
       });
 
       // Auto-provision admin if default email used or admins collection is empty
-      if (!found && (lowerIdentifier === 'sakib1514817122@gmail.com' || upperIdentifier === 'ADMIN')) {
+      if (!found && lowerEmail === 'sakib1514817122@gmail.com') {
         const adminCount = typeof adminsCol.countDocuments === 'function' ? await adminsCol.countDocuments() : 0;
-        if (adminCount === 0 || lowerIdentifier === 'sakib1514817122@gmail.com') {
+        if (adminCount === 0 || lowerEmail === 'sakib1514817122@gmail.com') {
           const newAdminDoc: any = {
             _id: 'ADMIN',
             email: 'sakib1514817122@gmail.com',
@@ -71,16 +68,12 @@ export async function POST(req: NextRequest) {
       return found;
     };
 
-    // Helper: Find student
+    // Helper: Find student strictly by email (no SID lookup)
     const findStudent = async () => {
       return await (studentsCol as any).findOne({
         $or: [
-          { sid: upperIdentifier },
-          { sid: cleanIdentifier },
-          { _id: upperIdentifier },
-          { _id: cleanIdentifier },
-          { sid: { $regex: new RegExp(`^${escapeRegex(cleanIdentifier)}$`, 'i') } },
-          { email: lowerIdentifier },
+          { email: lowerEmail },
+          { email: { $regex: new RegExp(`^${escapeRegex(cleanEmail)}$`, 'i') } },
         ],
       });
     };
@@ -164,11 +157,10 @@ export async function POST(req: NextRequest) {
       }
 
       if (status === 'pending') {
-        const studentSid = student.sid || cleanIdentifier;
         return NextResponse.json(
           { 
             success: false, 
-            error: `⏳ Your student registration (${studentSid || 'Pending SID'}) is currently awaiting admin verification and approval.` 
+            error: `⏳ Your student registration (${student.email || cleanEmail}) is currently awaiting admin verification and approval.` 
           },
           { status: 200 }
         );
@@ -232,14 +224,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           { 
             success: false, 
-            error: `This account (${studentMatch.name || cleanIdentifier}) is registered as a Student. Please switch to the "Student Login" portal.` 
+            error: `This email (${studentMatch.email || cleanEmail}) is registered as a Student. Please switch to the "Student Login" tab.` 
           },
           { status: 200 }
         );
       }
 
       return NextResponse.json(
-        { success: false, error: 'No administrator account found with this email or identifier.' },
+        { success: false, error: `No administrator account found with email '${cleanEmail}'.` },
         { status: 200 }
       );
     }
@@ -257,14 +249,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           { 
             success: false, 
-            error: 'This account belongs to an Administrator. Please switch to the "Admin Login" portal.' 
+            error: 'This email belongs to an Administrator. Please switch to the "Admin Login" tab.' 
           },
           { status: 200 }
         );
       }
 
       return NextResponse.json(
-        { success: false, error: `No student account found matching SID or Email '${cleanIdentifier}'. Please verify your credentials or register for an account.` },
+        { success: false, error: `No student account found with email '${cleanEmail}'. Please verify your email or register for an account.` },
         { status: 200 }
       );
     }
@@ -285,7 +277,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, error: `No account found matching '${cleanIdentifier}'. Please check your credentials.` },
+      { success: false, error: `No account found with email '${cleanEmail}'. Please check your credentials.` },
       { status: 200 }
     );
 

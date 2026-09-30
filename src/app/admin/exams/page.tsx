@@ -74,10 +74,10 @@ export default function AdminExamsPage() {
   return (
     <div className="space-y-4">
       {error && (
-        <div className="bg-rose-50 border border-rose-100 py-3 px-4 rounded-xl text-xs font-medium text-rose-700 flex items-center gap-2">
+        <div className="bg-rose-50 dark:bg-rose-950/50 border border-rose-100 dark:border-rose-900/60 py-3 px-4 rounded-xl text-xs font-medium text-rose-700 dark:text-rose-200 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
           <span>{error}</span>
-          <button onClick={fetchData} className="underline hover:text-rose-900 font-bold ml-1 flex items-center gap-1">
+          <button onClick={fetchData} className="underline hover:text-rose-900 dark:hover:text-rose-100 font-bold ml-1 flex items-center gap-1 cursor-pointer">
             <RefreshCcw className="w-3 h-3" /> Retry
           </button>
         </div>

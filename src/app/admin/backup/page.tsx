@@ -101,14 +101,14 @@ export default function AdminBackupPage() {
   return (
     <div className="space-y-3.5 max-w-7xl w-full mx-auto px-0 sm:px-2 overflow-x-hidden">
       {error && (
-        <div className="bg-rose-950/90 border border-rose-800 py-2.5 px-3 rounded-2xl text-xs font-medium text-rose-200 flex items-center justify-between gap-2 shadow-sm">
+        <div className="bg-rose-50 dark:bg-rose-950/90 border border-rose-200 dark:border-rose-800 py-2.5 px-3 rounded-2xl text-xs font-medium text-rose-900 dark:text-rose-200 flex items-center justify-between gap-2 shadow-sm">
           <div className="flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+            <ShieldAlert className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
             <span>{error}</span>
           </div>
           <button
             onClick={fetchCounts}
-            className="px-2 py-0.5 bg-rose-800 hover:bg-rose-700 text-white rounded-lg font-bold flex items-center gap-1 cursor-pointer transition-colors"
+            className="px-2 py-0.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold flex items-center gap-1 cursor-pointer transition-colors"
           >
             <RefreshCcw className="w-3 h-3" /> Retry
           </button>

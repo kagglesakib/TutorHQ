@@ -131,12 +131,12 @@ export default function AdminPortalPage() {
   return (
     <div className="space-y-3 max-w-7xl w-full mx-auto px-0 sm:px-2 overflow-x-hidden">
       {error && (
-        <div className="bg-rose-950/80 border border-rose-800 py-2 px-3 rounded-xl text-xs font-medium text-rose-200 flex items-center justify-between gap-2 shadow-xs">
+        <div className="bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 py-2 px-3 rounded-xl text-xs font-medium text-rose-900 dark:text-rose-200 flex items-center justify-between gap-2 shadow-xs">
           <div className="flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+            <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={fetchData} className="underline hover:text-white font-bold ml-1 flex items-center gap-1">
+          <button onClick={fetchData} className="underline hover:text-rose-950 dark:hover:text-white font-bold ml-1 flex items-center gap-1 cursor-pointer">
             <RefreshCcw className="w-3 h-3" /> Retry
           </button>
         </div>

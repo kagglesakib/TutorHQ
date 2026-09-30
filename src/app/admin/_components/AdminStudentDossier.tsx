@@ -26,6 +26,7 @@ import {
   Activity as ActivityIcon,
 } from 'lucide-react';
 import { formatBatch } from '@/utils/formatBatch';
+import { formatBillingMonth } from '@/utils/dateFormat';
 
 interface AdminStudentDossierProps {
   student: Student;
@@ -113,17 +114,17 @@ export default function AdminStudentDossier({
   return (
     <div className="w-full space-y-3.5" id="admin-student-dossier-wrapper">
       {/* Decorative, Colorful, Glowing, Realigned Banner Card */}
-      <div className="relative overflow-hidden rounded-3xl p-4 sm:p-5 border-2 border-indigo-200/90 bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/40 backdrop-blur-xl shadow-[0_10px_35px_-4px_rgba(79,70,229,0.15)] transition-all duration-300 hover:shadow-[0_16px_45px_-4px_rgba(79,70,229,0.20)]">
+      <div className="relative overflow-hidden rounded-3xl p-4 sm:p-5 border-2 border-indigo-200/90 dark:border-slate-800 bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/40 dark:from-slate-900/90 dark:via-slate-900/95 dark:to-indigo-950/40 backdrop-blur-xl shadow-[0_10px_35px_-4px_rgba(79,70,229,0.15)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.5)] transition-all duration-300">
         {/* Ambient Multi-Colored Glowing Orbs */}
-        <div className="absolute -top-14 -left-14 w-48 h-48 bg-gradient-to-br from-cyan-400/25 via-sky-400/20 to-blue-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -top-14 -right-14 w-52 h-52 bg-gradient-to-bl from-purple-500/25 via-fuchsia-500/15 to-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-14 left-1/3 w-44 h-44 bg-gradient-to-tr from-amber-400/20 via-orange-400/15 to-emerald-400/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:18px_18px] opacity-[0.035] pointer-events-none" />
+        <div className="absolute -top-14 -left-14 w-48 h-48 bg-gradient-to-br from-cyan-400/25 via-sky-400/20 to-blue-500/15 dark:from-cyan-500/10 dark:via-indigo-500/10 dark:to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-14 -right-14 w-52 h-52 bg-gradient-to-bl from-purple-500/25 via-fuchsia-500/15 to-indigo-500/20 dark:from-purple-500/10 dark:via-pink-500/10 dark:to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-14 left-1/3 w-44 h-44 bg-gradient-to-tr from-amber-400/20 via-orange-400/15 to-emerald-400/15 dark:from-emerald-500/10 dark:to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:18px_18px] opacity-[0.035] dark:opacity-[0.07] pointer-events-none" />
 
         {/* Card Content Stack */}
         <div className="relative z-10 space-y-3.5">
           {/* 1. Header Row: Avatar, Student Name, Status, and Action Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-indigo-100/80 dark:border-slate-800">
             {/* Identity Group */}
             <div className="flex items-center gap-3 min-w-0 flex-1">
               {/* Glowing Avatar */}
@@ -139,7 +140,7 @@ export default function AdminStudentDossier({
 
                 {/* Status Indicator Beacon */}
                 <span
-                  className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center shadow-xs ${
+                  className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 flex items-center justify-center shadow-xs ${
                     isRevoked ? 'bg-rose-500' : 'bg-emerald-500'
                   }`}
                   title={isRevoked ? 'Access Revoked' : 'Active Student'}
@@ -154,7 +155,7 @@ export default function AdminStudentDossier({
               {/* Name & Primary Badges */}
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight truncate">
+                  <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate">
                     {student.name}
                   </h2>
 
@@ -166,13 +167,13 @@ export default function AdminStudentDossier({
 
                   {/* Active / Revoked Badge */}
                   {isRevoked ? (
-                    <span className="text-[10px] font-extrabold bg-gradient-to-r from-rose-500/15 to-pink-500/15 text-rose-800 border border-rose-400/60 px-2 py-0.5 rounded-lg shadow-[0_0_10px_rgba(244,63,94,0.15)] flex items-center gap-1 shrink-0">
-                      <ShieldAlert className="w-3 h-3 text-rose-600" />
+                    <span className="text-[10px] font-extrabold bg-gradient-to-r from-rose-500/15 to-pink-500/15 text-rose-800 dark:text-rose-300 border border-rose-400/60 dark:border-rose-500/30 px-2 py-0.5 rounded-lg shadow-[0_0_10px_rgba(244,63,94,0.15)] flex items-center gap-1 shrink-0">
+                      <ShieldAlert className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                       <span>Revoked</span>
                     </span>
                   ) : (
-                    <span className="text-[10px] font-extrabold bg-gradient-to-r from-emerald-500/15 to-teal-500/15 text-emerald-800 border border-emerald-400/60 px-2 py-0.5 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.2)] flex items-center gap-1 shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    <span className="text-[10px] font-extrabold bg-gradient-to-r from-emerald-500/15 to-teal-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-400/60 dark:border-emerald-500/30 px-2 py-0.5 rounded-lg shadow-[0_0_10px_rgba(16,185,129,0.2)] flex items-center gap-1 shrink-0">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                       <span>Active</span>
                     </span>
                   )}
@@ -213,7 +214,7 @@ export default function AdminStudentDossier({
                 className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-[0_3px_14px_rgba(15,23,42,0.25)] hover:shadow-[0_5px_20px_rgba(15,23,42,0.35)] border active:scale-95 shrink-0 ${
                   isExpanded
                     ? 'bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white border-indigo-400/50 shadow-[0_4px_16px_rgba(79,70,229,0.35)]'
-                    : 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white hover:from-slate-800 hover:to-indigo-900 border-indigo-400/30'
+                    : 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-slate-800 dark:via-slate-800 dark:to-indigo-950 text-white hover:from-slate-800 hover:to-indigo-900 border-indigo-400/30'
                 }`}
                 title={isExpanded ? 'Hide Full Dossier' : 'Show Full Dossier & PDF Report Card'}
               >
@@ -233,29 +234,29 @@ export default function AdminStudentDossier({
           {/* 2. Middle Row: Dedicated Academic Badges Strip */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs">
             {/* College Badge */}
-            <span className="bg-white/95 text-sky-950 border border-sky-300/90 px-2.5 py-1 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-[0_2px_6px_rgba(14,165,233,0.1)] max-w-full truncate">
-              <Building2 className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+            <span className="bg-white/95 dark:bg-slate-800/80 text-sky-950 dark:text-sky-200 border border-sky-300/90 dark:border-sky-500/30 px-2.5 py-1 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-[0_2px_6px_rgba(14,165,233,0.1)] max-w-full truncate">
+              <Building2 className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
               <span className="truncate">{student.college || 'Institution N/A'}</span>
             </span>
 
             {/* HSC Batch Badge */}
-            <span className="bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-950 border border-emerald-300/90 px-2.5 py-1 rounded-xl font-mono font-black text-xs flex items-center gap-1.5 shadow-[0_2px_6px_rgba(16,185,129,0.12)] shrink-0">
-              <GraduationCap className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800/80 dark:to-slate-800/80 text-emerald-950 dark:text-emerald-300 border border-emerald-300/90 dark:border-emerald-500/30 px-2.5 py-1 rounded-xl font-mono font-black text-xs flex items-center gap-1.5 shadow-[0_2px_6px_rgba(16,185,129,0.12)] shrink-0">
+              <GraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>{formatBatch(student.hscBatch)}</span>
             </span>
 
             {/* Subject Badge */}
             {student.subject && (
-              <span className="bg-gradient-to-r from-purple-50 to-violet-50 text-purple-950 border border-purple-300/90 px-2.5 py-1 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-[0_2px_6px_rgba(147,51,234,0.12)] shrink-0">
-                <BookOpen className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+              <span className="bg-gradient-to-r from-purple-50 to-violet-50 dark:from-slate-800/80 dark:to-slate-800/80 text-purple-950 dark:text-purple-300 border border-purple-300/90 dark:border-purple-500/30 px-2.5 py-1 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-[0_2px_6px_rgba(147,51,234,0.12)] shrink-0">
+                <BookOpen className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
                 <span>{student.subject}</span>
               </span>
             )}
 
             {/* Group Badge */}
             {student.group && (
-              <span className="bg-gradient-to-r from-amber-50 to-orange-50 text-amber-950 border border-amber-300/90 px-2.5 py-1 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-[0_2px_6px_rgba(245,158,11,0.1)] shrink-0">
-                <Users className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-800/80 dark:to-slate-800/80 text-amber-950 dark:text-amber-300 border border-amber-300/90 dark:border-amber-500/30 px-2.5 py-1 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-[0_2px_6px_rgba(245,158,11,0.1)] shrink-0">
+                <Users className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{student.group}</span>
               </span>
             )}
@@ -264,49 +265,49 @@ export default function AdminStudentDossier({
           {/* 3. Bottom Row: Responsive Glowing Stat Pods Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 pt-1">
             {/* Attendance Pod */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-cyan-50/90 via-sky-50/70 to-blue-50/90 border-2 border-cyan-400/80 rounded-2xl p-2.5 sm:p-3 shadow-[0_4px_16px_rgba(6,182,212,0.18)] flex items-center gap-2.5">
+            <div className="relative overflow-hidden bg-gradient-to-br from-cyan-50/90 via-sky-50/70 to-blue-50/90 dark:from-cyan-950/40 dark:via-slate-900/90 dark:to-blue-950/30 border-2 border-cyan-400/80 dark:border-cyan-500/30 rounded-2xl p-2.5 sm:p-3 shadow-[0_4px_16px_rgba(6,182,212,0.18)] dark:shadow-[0_4px_16px_rgba(6,182,212,0.1)] flex items-center gap-2.5">
               <div className="absolute -top-3 -right-3 w-10 h-10 bg-cyan-400/30 rounded-full blur-md pointer-events-none" />
               <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-[0_2px_8px_rgba(6,182,212,0.35)] shrink-0">
                 <Award className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <span className="text-[9px] font-black font-mono uppercase tracking-wider text-cyan-800 block leading-tight">
+                <span className="text-[9px] font-black font-mono uppercase tracking-wider text-cyan-800 dark:text-cyan-300 block leading-tight">
                   ATTENDANCE
                 </span>
-                <span className="text-base sm:text-lg font-black font-mono text-slate-900 leading-tight block">
+                <span className="text-base sm:text-lg font-black font-mono text-slate-900 dark:text-white leading-tight block">
                   {attendanceRate}%
                 </span>
               </div>
             </div>
 
             {/* Average Exam Pod */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-amber-50/90 via-yellow-50/70 to-orange-50/90 border-2 border-amber-400/80 rounded-2xl p-2.5 sm:p-3 shadow-[0_4px_16px_rgba(245,158,11,0.18)] flex items-center gap-2.5">
+            <div className="relative overflow-hidden bg-gradient-to-br from-amber-50/90 via-yellow-50/70 to-orange-50/90 dark:from-amber-950/40 dark:via-slate-900/90 dark:to-orange-950/30 border-2 border-amber-400/80 dark:border-amber-500/30 rounded-2xl p-2.5 sm:p-3 shadow-[0_4px_16px_rgba(245,158,11,0.18)] dark:shadow-[0_4px_16px_rgba(245,158,11,0.1)] flex items-center gap-2.5">
               <div className="absolute -top-3 -right-3 w-10 h-10 bg-amber-400/30 rounded-full blur-md pointer-events-none" />
               <div className="p-2 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-[0_2px_8px_rgba(245,158,11,0.35)] shrink-0">
                 <Trophy className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <span className="text-[9px] font-black font-mono uppercase tracking-wider text-amber-800 block leading-tight">
+                <span className="text-[9px] font-black font-mono uppercase tracking-wider text-amber-800 dark:text-amber-300 block leading-tight">
                   AVG EXAM
                 </span>
-                <span className="text-base sm:text-lg font-black font-mono text-slate-900 leading-tight block">
+                <span className="text-base sm:text-lg font-black font-mono text-slate-900 dark:text-white leading-tight block">
                   {avgExamPct !== null ? `${avgExamPct}%` : 'N/A'}
                 </span>
               </div>
             </div>
 
-            {/* Total Sessions / Exams Pod (spans 2 on mobile if odd, or 1 on sm+) */}
-            <div className="col-span-2 sm:col-span-1 relative overflow-hidden bg-gradient-to-br from-indigo-50/90 via-purple-50/70 to-violet-50/90 border-2 border-indigo-300/80 rounded-2xl p-2.5 sm:p-3 shadow-[0_4px_16px_rgba(99,102,241,0.15)] flex items-center gap-2.5">
+            {/* Total Sessions / Exams Pod */}
+            <div className="col-span-2 sm:col-span-1 relative overflow-hidden bg-gradient-to-br from-indigo-50/90 via-purple-50/70 to-violet-50/90 dark:from-indigo-950/40 dark:via-slate-900/90 dark:to-violet-950/30 border-2 border-indigo-300/80 dark:border-indigo-500/30 rounded-2xl p-2.5 sm:p-3 shadow-[0_4px_16px_rgba(99,102,241,0.15)] dark:shadow-[0_4px_16px_rgba(99,102,241,0.1)] flex items-center gap-2.5">
               <div className="absolute -top-3 -right-3 w-10 h-10 bg-indigo-400/25 rounded-full blur-md pointer-events-none" />
               <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-[0_2px_8px_rgba(99,102,241,0.35)] shrink-0">
                 <ActivityIcon className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <span className="text-[9px] font-black font-mono uppercase tracking-wider text-indigo-800 block leading-tight">
+                <span className="text-[9px] font-black font-mono uppercase tracking-wider text-indigo-800 dark:text-indigo-300 block leading-tight">
                   LOGGED ENTRIES
                 </span>
-                <span className="text-base sm:text-lg font-black font-mono text-slate-900 leading-tight block">
-                  {totalSessions} <span className="text-xs font-bold text-slate-500 font-sans">records</span>
+                <span className="text-base sm:text-lg font-black font-mono text-slate-900 dark:text-white leading-tight block">
+                  {totalSessions} <span className="text-xs font-bold text-slate-500 dark:text-slate-400 font-sans">records</span>
                 </span>
               </div>
             </div>
@@ -318,33 +319,33 @@ export default function AdminStudentDossier({
       {isExpanded && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 animate-fadeIn">
           {/* Detailed Academic Profile & Contact Pod (7 cols) */}
-          <div className="lg:col-span-7 relative overflow-hidden bg-white/95 p-4 sm:p-5 rounded-3xl border-2 border-indigo-200/90 shadow-[0_8px_30px_-6px_rgba(79,70,229,0.14)] space-y-3.5">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-400/15 rounded-full blur-2xl pointer-events-none" />
+          <div className="lg:col-span-7 relative overflow-hidden bg-white/95 dark:bg-slate-900/90 p-4 sm:p-5 rounded-3xl border-2 border-indigo-200/90 dark:border-slate-800 shadow-[0_8px_30px_-6px_rgba(79,70,229,0.14)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] space-y-3.5">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-400/15 dark:bg-purple-500/10 rounded-full blur-2xl pointer-events-none" />
 
-            <div className="flex items-center justify-between border-b border-indigo-100/90 pb-2.5 relative z-10">
-              <h3 className="font-display font-black text-slate-900 text-xs sm:text-sm tracking-tight flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-indigo-100 text-indigo-700 shadow-2xs">
+            <div className="flex items-center justify-between border-b border-indigo-100/90 dark:border-slate-800 pb-2.5 relative z-10">
+              <h3 className="font-display font-black text-slate-900 dark:text-white text-xs sm:text-sm tracking-tight flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 shadow-2xs">
                   <Layers className="w-3.5 h-3.5" />
                 </div>
                 <span>Student Academic Profile &amp; Contact</span>
               </h3>
-              <span className="text-[10px] font-mono font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80 px-2 py-0.5 rounded-md">
+              <span className="text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 px-2 py-0.5 rounded-md">
                 Verified Dossier
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs relative z-10">
               {/* Email */}
-              <div className="p-2.5 bg-gradient-to-r from-violet-50/90 to-purple-50/90 rounded-2xl border border-violet-200/90 flex items-center gap-2.5 shadow-2xs">
+              <div className="p-2.5 bg-gradient-to-r from-violet-50/90 to-purple-50/90 dark:from-slate-800/80 dark:to-slate-800/80 rounded-2xl border border-violet-200/90 dark:border-purple-500/20 flex items-center gap-2.5 shadow-2xs">
                 <div className="p-2 bg-gradient-to-br from-violet-600 to-purple-600 text-white rounded-xl shrink-0 shadow-2xs">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-violet-700 block font-black text-[9px] uppercase tracking-wider font-mono">
+                  <span className="text-violet-700 dark:text-violet-300 block font-black text-[9px] uppercase tracking-wider font-mono">
                     Email Address
                   </span>
                   <span
-                    className="font-bold text-violet-950 text-xs truncate block"
+                    className="font-bold text-violet-950 dark:text-purple-100 text-xs truncate block"
                     title={student.email || 'Not specified'}
                   >
                     {student.email || 'Not specified'}
@@ -353,75 +354,75 @@ export default function AdminStudentDossier({
               </div>
 
               {/* Mobile Phone */}
-              <div className="p-2.5 bg-gradient-to-r from-teal-50/90 to-emerald-50/90 rounded-2xl border border-teal-200/90 flex items-center gap-2.5 shadow-2xs">
+              <div className="p-2.5 bg-gradient-to-r from-teal-50/90 to-emerald-50/90 dark:from-slate-800/80 dark:to-slate-800/80 rounded-2xl border border-teal-200/90 dark:border-emerald-500/20 flex items-center gap-2.5 shadow-2xs">
                 <div className="p-2 bg-gradient-to-br from-teal-600 to-emerald-600 text-white rounded-xl shrink-0 shadow-2xs">
                   <Phone className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-teal-700 block font-black text-[9px] uppercase tracking-wider font-mono">
+                  <span className="text-teal-700 dark:text-teal-300 block font-black text-[9px] uppercase tracking-wider font-mono">
                     Student Mobile
                   </span>
-                  <span className="font-bold text-teal-950 text-xs font-mono truncate block">
+                  <span className="font-bold text-teal-950 dark:text-emerald-100 text-xs font-mono truncate block">
                     {student.mobile || 'N/A'}
                   </span>
                 </div>
               </div>
 
               {/* College */}
-              <div className="p-2.5 bg-gradient-to-r from-sky-50/90 to-blue-50/90 rounded-2xl border border-sky-200/90 flex items-center gap-2.5 shadow-2xs">
+              <div className="p-2.5 bg-gradient-to-r from-sky-50/90 to-blue-50/90 dark:from-slate-800/80 dark:to-slate-800/80 rounded-2xl border border-sky-200/90 dark:border-sky-500/20 flex items-center gap-2.5 shadow-2xs">
                 <div className="p-2 bg-gradient-to-br from-sky-600 to-blue-600 text-white rounded-xl shrink-0 shadow-2xs">
                   <Building2 className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-sky-700 block font-black text-[9px] uppercase tracking-wider font-mono">
+                  <span className="text-sky-700 dark:text-sky-300 block font-black text-[9px] uppercase tracking-wider font-mono">
                     Institution / College
                   </span>
-                  <span className="font-bold text-sky-950 text-xs truncate block">
+                  <span className="font-bold text-sky-950 dark:text-sky-100 text-xs truncate block">
                     {student.college || 'N/A'}
                   </span>
                 </div>
               </div>
 
               {/* HSC Batch */}
-              <div className="p-2.5 bg-gradient-to-r from-emerald-50/90 to-teal-50/90 rounded-2xl border border-emerald-200/90 flex items-center gap-2.5 shadow-2xs">
+              <div className="p-2.5 bg-gradient-to-r from-emerald-50/90 to-teal-50/90 dark:from-slate-800/80 dark:to-slate-800/80 rounded-2xl border border-emerald-200/90 dark:border-emerald-500/20 flex items-center gap-2.5 shadow-2xs">
                 <div className="p-2 bg-gradient-to-br from-emerald-600 to-teal-600 text-white rounded-xl shrink-0 shadow-2xs">
                   <GraduationCap className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-emerald-700 block font-black text-[9px] uppercase tracking-wider font-mono">
+                  <span className="text-emerald-700 dark:text-emerald-300 block font-black text-[9px] uppercase tracking-wider font-mono">
                     HSC Batch
                   </span>
-                  <span className="font-black text-emerald-950 text-xs font-mono truncate block">
+                  <span className="font-black text-emerald-950 dark:text-emerald-100 text-xs font-mono truncate block">
                     {formatBatch(student.hscBatch)}
                   </span>
                 </div>
               </div>
 
               {/* Group */}
-              <div className="p-2.5 bg-gradient-to-r from-purple-50/90 to-indigo-50/90 rounded-2xl border border-purple-200/90 flex items-center gap-2.5 shadow-2xs">
+              <div className="p-2.5 bg-gradient-to-r from-purple-50/90 to-indigo-50/90 dark:from-slate-800/80 dark:to-slate-800/80 rounded-2xl border border-purple-200/90 dark:border-purple-500/20 flex items-center gap-2.5 shadow-2xs">
                 <div className="p-2 bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-xl shrink-0 shadow-2xs">
                   <Users className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-purple-700 block font-black text-[9px] uppercase tracking-wider font-mono">
+                  <span className="text-purple-700 dark:text-purple-300 block font-black text-[9px] uppercase tracking-wider font-mono">
                     Academic Group
                   </span>
-                  <span className="font-bold text-purple-950 text-xs truncate block">
+                  <span className="font-bold text-purple-950 dark:text-purple-100 text-xs truncate block">
                     {student.group || 'Science / General'}
                   </span>
                 </div>
               </div>
 
               {/* Subject */}
-              <div className="p-2.5 bg-gradient-to-r from-amber-50/90 to-orange-50/90 rounded-2xl border border-amber-200/90 flex items-center gap-2.5 shadow-2xs">
+              <div className="p-2.5 bg-gradient-to-r from-amber-50/90 to-orange-50/90 dark:from-slate-800/80 dark:to-slate-800/80 rounded-2xl border border-amber-200/90 dark:border-amber-500/20 flex items-center gap-2.5 shadow-2xs">
                 <div className="p-2 bg-gradient-to-br from-amber-600 to-orange-600 text-white rounded-xl shrink-0 shadow-2xs">
                   <BookOpen className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-amber-700 block font-black text-[9px] uppercase tracking-wider font-mono">
+                  <span className="text-amber-700 dark:text-amber-300 block font-black text-[9px] uppercase tracking-wider font-mono">
                     Enrolled Subject
                   </span>
-                  <span className="font-bold text-amber-950 text-xs truncate block">
+                  <span className="font-bold text-amber-950 dark:text-amber-100 text-xs truncate block">
                     {student.subject || 'All Core Subjects'}
                   </span>
                 </div>
@@ -429,15 +430,15 @@ export default function AdminStudentDossier({
 
               {/* Guardian Phone */}
               {student.guardiansPhone && (
-                <div className="p-2.5 bg-gradient-to-r from-rose-50/90 to-pink-50/90 rounded-2xl border border-rose-200/90 flex items-center gap-2.5 shadow-2xs">
+                <div className="p-2.5 bg-gradient-to-r from-rose-50/90 to-pink-50/90 dark:from-slate-800/80 dark:to-slate-800/80 rounded-2xl border border-rose-200/90 dark:border-rose-500/20 flex items-center gap-2.5 shadow-2xs">
                   <div className="p-2 bg-gradient-to-br from-rose-600 to-pink-600 text-white rounded-xl shrink-0 shadow-2xs">
                     <Phone className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-rose-700 block font-black text-[9px] uppercase tracking-wider font-mono">
+                    <span className="text-rose-700 dark:text-rose-300 block font-black text-[9px] uppercase tracking-wider font-mono">
                       Guardian Phone
                     </span>
-                    <span className="font-bold text-rose-950 text-xs font-mono truncate block">
+                    <span className="font-bold text-rose-950 dark:text-rose-100 text-xs font-mono truncate block">
                       {student.guardiansPhone}
                     </span>
                   </div>
@@ -446,15 +447,15 @@ export default function AdminStudentDossier({
 
               {/* Address */}
               {student.address && (
-                <div className="p-2.5 bg-gradient-to-r from-indigo-50/90 to-sky-50/90 rounded-2xl border border-indigo-200/90 flex items-start gap-2.5 sm:col-span-2 shadow-2xs">
+                <div className="p-2.5 bg-gradient-to-r from-indigo-50/90 to-sky-50/90 dark:from-slate-800/80 dark:to-slate-800/80 rounded-2xl border border-indigo-200/90 dark:border-indigo-500/20 flex items-start gap-2.5 sm:col-span-2 shadow-2xs">
                   <div className="p-2 bg-gradient-to-br from-indigo-600 to-blue-600 text-white rounded-xl shrink-0 mt-0.5 shadow-2xs">
                     <MapPin className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <span className="text-indigo-700 block font-black text-[9px] uppercase tracking-wider font-mono">
+                    <span className="text-indigo-700 dark:text-indigo-300 block font-black text-[9px] uppercase tracking-wider font-mono">
                       Residential Address
                     </span>
-                    <span className="text-indigo-950 text-xs leading-relaxed font-semibold break-words">
+                    <span className="text-indigo-950 dark:text-indigo-100 text-xs leading-relaxed font-semibold break-words">
                       {student.address}
                     </span>
                   </div>
@@ -464,19 +465,19 @@ export default function AdminStudentDossier({
           </div>
 
           {/* PDF Report Card Generator Pod (5 cols) */}
-          <div className="lg:col-span-5 relative overflow-hidden bg-gradient-to-br from-emerald-50/95 via-teal-50/90 to-emerald-100/95 p-4 sm:p-5 rounded-3xl border-2 border-emerald-300 shadow-[0_8px_30px_-6px_rgba(16,185,129,0.18)] flex flex-col justify-between space-y-3.5">
-            <div className="absolute -top-10 -right-10 w-36 h-36 bg-emerald-400/25 rounded-full blur-2xl pointer-events-none" />
+          <div className="lg:col-span-5 relative overflow-hidden bg-gradient-to-br from-emerald-50/95 via-teal-50/90 to-emerald-100/95 dark:from-slate-900/90 dark:via-slate-900/95 dark:to-emerald-950/40 p-4 sm:p-5 rounded-3xl border-2 border-emerald-300 dark:border-slate-800 shadow-[0_8px_30px_-6px_rgba(16,185,129,0.18)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between space-y-3.5">
+            <div className="absolute -top-10 -right-10 w-36 h-36 bg-emerald-400/25 dark:bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
 
             <div className="space-y-3 relative z-10">
-              <div className="flex items-center gap-2.5 border-b border-emerald-200/90 pb-2.5">
+              <div className="flex items-center gap-2.5 border-b border-emerald-200/90 dark:border-slate-800 pb-2.5">
                 <div className="p-2 bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-xl shadow-[0_2px_8px_rgba(16,185,129,0.4)] shrink-0">
                   <FileText className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-display font-black text-emerald-950 text-xs sm:text-sm">
+                  <h3 className="font-display font-black text-emerald-950 dark:text-white text-xs sm:text-sm">
                     Monthly PDF Report Card
                   </h3>
-                  <p className="text-[11px] text-emerald-800 font-medium">
+                  <p className="text-[11px] text-emerald-800 dark:text-emerald-300 font-medium">
                     Generate transcript &amp; attendance scorecard
                   </p>
                 </div>
@@ -484,7 +485,7 @@ export default function AdminStudentDossier({
 
               {/* Year Selector */}
               <div className="space-y-1.5">
-                <span className="text-[10px] font-black text-emerald-950 uppercase font-mono block tracking-wide">
+                <span className="text-[10px] font-black text-emerald-950 dark:text-emerald-300 uppercase font-mono block tracking-wide">
                   SELECT YEAR:
                 </span>
                 <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
@@ -495,8 +496,8 @@ export default function AdminStudentDossier({
                       onClick={() => handleYearSelect(y)}
                       className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                         selectedYear === y
-                          ? 'bg-gradient-to-r from-emerald-700 to-teal-700 text-white font-black shadow-[0_2px_8px_rgba(16,185,129,0.35)]'
-                          : 'bg-white text-emerald-950 hover:bg-emerald-100 border border-emerald-300/80 shadow-2xs'
+                          ? 'bg-gradient-to-r from-emerald-700 to-teal-700 dark:from-emerald-600 dark:to-teal-600 text-white font-black shadow-[0_2px_8px_rgba(16,185,129,0.35)]'
+                          : 'bg-white dark:bg-slate-800 text-emerald-950 dark:text-slate-200 hover:bg-emerald-100 dark:hover:bg-slate-700 border border-emerald-300/80 dark:border-slate-700 shadow-2xs'
                       }`}
                     >
                       {y}
@@ -507,7 +508,7 @@ export default function AdminStudentDossier({
 
               {/* Month Selector */}
               <div className="space-y-1.5">
-                <span className="text-[10px] font-black text-emerald-950 uppercase font-mono block tracking-wide">
+                <span className="text-[10px] font-black text-emerald-950 dark:text-emerald-300 uppercase font-mono block tracking-wide">
                   SELECT MONTH:
                 </span>
                 <div className="grid grid-cols-6 gap-1">
@@ -518,8 +519,8 @@ export default function AdminStudentDossier({
                       onClick={() => handleMonthSelect(m.value)}
                       className={`py-1.5 rounded-xl text-[10px] font-mono font-bold text-center transition-all cursor-pointer ${
                         selectedMonth === m.value
-                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black shadow-[0_2px_8px_rgba(79,70,229,0.35)]'
-                          : 'bg-white text-slate-700 hover:bg-emerald-100 border border-emerald-200/90 shadow-2xs'
+                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 text-white font-black shadow-[0_2px_8px_rgba(79,70,229,0.35)]'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-emerald-100 dark:hover:bg-slate-700 border border-emerald-200/90 dark:border-slate-700 shadow-2xs'
                       }`}
                     >
                       {m.name}
@@ -540,7 +541,7 @@ export default function AdminStudentDossier({
               <span>
                 {isGeneratingPdf
                   ? 'Generating PDF Card...'
-                  : `Export ${selectedYear}-${selectedMonth} Report Card`}
+                  : `Export ${formatBillingMonth(`${selectedYear}-${selectedMonth}`)} Report Card`}
               </span>
             </button>
           </div>

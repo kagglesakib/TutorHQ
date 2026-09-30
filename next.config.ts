@@ -11,10 +11,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    // Radically speeds up compilation by tree-shaking barrel imports for large libraries
-    optimizePackageImports: ['lucide-react', 'recharts', 'motion'],
-  },
   async redirects() {
     return [
       {
