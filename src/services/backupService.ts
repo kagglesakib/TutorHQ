@@ -56,39 +56,57 @@ export async function generateBackup(): Promise<any> {
     updatedAt: s.updatedAt ? (typeof s.updatedAt === 'string' ? s.updatedAt : s.updatedAt.toISOString()) : new Date().toISOString(),
   }));
 
-  const activities = rawActivities.map((act: any) => ({
-    _id: String(act._id || act.aid || `D_${Date.now()}`),
-    studentId: String(act.studentId || act.studentSid || ''),
-    date: typeof act.date === 'string' ? act.date.slice(0, 10) : sanitizeDateString(act.date).slice(0, 10),
-    status: act.status || 'Present',
-    subject: act.subject || '',
-    topic: act.topic || '',
-    hwMarks: act.hwMarks !== undefined && act.hwMarks !== null ? act.hwMarks : '',
-    cwMarks: act.cwMarks !== undefined && act.cwMarks !== null ? act.cwMarks : '',
-    comment: act.comment || '',
-  }));
+  const activities = rawActivities.map((act: any) => {
+    const actSid = String(act.sid || act.studentSid || act.studentId || '');
+    return {
+      _id: String(act._id || act.aid || `D_${Date.now()}`),
+      aid: act.aid || String(act._id),
+      sid: actSid,
+      studentSid: actSid,
+      studentId: actSid,
+      date: typeof act.date === 'string' ? act.date.slice(0, 10) : sanitizeDateString(act.date).slice(0, 10),
+      status: act.status || 'Present',
+      subject: act.subject || '',
+      topic: act.topic || '',
+      hwMarks: act.hwMarks !== undefined && act.hwMarks !== null ? act.hwMarks : '',
+      cwMarks: act.cwMarks !== undefined && act.cwMarks !== null ? act.cwMarks : '',
+      comment: act.comment || '',
+    };
+  });
 
-  const exams = rawExams.map((ex: any) => ({
-    _id: String(ex._id || ex.eid || `E_${Date.now()}`),
-    studentId: String(ex.studentId || ex.studentSid || ''),
-    date: typeof ex.date === 'string' ? ex.date.slice(0, 10) : sanitizeDateString(ex.date).slice(0, 10),
-    subject: ex.subject || '',
-    topic: ex.topic || '',
-    status: ex.status || 'Present',
-    totalMarks: Number(ex.totalMarks || 100),
-    obtainedMarks: ex.obtainedMarks !== undefined && ex.obtainedMarks !== null ? (typeof ex.obtainedMarks === 'number' ? ex.obtainedMarks : Number(ex.obtainedMarks)) : null,
-    remarks: ex.remarks || '',
-    comment: ex.comment || '',
-  }));
+  const exams = rawExams.map((ex: any) => {
+    const exSid = String(ex.sid || ex.studentSid || ex.studentId || '');
+    return {
+      _id: String(ex._id || ex.eid || `E_${Date.now()}`),
+      eid: ex.eid || String(ex._id),
+      sid: exSid,
+      studentSid: exSid,
+      studentId: exSid,
+      date: typeof ex.date === 'string' ? ex.date.slice(0, 10) : sanitizeDateString(ex.date).slice(0, 10),
+      subject: ex.subject || '',
+      topic: ex.topic || '',
+      status: ex.status || 'Present',
+      totalMarks: Number(ex.totalMarks || 100),
+      obtainedMarks: ex.obtainedMarks !== undefined && ex.obtainedMarks !== null ? (typeof ex.obtainedMarks === 'number' ? ex.obtainedMarks : Number(ex.obtainedMarks)) : null,
+      remarks: ex.remarks || '',
+      comment: ex.comment || '',
+    };
+  });
 
-  const payments = rawPayments.map((p: any) => ({
-    _id: String(p._id || p.pid || `P_${Date.now()}`),
-    studentId: String(p.studentId || p.studentSid || ''),
-    date: typeof p.date === 'string' ? p.date.slice(0, 10) : sanitizeDateString(p.date).slice(0, 10),
-    amount: Number(p.amount || 0),
-    paymentMonth: p.paymentMonth || '',
-    comment: p.comment || '',
-  }));
+  const payments = rawPayments.map((p: any) => {
+    const pSid = String(p.sid || p.studentSid || p.studentId || '');
+    return {
+      _id: String(p._id || p.pid || `P_${Date.now()}`),
+      pid: p.pid || String(p._id),
+      sid: pSid,
+      studentSid: pSid,
+      studentId: pSid,
+      date: typeof p.date === 'string' ? p.date.slice(0, 10) : sanitizeDateString(p.date).slice(0, 10),
+      amount: Number(p.amount || 0),
+      paymentMonth: p.paymentMonth || '',
+      comment: p.comment || '',
+    };
+  });
 
   return {
     admins,
@@ -217,9 +235,13 @@ export async function restoreBackup(payload: any): Promise<{
       if (!finalTopic) finalTopic = split.topic;
     }
 
+    const actSid = String(act.sid || act.studentSid || act.studentId || '');
     return {
       _id: String(act._id || act.aid || `D_${Date.now()}_${idx}`),
-      studentId: String(act.studentId || act.studentSid || ''),
+      aid: String(act.aid || act._id || `D_${Date.now()}_${idx}`),
+      sid: actSid,
+      studentSid: actSid,
+      studentId: actSid,
       date: typeof act.date === 'string' ? act.date.slice(0, 10) : sanitizeDateString(act.date).slice(0, 10),
       status: act.status || 'Present',
       subject: finalSubject,
@@ -240,9 +262,13 @@ export async function restoreBackup(payload: any): Promise<{
       if (!finalTopic) finalTopic = split.topic;
     }
 
+    const exSid = String(ex.sid || ex.studentSid || ex.studentId || '');
     return {
       _id: String(ex._id || ex.eid || `E_${Date.now()}_${idx}`),
-      studentId: String(ex.studentId || ex.studentSid || ''),
+      eid: String(ex.eid || ex._id || `E_${Date.now()}_${idx}`),
+      sid: exSid,
+      studentSid: exSid,
+      studentId: exSid,
       date: typeof ex.date === 'string' ? ex.date.slice(0, 10) : sanitizeDateString(ex.date).slice(0, 10),
       subject: finalSubject,
       topic: finalTopic,
@@ -257,14 +283,20 @@ export async function restoreBackup(payload: any): Promise<{
   });
 
   // 5. Prepare Payments
-  const finalPayments = rawPayments.map((p: any, idx: number) => ({
-    _id: String(p._id || p.pid || `P_${Date.now()}_${idx}`),
-    studentId: String(p.studentId || p.studentSid || ''),
-    date: typeof p.date === 'string' ? p.date.slice(0, 10) : sanitizeDateString(p.date).slice(0, 10),
-    amount: Number(p.amount || 0),
-    paymentMonth: p.paymentMonth || '',
-    comment: p.comment || '',
-  }));
+  const finalPayments = rawPayments.map((p: any, idx: number) => {
+    const pSid = String(p.sid || p.studentSid || p.studentId || '');
+    return {
+      _id: String(p._id || p.pid || `P_${Date.now()}_${idx}`),
+      pid: String(p.pid || p._id || `P_${Date.now()}_${idx}`),
+      sid: pSid,
+      studentSid: pSid,
+      studentId: pSid,
+      date: typeof p.date === 'string' ? p.date.slice(0, 10) : sanitizeDateString(p.date).slice(0, 10),
+      amount: Number(p.amount || 0),
+      paymentMonth: p.paymentMonth || '',
+      comment: p.comment || '',
+    };
+  });
 
   // 6. Write atomically to MongoDB collections
   await Promise.allSettled([

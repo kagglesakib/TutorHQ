@@ -11,13 +11,13 @@ export async function getRevokedStudentIds(): Promise<Set<string>> {
     const revokedStudents = await mongoDb.collection('students')
       .find(
         {
+          status: { $ne: 'active' },
           $or: [
             { status: 'revoked' },
             { approved: 'no' },
             { approved: 'disapproved' },
             { isApproved: 'no' },
             { isApproved: 'disapproved' },
-            { isApproved: false },
           ]
         },
         { projection: { _id: 1, sid: 1 } }
@@ -61,6 +61,7 @@ export async function isStudentRevoked(sid?: string, email?: string): Promise<bo
     const student = await mongoDb.collection('students').findOne({
       $and: [
         { $or: clauses },
+        { status: { $ne: 'active' } },
         {
           $or: [
             { status: 'revoked' },
@@ -68,7 +69,6 @@ export async function isStudentRevoked(sid?: string, email?: string): Promise<bo
             { approved: 'disapproved' },
             { isApproved: 'no' },
             { isApproved: 'disapproved' },
-            { isApproved: false },
           ]
         }
       ]

@@ -319,6 +319,16 @@ async function ensureNormalizedIndexes(db: Db) {
       }
     } catch {}
 
+    // Synchronize isApproved for any active students who might have legacy isApproved: false
+    try {
+      if (typeof studentsCol.updateMany === 'function') {
+        await studentsCol.updateMany(
+          { status: 'active', isApproved: { $ne: true } },
+          { $set: { isApproved: true, approved: 'yes' } }
+        );
+      }
+    } catch {}
+
     // Drop old sid_1 index if present
     try {
       if (typeof studentsCol.dropIndex === 'function') {

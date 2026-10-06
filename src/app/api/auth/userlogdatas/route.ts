@@ -259,9 +259,12 @@ export async function PUT(req: NextRequest) {
     }
 
     // Update students collection
+    const isApprovedBool = finalStatus === 'active';
     const updateFields: any = {
       updatedAt: new Date(),
       status: finalStatus,
+      isApproved: isApprovedBool,
+      approved: isApprovedBool ? 'yes' : (finalStatus === 'revoked' ? 'no' : 'pending'),
     };
 
     if (cleanSid !== undefined) updateFields.sid = cleanSid;

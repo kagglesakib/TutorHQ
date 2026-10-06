@@ -228,6 +228,7 @@ export async function updateStudent(sid: string, data: Partial<Student>): Promis
 
   if (updateFields.status !== undefined) {
     updateFields.isApproved = updateFields.status === 'active';
+    updateFields.approved = updateFields.status === 'active' ? 'yes' : (updateFields.status === 'revoked' ? 'no' : 'pending');
   }
 
   let result = await (studentsCol as any).findOneAndUpdate(
@@ -286,8 +287,8 @@ export async function deleteStudent(sid: string): Promise<boolean> {
 
   const studentObjId = student?._id;
 
-  // Delete all referencing activity, exam, and payment records by ObjectId FK or SID
-  const refClauses: any[] = [{ studentSid: cleanSid }];
+  // Delete all referencing activity, exam, and payment records by SID
+  const refClauses: any[] = [{ sid: cleanSid }, { studentSid: cleanSid }, { studentId: cleanSid }];
   if (studentObjId) {
     refClauses.push({ studentId: studentObjId });
     refClauses.push({ studentId: String(studentObjId) });

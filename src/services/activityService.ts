@@ -43,16 +43,17 @@ export async function getActivities(options?: { includeRevoked?: boolean }): Pro
   for (const act of rawActivities) {
     let student: any = null;
 
-    if (act.studentId) {
+    const lookupSid = String(act.sid || act.studentSid || act.studentId || '').trim().toUpperCase();
+    if (lookupSid) {
+      student = studentBySidMap.get(lookupSid) || studentByIdMap.get(lookupSid);
+    }
+    if (!student && act.studentId) {
       student = studentByIdMap.get(String(act.studentId));
     }
-    if (!student && act.studentSid) {
-      student = studentBySidMap.get(String(act.studentSid).trim().toUpperCase());
-    }
 
-    // Check revocation filter
+    // Check revocation filter: only filter out if student is actually revoked (active students are never excluded)
     if (!options?.includeRevoked && student) {
-      if (revokedIds.has(String(student._id)) || (student.sid && revokedIds.has(String(student.sid).trim().toUpperCase()))) {
+      if (student.status !== 'active' && (revokedIds.has(String(student._id)) || (student.sid && revokedIds.has(String(student.sid).trim().toUpperCase())))) {
         continue;
       }
     }
@@ -60,12 +61,14 @@ export async function getActivities(options?: { includeRevoked?: boolean }): Pro
     const subject = act.subject || (act.subjectTuitioned ? splitSubjectTopic(act.subjectTuitioned).subject : '');
     const topic = act.topic || (act.subjectTuitioned ? splitSubjectTopic(act.subjectTuitioned).topic : '');
     const displaySubjectTuitioned = topic ? `${subject} - ${topic}` : (subject || 'General Session');
+    const finalSid = student?.sid || act.sid || act.studentSid || act.studentId || '';
 
     formatted.push({
       _id: String(act._id),
       aid: act.aid || String(act._id),
-      studentId: act.studentId || (student ? student._id : undefined),
-      studentSid: student?.sid || act.studentSid || '',
+      sid: finalSid,
+      studentId: finalSid,
+      studentSid: finalSid,
       studentName: student?.name || 'Student',
       date: act.date ? (act.date instanceof Date ? act.date.toISOString().split('T')[0] : String(act.date).replace(/"/g, '')) : '',
       status: act.status || 'Present',
@@ -83,50 +86,30 @@ export async function getActivities(options?: { includeRevoked?: boolean }): Pro
 }
 
 /**
- * Creates a new activity referencing student's ObjectId
+ * Creates a new activity referencing student's SID
  */
 export async function createActivity(data: Partial<Activity> & Record<string, any>): Promise<Activity> {
-  const { aid, studentId, studentSid, date, status, subject, topic, subjectTuitioned, hwMarks, cwMarks, comment } = data;
-  if ((!studentId && !studentSid) || !date || !status) {
-    throw new Error('Student reference (studentId or studentSid), date, and status are required');
+  const { aid, sid, studentId, studentSid, date, status, subject, topic, subjectTuitioned, hwMarks, cwMarks, comment } = data;
+  const targetSid = String(sid || studentSid || studentId || '').trim().toUpperCase();
+  if (!targetSid || !date || !status) {
+    throw new Error('Student SID, date, and status are required');
   }
 
   const mongoDb = await getMongoDb();
-  let resolvedStudentObjId: ObjectId | null = null;
-  let resolvedStudentSid = String(studentSid || '').trim().toUpperCase();
+  let resolvedStudentSid = targetSid;
   let resolvedStudentName = 'Student';
 
-  // Resolve student by studentId or studentSid
-  if (studentId) {
-    let query: any = { _id: studentId };
-    if (typeof studentId === 'string' && ObjectId.isValid(studentId)) {
-      query = { $or: [{ _id: new ObjectId(studentId) }, { _id: studentId }] };
-    }
-    const sDoc = await mongoDb.collection('students').findOne(query);
-    if (sDoc) {
-      resolvedStudentObjId = sDoc._id;
-      resolvedStudentSid = sDoc.sid;
-      resolvedStudentName = sDoc.name;
-    }
-  }
-
-  if (!resolvedStudentObjId && studentSid) {
-    const sDoc = await mongoDb.collection('students').findOne({
-      $or: [
-        { sid: resolvedStudentSid },
-        { sid: { $regex: new RegExp(`^${resolvedStudentSid}$`, 'i') } }
-      ]
-    });
-    if (sDoc) {
-      resolvedStudentObjId = sDoc._id;
-      resolvedStudentSid = sDoc.sid;
-      resolvedStudentName = sDoc.name;
-    }
-  }
-
-  if (!resolvedStudentObjId) {
-    // If student record not found, create an ObjectId so referential integrity isn't broken
-    resolvedStudentObjId = new ObjectId();
+  // Resolve student by SID
+  const sDoc: any = await (mongoDb.collection('students') as any).findOne({
+    $or: [
+      { sid: targetSid },
+      { sid: { $regex: new RegExp(`^${targetSid}$`, 'i') } },
+      { _id: targetSid }
+    ]
+  });
+  if (sDoc) {
+    resolvedStudentSid = sDoc.sid || targetSid;
+    resolvedStudentName = sDoc.name || 'Student';
   }
 
   // Split subject & topic
@@ -143,8 +126,9 @@ export async function createActivity(data: Partial<Activity> & Record<string, an
   const newActivityDoc: any = {
     _id: activityId,
     aid: activityId,
-    studentId: resolvedStudentSid || String(studentId || ''),
-    studentSid: resolvedStudentSid, // keep for backward-compat
+    sid: resolvedStudentSid,
+    studentId: resolvedStudentSid,
+    studentSid: resolvedStudentSid,
     date: sanitizeDate(date),
     status,
     subject: isAbsent ? 'N/A' : (finalSubject || 'Tuition'),
@@ -162,7 +146,8 @@ export async function createActivity(data: Partial<Activity> & Record<string, an
   return {
     _id: String(newActivityDoc._id),
     aid: newActivityDoc.aid,
-    studentId: newActivityDoc.studentId,
+    sid: resolvedStudentSid,
+    studentId: resolvedStudentSid,
     studentSid: resolvedStudentSid,
     studentName: resolvedStudentName,
     date: newActivityDoc.date instanceof Date ? newActivityDoc.date.toISOString().split('T')[0] : String(newActivityDoc.date),

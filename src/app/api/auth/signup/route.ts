@@ -146,7 +146,8 @@ export async function POST(req: NextRequest) {
       password: cleanPassword, // plaintext per current requirements
       phone: cleanPhone,
       status: 'pending' as const,
-      isApproved: false,
+      isApproved: 'pending',
+      approved: 'pending',
       college: String(college || '').trim(),
       hscBatch: String(hscBatch || '').trim(),
       group: String(group || 'Science').trim(),

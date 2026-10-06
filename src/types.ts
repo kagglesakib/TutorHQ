@@ -63,13 +63,14 @@ export interface AuthUser {
 /**
  * Normalized Activity Model
  * Collection: activities
- * studentId: ObjectId FK -> students._id
+ * sid: Student SID identifier (e.g. "2609145")
  */
 export interface Activity {
   _id?: any;
   aid?: string;
-  studentId?: any; // ObjectId reference (resolved on server)
-  studentSid?: string; // Populated for display/compatibility
+  sid?: string; // Student SID
+  studentId?: string; // Student SID reference
+  studentSid?: string; // Student SID
   studentName?: string; // Populated for display
   date: string;
   status: string; // e.g. Present | Absent
@@ -85,13 +86,14 @@ export interface Activity {
 /**
  * Normalized Exam Model
  * Collection: exams
- * studentId: ObjectId FK -> students._id
+ * sid: Student SID identifier (e.g. "2609145")
  */
 export interface Exam {
   _id?: any;
   eid?: string;
-  studentId?: any; // ObjectId reference (resolved on server)
-  studentSid?: string; // Populated for display/compatibility
+  sid?: string; // Student SID
+  studentId?: string; // Student SID reference
+  studentSid?: string; // Student SID
   studentName?: string; // Populated for display
   date: string;
   subject?: string; // split out of subjectAndTopic
@@ -108,13 +110,14 @@ export interface Exam {
 /**
  * Normalized Payment Model
  * Collection: payments
- * studentId: ObjectId FK -> students._id
+ * sid: Student SID identifier (e.g. "2609145")
  */
 export interface Payment {
   _id?: any;
   pid?: string;
-  studentId?: any; // ObjectId reference (resolved on server)
-  studentSid?: string; // Populated for display/compatibility
+  sid?: string; // Student SID
+  studentId?: string; // Student SID reference
+  studentSid?: string; // Student SID
   studentName?: string; // Populated for display
   date: string;
   amount: number;

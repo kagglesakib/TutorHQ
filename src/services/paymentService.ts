@@ -24,14 +24,18 @@ export async function getPayments(): Promise<Payment[]> {
 
   return rawPayments.map((p) => {
     let student: any = null;
-    if (p.studentId) student = studentByIdMap.get(String(p.studentId));
-    if (!student && p.studentSid) student = studentBySidMap.get(String(p.studentSid).trim().toUpperCase());
+    const lookupSid = String(p.sid || p.studentSid || p.studentId || '').trim().toUpperCase();
+    if (lookupSid) student = studentBySidMap.get(lookupSid) || studentByIdMap.get(lookupSid);
+    if (!student && p.studentId) student = studentByIdMap.get(String(p.studentId));
+
+    const finalSid = student?.sid || p.sid || p.studentSid || p.studentId || '';
 
     return {
       _id: String(p._id),
       pid: p.pid || String(p._id),
-      studentId: p.studentId || (student ? student._id : undefined),
-      studentSid: student?.sid || p.studentSid || '',
+      sid: finalSid,
+      studentId: finalSid,
+      studentSid: finalSid,
       studentName: student?.name || 'Student',
       date: p.date ? (p.date instanceof Date ? p.date.toISOString().split('T')[0] : String(p.date).replace(/"/g, '')) : '',
       amount: Number(p.amount) || 0,
@@ -43,52 +47,34 @@ export async function getPayments(): Promise<Payment[]> {
 }
 
 export async function createPayment(data: Partial<Payment> & Record<string, any>): Promise<Payment> {
-  const { pid, studentId, studentSid, date, amount, paymentMonth, comment } = data;
-  if ((!studentId && !studentSid) || !date || amount === undefined || !paymentMonth) {
-    throw new Error('studentId or studentSid, date, amount, and paymentMonth are required');
+  const { pid, sid, studentId, studentSid, date, amount, paymentMonth, comment } = data;
+  const targetSid = String(sid || studentSid || studentId || '').trim().toUpperCase();
+  if (!targetSid || !date || amount === undefined || !paymentMonth) {
+    throw new Error('Student SID, date, amount, and paymentMonth are required');
   }
 
   const mongoDb = await getMongoDb();
-  let resolvedStudentObjId: ObjectId | null = null;
-  let resolvedStudentSid = String(studentSid || '').trim().toUpperCase();
+  let resolvedStudentSid = targetSid;
   let resolvedStudentName = 'Student';
 
-  if (studentId) {
-    let query: any = { _id: studentId };
-    if (typeof studentId === 'string' && ObjectId.isValid(studentId)) {
-      query = { $or: [{ _id: new ObjectId(studentId) }, { _id: studentId }] };
-    }
-    const sDoc = await mongoDb.collection('students').findOne(query);
-    if (sDoc) {
-      resolvedStudentObjId = sDoc._id;
-      resolvedStudentSid = sDoc.sid;
-      resolvedStudentName = sDoc.name;
-    }
-  }
-
-  if (!resolvedStudentObjId && studentSid) {
-    const sDoc = await mongoDb.collection('students').findOne({
-      $or: [
-        { sid: resolvedStudentSid },
-        { sid: { $regex: new RegExp(`^${resolvedStudentSid}$`, 'i') } }
-      ]
-    });
-    if (sDoc) {
-      resolvedStudentObjId = sDoc._id;
-      resolvedStudentSid = sDoc.sid;
-      resolvedStudentName = sDoc.name;
-    }
-  }
-
-  if (!resolvedStudentObjId) {
-    resolvedStudentObjId = new ObjectId();
+  const sDoc: any = await (mongoDb.collection('students') as any).findOne({
+    $or: [
+      { sid: targetSid },
+      { sid: { $regex: new RegExp(`^${targetSid}$`, 'i') } },
+      { _id: targetSid }
+    ]
+  });
+  if (sDoc) {
+    resolvedStudentSid = sDoc.sid || targetSid;
+    resolvedStudentName = sDoc.name || 'Student';
   }
 
   const paymentId = pid || generatePaymentId();
   const newPaymentDoc: any = {
     _id: paymentId,
     pid: paymentId,
-    studentId: resolvedStudentSid || String(studentId || ''),
+    sid: resolvedStudentSid,
+    studentId: resolvedStudentSid,
     studentSid: resolvedStudentSid,
     date: sanitizeDate(date),
     amount: Number(amount),
@@ -102,7 +88,8 @@ export async function createPayment(data: Partial<Payment> & Record<string, any>
   return {
     _id: String(newPaymentDoc._id),
     pid: newPaymentDoc.pid,
-    studentId: newPaymentDoc.studentId,
+    sid: resolvedStudentSid,
+    studentId: resolvedStudentSid,
     studentSid: resolvedStudentSid,
     studentName: resolvedStudentName,
     date: newPaymentDoc.date instanceof Date ? newPaymentDoc.date.toISOString().split('T')[0] : String(newPaymentDoc.date),

@@ -29,15 +29,16 @@ export async function getExams(options?: { includeRevoked?: boolean }): Promise<
   for (const ex of rawExams) {
     let student: any = null;
 
-    if (ex.studentId) {
-      student = studentByIdMap.get(String(ex.studentId));
+    const lookupSid = String(ex.sid || ex.studentSid || ex.studentId || '').trim().toUpperCase();
+    if (lookupSid) {
+      student = studentBySidMap.get(lookupSid) || studentByIdMap.get(lookupSid);
     }
-    if (!student && ex.studentSid) {
-      student = studentBySidMap.get(String(ex.studentSid).trim().toUpperCase());
+    if (!student && ex.studentId) {
+      student = studentByIdMap.get(String(ex.studentId));
     }
 
     if (!options?.includeRevoked && student) {
-      if (revokedIds.has(String(student._id)) || (student.sid && revokedIds.has(String(student.sid).trim().toUpperCase()))) {
+      if (student.status !== 'active' && (revokedIds.has(String(student._id)) || (student.sid && revokedIds.has(String(student.sid).trim().toUpperCase())))) {
         continue;
       }
     }
@@ -45,12 +46,14 @@ export async function getExams(options?: { includeRevoked?: boolean }): Promise<
     const subject = ex.subject || (ex.subjectAndTopic ? splitSubjectTopic(ex.subjectAndTopic).subject : '');
     const topic = ex.topic || (ex.subjectAndTopic ? splitSubjectTopic(ex.subjectAndTopic).topic : '');
     const displaySubjectTopic = topic ? `${subject} - ${topic}` : (subject || 'General Assessment');
+    const finalSid = student?.sid || ex.sid || ex.studentSid || ex.studentId || '';
 
     formatted.push({
       _id: String(ex._id),
       eid: ex.eid || String(ex._id),
-      studentId: ex.studentId || (student ? student._id : undefined),
-      studentSid: student?.sid || ex.studentSid || '',
+      sid: finalSid,
+      studentId: finalSid,
+      studentSid: finalSid,
       studentName: student?.name || 'Student',
       date: ex.date ? (ex.date instanceof Date ? ex.date.toISOString().split('T')[0] : String(ex.date).replace(/"/g, '')) : '',
       subject,
@@ -69,45 +72,26 @@ export async function getExams(options?: { includeRevoked?: boolean }): Promise<
 }
 
 export async function createExam(data: Partial<Exam> & Record<string, any>): Promise<Exam> {
-  const { eid, studentId, studentSid, date, subject, topic, subjectAndTopic, status, totalMarks, obtainedMarks, remarks, comment } = data;
-  if ((!studentId && !studentSid) || !date || totalMarks === undefined) {
-    throw new Error('studentId or studentSid, date, and totalMarks are required');
+  const { eid, sid, studentId, studentSid, date, subject, topic, subjectAndTopic, status, totalMarks, obtainedMarks, remarks, comment } = data;
+  const targetSid = String(sid || studentSid || studentId || '').trim().toUpperCase();
+  if (!targetSid || !date || totalMarks === undefined) {
+    throw new Error('Student SID, date, and totalMarks are required');
   }
 
   const mongoDb = await getMongoDb();
-  let resolvedStudentObjId: ObjectId | null = null;
-  let resolvedStudentSid = String(studentSid || '').trim().toUpperCase();
+  let resolvedStudentSid = targetSid;
   let resolvedStudentName = 'Student';
 
-  if (studentId) {
-    let query: any = { _id: studentId };
-    if (typeof studentId === 'string' && ObjectId.isValid(studentId)) {
-      query = { $or: [{ _id: new ObjectId(studentId) }, { _id: studentId }] };
-    }
-    const sDoc = await mongoDb.collection('students').findOne(query);
-    if (sDoc) {
-      resolvedStudentObjId = sDoc._id;
-      resolvedStudentSid = sDoc.sid;
-      resolvedStudentName = sDoc.name;
-    }
-  }
-
-  if (!resolvedStudentObjId && studentSid) {
-    const sDoc = await mongoDb.collection('students').findOne({
-      $or: [
-        { sid: resolvedStudentSid },
-        { sid: { $regex: new RegExp(`^${resolvedStudentSid}$`, 'i') } }
-      ]
-    });
-    if (sDoc) {
-      resolvedStudentObjId = sDoc._id;
-      resolvedStudentSid = sDoc.sid;
-      resolvedStudentName = sDoc.name;
-    }
-  }
-
-  if (!resolvedStudentObjId) {
-    resolvedStudentObjId = new ObjectId();
+  const sDoc: any = await (mongoDb.collection('students') as any).findOne({
+    $or: [
+      { sid: targetSid },
+      { sid: { $regex: new RegExp(`^${targetSid}$`, 'i') } },
+      { _id: targetSid }
+    ]
+  });
+  if (sDoc) {
+    resolvedStudentSid = sDoc.sid || targetSid;
+    resolvedStudentName = sDoc.name || 'Student';
   }
 
   let finalSubject = subject || '';
@@ -124,7 +108,8 @@ export async function createExam(data: Partial<Exam> & Record<string, any>): Pro
   const newExamDoc: any = {
     _id: examId,
     eid: examId,
-    studentId: resolvedStudentSid || String(studentId || ''),
+    sid: resolvedStudentSid,
+    studentId: resolvedStudentSid,
     studentSid: resolvedStudentSid,
     date: sanitizeDate(date),
     subject: finalSubject || 'Exam',
@@ -144,7 +129,8 @@ export async function createExam(data: Partial<Exam> & Record<string, any>): Pro
   return {
     _id: String(newExamDoc._id),
     eid: newExamDoc.eid,
-    studentId: newExamDoc.studentId,
+    sid: resolvedStudentSid,
+    studentId: resolvedStudentSid,
     studentSid: resolvedStudentSid,
     studentName: resolvedStudentName,
     date: newExamDoc.date instanceof Date ? newExamDoc.date.toISOString().split('T')[0] : String(newExamDoc.date),
