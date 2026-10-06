@@ -96,9 +96,6 @@ export default function AdminHeader() {
               <span className="text-[9px] bg-emerald-900/90 border border-emerald-500/50 text-emerald-300 font-extrabold px-1.5 py-0.2 rounded-md font-mono shadow-2xs">
                 Admin
               </span>
-              <span className="hidden md:inline-flex text-[9px] text-emerald-300/80 font-bold uppercase tracking-wider font-mono">
-                Command Matrix
-              </span>
             </div>
           </Link>
 

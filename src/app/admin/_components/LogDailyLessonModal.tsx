@@ -28,12 +28,12 @@ export default function LogDailyLessonModal({
   const [status, setStatus] = useState<'Present' | 'Absent'>('Present');
   const [subjectTopic, setSubjectTopic] = useState<string>('');
   
-  // Homework state & checkbox system
-  const [hwMarks, setHwMarks] = useState<string>('8.50');
+  // Homework state & checkbox system - start empty with example placeholder
+  const [hwMarks, setHwMarks] = useState<string>('');
   const [isHwNotGraded, setIsHwNotGraded] = useState<boolean>(false);
 
-  // Classwork state & checkbox system
-  const [cwMarks, setCwMarks] = useState<string>('9.00');
+  // Classwork state & checkbox system - start empty with example placeholder
+  const [cwMarks, setCwMarks] = useState<string>('');
   const [isCwNotGraded, setIsCwNotGraded] = useState<boolean>(false);
 
   // Remarks state
@@ -42,13 +42,10 @@ export default function LogDailyLessonModal({
   // Loading / Submit state
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Sync selected student when props change
+  // Sync selected student when props change (do not prefill subjectTopic as value, keep placeholder)
   useEffect(() => {
     if (student?.sid) {
       setSelectedSid(student.sid);
-      if (student.subject) {
-        setSubjectTopic(prev => prev || `${student.subject} – Topic Name`);
-      }
     } else if (students.length > 0 && !selectedSid) {
       setSelectedSid(students[0].sid);
     }
@@ -81,11 +78,11 @@ export default function LogDailyLessonModal({
 
       await onAddActivity(act);
       onClose();
-      // Reset form
+      // Reset form to empty with placeholders
       setSubjectTopic('');
       setComment('');
-      setHwMarks('8.50');
-      setCwMarks('9.00');
+      setHwMarks('');
+      setCwMarks('');
       setIsHwNotGraded(false);
       setIsCwNotGraded(false);
     } catch (err) {
@@ -96,8 +93,8 @@ export default function LogDailyLessonModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center p-2 sm:p-3 bg-slate-950/75 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150">
-      <div className="relative w-full max-w-[420px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-[0_0_40px_rgba(147,51,234,0.25)] overflow-hidden border border-purple-200 dark:border-purple-900/60 my-auto flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-[250] flex items-center justify-center p-2.5 sm:p-4 pt-16 sm:pt-20 pb-4 bg-slate-950/75 backdrop-blur-xs overflow-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden animate-in fade-in duration-150">
+      <div className="relative w-full max-w-[420px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-[0_0_40px_rgba(147,51,234,0.25)] overflow-hidden border border-purple-200 dark:border-purple-900/60 m-auto flex flex-col max-h-[calc(100vh-5.5rem)]">
         
         {/* Header Card matching visual design - compact padding */}
         <div className="bg-gradient-to-r from-slate-950 via-purple-950 to-indigo-950 text-white p-3 sm:p-3.5 border-b border-purple-800/40 relative shrink-0">
@@ -235,8 +232,8 @@ export default function LogDailyLessonModal({
               required={status === 'Present'}
               value={subjectTopic}
               onChange={(e) => setSubjectTopic(e.target.value)}
-              placeholder="e.g. Physics – Circular Motion & Gravitationa"
-              className="w-full bg-white dark:bg-slate-950 border border-purple-200/90 dark:border-slate-800 focus:border-purple-600 dark:focus:border-purple-400 focus:ring-1 focus:ring-purple-200 dark:focus:ring-purple-900 focus:outline-hidden rounded-xl px-3 py-1.5 text-xs text-purple-950 dark:text-purple-100 font-semibold placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-2xs transition-all"
+              placeholder={currentStudent?.subject ? `e.g. ${currentStudent.subject} – Topic Name` : "e.g. Physics, Chemistry, Math – Topic Name"}
+              className="w-full bg-white dark:bg-slate-950 border border-purple-200/90 dark:border-slate-800 focus:border-purple-600 dark:focus:border-purple-400 focus:ring-1 focus:ring-purple-200 dark:focus:ring-purple-900 focus:outline-hidden rounded-xl px-3 py-1.5 text-xs text-purple-950 dark:text-purple-100 font-semibold placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xs transition-all"
             />
           </div>
 
