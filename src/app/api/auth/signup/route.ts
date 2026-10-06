@@ -139,9 +139,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert new student document into students collection
-    const newStudentDoc = {
+    const newStudentDoc: any = {
       _id: `STU_${Date.now()}`,
-      sid: '', // SID is unassigned until approved by admin
       name: cleanName,
       email: cleanEmail,
       password: cleanPassword, // plaintext per current requirements

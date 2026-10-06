@@ -312,9 +312,29 @@ async function ensureNormalizedIndexes(db: Db) {
     const examsCol = db.collection('exams');
     const paymentsCol = db.collection('payments');
 
+    // Clean up empty string SIDs in students collection
+    try {
+      if (typeof studentsCol.updateMany === 'function') {
+        await studentsCol.updateMany({ sid: '' }, { $unset: { sid: '' } });
+      }
+    } catch {}
+
+    // Drop old sid_1 index if present
+    try {
+      if (typeof studentsCol.dropIndex === 'function') {
+        await studentsCol.dropIndex('sid_1').catch(() => null);
+      }
+    } catch {}
+
     await Promise.allSettled([
       adminsCol.createIndex({ email: 1 }, { unique: true }),
-      studentsCol.createIndex({ sid: 1 }, { unique: true, sparse: true }),
+      studentsCol.createIndex(
+        { sid: 1 },
+        {
+          unique: true,
+          partialFilterExpression: { sid: { $type: 'string', $gt: '' } },
+        }
+      ),
       studentsCol.createIndex({ email: 1 }, { unique: true, sparse: true }),
       activitiesCol.createIndex({ studentId: 1, date: -1 }),
       examsCol.createIndex({ studentId: 1, date: -1 }),
