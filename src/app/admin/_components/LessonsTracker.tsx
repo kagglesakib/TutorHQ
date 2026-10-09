@@ -17,6 +17,7 @@ import {
   LayoutGrid,
   LayoutList,
   Award,
+  GraduationCap,
   Sparkles,
   ArrowUpDown,
   ClipboardList,
@@ -51,6 +52,8 @@ export default function LessonsTracker({
 
   // Edit activity state
   const [editFormData, setEditFormData] = useState<Activity | null>(null);
+  const [editIsHwNotGraded, setEditIsHwNotGraded] = useState<boolean>(false);
+  const [editIsCwNotGraded, setEditIsCwNotGraded] = useState<boolean>(false);
 
   // Telemetry Calculations
   const totalLogs = activities.length;
@@ -108,13 +111,25 @@ export default function LessonsTracker({
   const handleStartEdit = (act: Activity) => {
     setEditingAid(act.aid);
     setEditFormData({ ...act });
+    setEditIsHwNotGraded(act.status === 'Absent' || act.hwMarks === undefined || act.hwMarks === null || isNaN(Number(act.hwMarks)));
+    setEditIsCwNotGraded(act.status === 'Absent' || act.cwMarks === undefined || act.cwMarks === null || isNaN(Number(act.cwMarks)));
   };
 
   const handleSaveEdit = () => {
     if (editFormData) {
-      onUpdateActivity(editFormData);
+      const isAbsent = editFormData.status === 'Absent';
+      const finalHw = (isAbsent || editIsHwNotGraded) ? undefined : (editFormData.hwMarks !== undefined && !isNaN(Number(editFormData.hwMarks)) ? Number(editFormData.hwMarks) : undefined);
+      const finalCw = (isAbsent || editIsCwNotGraded) ? undefined : (editFormData.cwMarks !== undefined && !isNaN(Number(editFormData.cwMarks)) ? Number(editFormData.cwMarks) : undefined);
+
+      onUpdateActivity({
+        ...editFormData,
+        hwMarks: finalHw,
+        cwMarks: finalCw,
+      });
       setEditingAid(null);
       setEditFormData(null);
+      setEditIsHwNotGraded(false);
+      setEditIsCwNotGraded(false);
     }
   };
 
@@ -436,7 +451,24 @@ export default function LessonsTracker({
                         </label>
                         <select
                           value={editFormData.status}
-                          onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                          onChange={(e) => {
+                            const newStatus = e.target.value as 'Present' | 'Absent';
+                            if (newStatus === 'Absent') {
+                              setEditFormData({
+                                ...editFormData,
+                                status: 'Absent',
+                                hwMarks: undefined,
+                                cwMarks: undefined,
+                              });
+                              setEditIsHwNotGraded(true);
+                              setEditIsCwNotGraded(true);
+                            } else {
+                              setEditFormData({
+                                ...editFormData,
+                                status: 'Present',
+                              });
+                            }
+                          }}
                           className={`w-full px-3 py-2 border rounded-xl text-xs font-bold transition-all ${
                             editFormData.status === 'Present'
                               ? 'bg-emerald-50/80 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-200 focus:ring-2 focus:ring-emerald-500/20'
@@ -462,48 +494,110 @@ export default function LessonsTracker({
                         />
                       </div>
 
-                      <div>
-                        <label className="text-[10.5px] font-black text-amber-900 dark:text-amber-300 uppercase tracking-wider block mb-1 flex items-center justify-between">
-                          <span>Homework Marks (HW)</span>
-                          <span className="text-[9px] font-mono text-amber-700 dark:text-amber-300 font-bold bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-1.5 py-0.2 rounded">
-                            Max: 10
-                          </span>
-                        </label>
-                        <input
-                          type="number"
-                          step="0.1"
-                          placeholder="e.g. 8.5"
-                          value={editFormData.hwMarks ?? ''}
-                          onChange={(e) =>
-                            setEditFormData({
-                              ...editFormData,
-                              hwMarks: e.target.value === '' ? undefined : Number(e.target.value),
-                            })
-                          }
-                          className="w-full px-3 py-2 bg-amber-50/50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 focus:bg-white dark:focus:bg-slate-900 focus:border-amber-600 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 rounded-xl text-xs font-mono font-bold text-amber-950 dark:text-amber-200 transition-all"
-                        />
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-1 flex-wrap">
+                          <label className="text-[10.5px] font-black text-amber-900 dark:text-amber-300 uppercase tracking-wider flex items-center gap-1">
+                            <Award className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                            <span>Homework Marks (HW)</span>
+                          </label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] font-mono text-amber-700 dark:text-amber-300 font-bold bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 px-1.5 py-0.2 rounded">
+                              Max: 10
+                            </span>
+                            <label className="bg-white/90 dark:bg-slate-900 border border-amber-300 dark:border-amber-800 hover:border-amber-400 rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[10px] font-bold text-amber-950 dark:text-amber-300 shadow-2xs cursor-pointer select-none transition-all">
+                              <input
+                                type="checkbox"
+                                checked={editIsHwNotGraded || editFormData.status === 'Absent'}
+                                disabled={editFormData.status === 'Absent'}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setEditIsHwNotGraded(checked);
+                                  if (checked) {
+                                    setEditFormData({ ...editFormData, hwMarks: undefined });
+                                  }
+                                }}
+                                className="w-3.5 h-3.5 rounded text-amber-600 focus:ring-amber-500 border-slate-300 dark:border-slate-700 cursor-pointer disabled:cursor-not-allowed"
+                              />
+                              <span>Not Graded</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {editFormData.status === 'Absent' || editIsHwNotGraded ? (
+                          <div className="w-full bg-amber-100/70 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 rounded-xl px-3 py-2 text-xs font-mono font-bold text-amber-800/80 dark:text-amber-300/80 italic shadow-2xs flex items-center justify-between select-none">
+                            <span>{editFormData.status === 'Absent' ? 'Absent — No Marks' : 'Not Graded for this session'}</span>
+                            <span className="text-[9px] bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200 px-1.5 py-0.2 rounded font-sans font-bold">Exempt</span>
+                          </div>
+                        ) : (
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max="10"
+                            placeholder="e.g. 8.5"
+                            value={editFormData.hwMarks ?? ''}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData,
+                                hwMarks: e.target.value === '' ? undefined : Number(e.target.value),
+                              })
+                            }
+                            className="w-full px-3 py-2 bg-amber-50/50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 focus:bg-white dark:focus:bg-slate-900 focus:border-amber-600 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 rounded-xl text-xs font-mono font-bold text-amber-950 dark:text-amber-200 transition-all"
+                          />
+                        )}
                       </div>
 
-                      <div>
-                        <label className="text-[10.5px] font-black text-sky-900 dark:text-sky-300 uppercase tracking-wider block mb-1 flex items-center justify-between">
-                          <span>Classwork Marks (CW)</span>
-                          <span className="text-[9px] font-mono text-sky-700 dark:text-sky-300 font-bold bg-sky-100 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-800 px-1.5 py-0.2 rounded">
-                            Max: 10
-                          </span>
-                        </label>
-                        <input
-                          type="number"
-                          step="0.1"
-                          placeholder="e.g. 9.0"
-                          value={editFormData.cwMarks ?? ''}
-                          onChange={(e) =>
-                            setEditFormData({
-                              ...editFormData,
-                              cwMarks: e.target.value === '' ? undefined : Number(e.target.value),
-                            })
-                          }
-                          className="w-full px-3 py-2 bg-sky-50/50 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-800 focus:bg-white dark:focus:bg-slate-900 focus:border-sky-600 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 rounded-xl text-xs font-mono font-bold text-sky-950 dark:text-sky-200 transition-all"
-                        />
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-1 flex-wrap">
+                          <label className="text-[10.5px] font-black text-sky-900 dark:text-sky-300 uppercase tracking-wider flex items-center gap-1">
+                            <GraduationCap className="w-3 h-3 text-sky-600 dark:text-sky-400" />
+                            <span>Classwork Marks (CW)</span>
+                          </label>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] font-mono text-sky-700 dark:text-sky-300 font-bold bg-sky-100 dark:bg-sky-950/80 border border-sky-300 dark:border-sky-800 px-1.5 py-0.2 rounded">
+                              Max: 10
+                            </span>
+                            <label className="bg-white/90 dark:bg-slate-900 border border-sky-300 dark:border-sky-800 hover:border-sky-400 rounded-md px-1.5 py-0.5 flex items-center gap-1 text-[10px] font-bold text-sky-950 dark:text-sky-300 shadow-2xs cursor-pointer select-none transition-all">
+                              <input
+                                type="checkbox"
+                                checked={editIsCwNotGraded || editFormData.status === 'Absent'}
+                                disabled={editFormData.status === 'Absent'}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setEditIsCwNotGraded(checked);
+                                  if (checked) {
+                                    setEditFormData({ ...editFormData, cwMarks: undefined });
+                                  }
+                                }}
+                                className="w-3.5 h-3.5 rounded text-sky-600 focus:ring-sky-500 border-slate-300 dark:border-slate-700 cursor-pointer disabled:cursor-not-allowed"
+                              />
+                              <span>Not Graded</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {editFormData.status === 'Absent' || editIsCwNotGraded ? (
+                          <div className="w-full bg-sky-100/70 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-900/60 rounded-xl px-3 py-2 text-xs font-mono font-bold text-sky-800/80 dark:text-sky-300/80 italic shadow-2xs flex items-center justify-between select-none">
+                            <span>{editFormData.status === 'Absent' ? 'Absent — No Marks' : 'Not Graded for this session'}</span>
+                            <span className="text-[9px] bg-sky-200 dark:bg-sky-900 text-sky-900 dark:text-sky-200 px-1.5 py-0.2 rounded font-sans font-bold">Exempt</span>
+                          </div>
+                        ) : (
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max="10"
+                            placeholder="e.g. 9.0"
+                            value={editFormData.cwMarks ?? ''}
+                            onChange={(e) =>
+                              setEditFormData({
+                                ...editFormData,
+                                cwMarks: e.target.value === '' ? undefined : Number(e.target.value),
+                              })
+                            }
+                            className="w-full px-3 py-2 bg-sky-50/50 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-800 focus:bg-white dark:focus:bg-slate-900 focus:border-sky-600 dark:focus:border-sky-400 focus:ring-2 focus:ring-sky-500/20 rounded-xl text-xs font-mono font-bold text-sky-950 dark:text-sky-200 transition-all"
+                          />
+                        )}
                       </div>
 
                       <div className="sm:col-span-2">

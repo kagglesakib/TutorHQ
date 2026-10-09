@@ -23,6 +23,9 @@ import {
   X,
   LayoutGrid,
   LayoutList,
+  BookOpen,
+  MessageSquare,
+  GraduationCap,
 } from 'lucide-react';
 import { formatEid, generateExamId } from '@/utils/id';
 import { formatDateWithDay } from '@/utils/dateFormat';
@@ -948,156 +951,247 @@ export default function GlobalExamList({
         </div>
       )}
 
-      {/* 5. Quick Add Exam Modal (styled in the same purple-indigo-teal aesthetic) */}
+      {/* 5. Quick Add Exam Modal (colorful, compact, offset down from top navbar) */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-slate-900/60 dark:bg-black/70 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-indigo-300 dark:border-indigo-700 shadow-2xl w-full max-w-lg overflow-hidden animate-scaleIn">
-            <div className="p-3.5 sm:p-4 bg-gradient-to-r from-purple-700 via-indigo-700 to-indigo-800 text-white flex items-center justify-between border-b border-purple-400/30">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-white/20 rounded-lg">
-                  <ClipboardList className="w-4 h-4 text-white" />
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-2.5 sm:p-4 pt-14 sm:pt-16 pb-4 bg-slate-950/75 backdrop-blur-xs overflow-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden animate-in fade-in duration-150">
+          <div className="relative w-full max-w-[420px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl dark:shadow-[0_0_40px_rgba(147,51,234,0.25)] overflow-hidden border border-purple-200 dark:border-purple-900/60 m-auto flex flex-col max-h-[calc(100vh-5rem)]">
+            {/* Header Card matching visual design - compact padding */}
+            <div className="bg-gradient-to-r from-slate-950 via-purple-950 to-indigo-950 text-white p-3 sm:p-3.5 border-b border-purple-800/40 relative shrink-0">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-1.5 bg-indigo-900/80 border border-purple-500/40 text-amber-400 rounded-xl shadow-xs dark:shadow-[0_0_12px_rgba(168,85,247,0.4)] shrink-0 flex items-center justify-center">
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div className="min-w-0 space-y-0">
+                    <h3 className="font-display font-black text-white text-xs sm:text-sm tracking-tight leading-tight">
+                      Record Examination Evaluation
+                    </h3>
+                    <p className="text-[10px] text-purple-200/90 font-medium truncate">
+                      Log test score, attendance status &amp; student marks
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-black tracking-tight">Record Examination Evaluation</h3>
-                  <p className="text-[10px] text-purple-200">Log test score, attendance status, and student marks</p>
-                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="p-1.5 bg-purple-900/50 hover:bg-purple-800/80 text-purple-200 hover:text-white rounded-lg border border-purple-700/50 transition-all cursor-pointer shrink-0 active:scale-95"
+                  aria-label="Close modal"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsAddModalOpen(false)}
-                className="p-1 hover:bg-white/20 text-white/80 hover:text-white rounded-lg transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
 
-            <form onSubmit={handleAddSubmit} className="p-4 sm:p-5 space-y-3.5">
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Student *</label>
+            {/* Scrollable Form Body - Tight & Compact */}
+            <form onSubmit={handleAddSubmit} className="p-2.5 sm:p-3 space-y-2 overflow-y-auto flex-1 text-xs">
+              
+              {/* Exam Date Row */}
+              <div className="flex items-center justify-between gap-2 px-0.5">
+                <div className="flex items-center gap-1 text-[10.5px] font-mono font-black text-slate-700 dark:text-slate-300">
+                  <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>EXAM DATE:</span>
+                </div>
+                <input
+                  type="date"
+                  required
+                  value={newExamData.date}
+                  onChange={(e) => setNewExamData({ ...newExamData, date: e.target.value })}
+                  className="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg text-[11px] font-mono font-black text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 shadow-2xs"
+                />
+              </div>
+
+              {/* Student Selector Card - Colorful Indigo/Purple */}
+              <div className="bg-indigo-50/80 dark:bg-indigo-950/30 border-2 border-indigo-200/90 dark:border-indigo-900/60 rounded-xl p-2.5 space-y-1 shadow-2xs">
+                <label className="text-[10px] font-mono font-black tracking-wider text-indigo-950 dark:text-indigo-300 uppercase flex items-center gap-1">
+                  <User className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400 shrink-0" />
+                  <span>STUDENT PROFILE</span>
+                </label>
                 <select
                   required
                   value={newExamData.studentSid}
                   onChange={(e) => setNewExamData({ ...newExamData, studentSid: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                  className="w-full bg-white dark:bg-slate-950 border border-indigo-200/90 dark:border-slate-800 focus:border-indigo-600 dark:focus:border-indigo-400 focus:ring-1 focus:ring-indigo-200 dark:focus:ring-indigo-900 focus:outline-hidden rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 shadow-2xs transition-all"
                 >
                   {activeStudents.map((s) => (
-                    <option key={s.sid} value={s.sid} className="dark:bg-slate-800">
-                      {s.name} ({s.sid})
+                    <option key={s.sid} value={s.sid} className="dark:bg-slate-900">
+                      {s.name} (SID: {s.sid})
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Exam Date *</label>
-                  <input
-                    type="date"
-                    required
-                    value={newExamData.date}
-                    onChange={(e) => setNewExamData({ ...newExamData, date: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Attendance Status</label>
-                  <select
-                    value={newExamData.status}
-                    onChange={(e) =>
-                      setNewExamData({
-                        ...newExamData,
-                        status: e.target.value as 'Present' | 'Absent',
-                      })
-                    }
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+              {/* Attendance Status - Colorful 2-Button Toggle */}
+              <div className={`border-2 rounded-xl p-2 space-y-1 shadow-2xs transition-colors ${
+                newExamData.status === 'Present'
+                  ? 'bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-200/90 dark:border-emerald-800/60'
+                  : 'bg-rose-50/80 dark:bg-rose-950/40 border-rose-200/90 dark:border-rose-800/60'
+              }`}>
+                <label className={`block text-[10px] font-mono font-black tracking-wider uppercase ${
+                  newExamData.status === 'Present' ? 'text-emerald-950 dark:text-emerald-300' : 'text-rose-950 dark:text-rose-300'
+                }`}>
+                  ATTENDANCE STATUS
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewExamData({ ...newExamData, status: 'Present' })}
+                    className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      newExamData.status === 'Present'
+                        ? 'bg-emerald-600 text-white shadow-xs dark:shadow-[0_0_12px_rgba(16,185,129,0.4)] border border-emerald-500 active:scale-98'
+                        : 'bg-white dark:bg-slate-950 text-emerald-900 dark:text-emerald-300 border border-emerald-200/90 dark:border-slate-800 hover:bg-emerald-100/60 dark:hover:bg-slate-800'
+                    }`}
                   >
-                    <option value="Present" className="dark:bg-slate-800">Present</option>
-                    <option value="Absent" className="dark:bg-slate-800">Absent</option>
-                  </select>
+                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                    <span>Present</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewExamData({ ...newExamData, status: 'Absent', obtainedMarks: '' })}
+                    className={`py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      newExamData.status === 'Absent'
+                        ? 'bg-rose-600 text-white shadow-xs dark:shadow-[0_0_12px_rgba(244,63,94,0.4)] border border-rose-500 active:scale-98'
+                        : 'bg-white dark:bg-slate-950 text-rose-800 dark:text-rose-300 border border-rose-200/90 dark:border-slate-800 hover:bg-rose-100/60 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <XCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>Absent</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Subject & Topic / Syllabus *</label>
+              {/* Subject & Topic / Syllabus Card - Colorful Purple */}
+              <div className="bg-purple-50/80 dark:bg-purple-950/30 border-2 border-purple-200/90 dark:border-purple-900/60 rounded-xl p-2.5 space-y-1 shadow-2xs">
+                <label className="text-[10px] font-mono font-black tracking-wider text-purple-950 dark:text-purple-300 uppercase flex items-center gap-1">
+                  <BookOpen className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400 shrink-0" />
+                  <span>SUBJECT &amp; TOPIC / SYLLABUS</span>
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Physics - Dynamics & Momentum Test"
+                  placeholder="e.g. Physics – Dynamics &amp; Momentum Test"
                   value={newExamData.subjectAndTopic}
                   onChange={(e) => setNewExamData({ ...newExamData, subjectAndTopic: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                  className="w-full bg-white dark:bg-slate-950 border border-purple-200/90 dark:border-slate-800 focus:border-purple-600 dark:focus:border-purple-400 focus:ring-1 focus:ring-purple-200 dark:focus:ring-purple-900 focus:outline-hidden rounded-xl px-2.5 py-1.5 text-xs text-purple-950 dark:text-purple-100 font-semibold placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xs transition-all"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Total Marks *</label>
+              {/* Marks Row: Total Marks (Amber) & Obtained Marks (Sky with Live Score Badge) */}
+              <div className="grid grid-cols-2 gap-2">
+                {/* Total Marks */}
+                <div className="bg-amber-50/80 dark:bg-amber-950/30 border-2 border-amber-200/90 dark:border-amber-900/60 rounded-xl p-2.5 space-y-1 shadow-2xs">
+                  <label className="text-[10px] font-mono font-black tracking-wider text-amber-950 dark:text-amber-300 uppercase flex items-center gap-1">
+                    <Award className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
+                    <span>TOTAL MARKS</span>
+                  </label>
                   <input
                     type="number"
                     required
                     min={1}
                     value={newExamData.totalMarks}
                     onChange={(e) => setNewExamData({ ...newExamData, totalMarks: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
+                    placeholder="e.g. 50"
+                    className="w-full bg-white dark:bg-slate-950 border border-amber-200/90 dark:border-slate-800 focus:border-amber-600 dark:focus:border-amber-400 focus:ring-1 focus:ring-amber-200 dark:focus:ring-amber-900 focus:outline-hidden rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-slate-900 dark:text-slate-100 shadow-2xs transition-all"
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Obtained Marks</label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={newExamData.obtainedMarks}
-                    onChange={(e) =>
-                      setNewExamData({
-                        ...newExamData,
-                        obtainedMarks: e.target.value !== '' ? Number(e.target.value) : '',
-                      })
-                    }
-                    disabled={newExamData.status === 'Absent'}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-slate-100 disabled:bg-slate-100 dark:disabled:bg-slate-900 disabled:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
-                  />
+
+                {/* Obtained Marks */}
+                <div className="bg-sky-50/80 dark:bg-sky-950/30 border-2 border-sky-200/90 dark:border-sky-900/60 rounded-xl p-2.5 space-y-1 shadow-2xs">
+                  <div className="flex items-center justify-between gap-1">
+                    <label className="text-[10px] font-mono font-black tracking-wider text-sky-950 dark:text-sky-300 uppercase flex items-center gap-1">
+                      <GraduationCap className="w-3.5 h-3.5 text-sky-700 dark:text-sky-400 shrink-0" />
+                      <span>OBTAINED</span>
+                    </label>
+                    {newExamData.status === 'Present' && typeof newExamData.obtainedMarks === 'number' && newExamData.totalMarks > 0 && (
+                      <span className="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-sky-200/90 dark:bg-sky-900 text-sky-900 dark:text-sky-200">
+                        {Math.round((newExamData.obtainedMarks / newExamData.totalMarks) * 100)}%
+                      </span>
+                    )}
+                  </div>
+                  {newExamData.status === 'Absent' ? (
+                    <div className="w-full bg-rose-100/70 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-rose-800 dark:text-rose-300 italic shadow-2xs text-center select-none">
+                      Absent — Exempt
+                    </div>
+                  ) : (
+                    <input
+                      type="number"
+                      min={0}
+                      max={newExamData.totalMarks}
+                      step="0.1"
+                      placeholder="e.g. 40"
+                      value={newExamData.obtainedMarks}
+                      onChange={(e) =>
+                        setNewExamData({
+                          ...newExamData,
+                          obtainedMarks: e.target.value !== '' ? Number(e.target.value) : '',
+                        })
+                      }
+                      className="w-full bg-white dark:bg-slate-950 border border-sky-200/90 dark:border-slate-800 focus:border-sky-600 dark:focus:border-sky-400 focus:ring-1 focus:ring-sky-200 dark:focus:ring-sky-900 focus:outline-hidden rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xs transition-all"
+                    />
+                  )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Remarks Tag</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Excellent / Good / Needs Focus"
-                    value={newExamData.remarks}
-                    onChange={(e) => setNewExamData({ ...newExamData, remarks: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
-                  />
+              {/* Remarks Tag & Quick Chips - Colorful Teal */}
+              <div className="bg-teal-50/80 dark:bg-teal-950/30 border-2 border-teal-200/90 dark:border-teal-900/60 rounded-xl p-2.5 space-y-1 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-mono font-black tracking-wider text-teal-950 dark:text-teal-300 uppercase flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-teal-700 dark:text-teal-400 shrink-0" />
+                    <span>REMARKS TAG</span>
+                  </label>
+                  <div className="flex items-center gap-1">
+                    {['Excellent', 'Good', 'Needs Focus'].map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => setNewExamData({ ...newExamData, remarks: tag })}
+                        className={`text-[9px] px-1.5 py-0.2 rounded font-mono font-bold cursor-pointer transition-all ${
+                          newExamData.remarks === tag
+                            ? 'bg-teal-600 text-white'
+                            : 'bg-white dark:bg-slate-900 text-teal-900 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">Feedback Comment</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Strong conceptual grasp"
-                    value={newExamData.comment}
-                    onChange={(e) => setNewExamData({ ...newExamData, comment: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30"
-                  />
-                </div>
+                <input
+                  type="text"
+                  placeholder="e.g. Excellent / Good / Needs Focus"
+                  value={newExamData.remarks}
+                  onChange={(e) => setNewExamData({ ...newExamData, remarks: e.target.value })}
+                  className="w-full bg-white dark:bg-slate-950 border border-teal-200/90 dark:border-slate-800 focus:border-teal-600 dark:focus:border-teal-400 focus:ring-1 focus:ring-teal-200 dark:focus:ring-teal-900 focus:outline-hidden rounded-xl px-2.5 py-1.5 text-xs text-teal-950 dark:text-teal-100 font-semibold placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xs transition-all"
+                />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
+              {/* Feedback Comment - Colorful Fuchsia/Pink */}
+              <div className="bg-fuchsia-50/80 dark:bg-fuchsia-950/30 border-2 border-fuchsia-200/90 dark:border-fuchsia-900/60 rounded-xl p-2.5 space-y-1 shadow-2xs">
+                <label className="text-[10px] font-mono font-black tracking-wider text-fuchsia-950 dark:text-fuchsia-300 uppercase flex items-center gap-1">
+                  <MessageSquare className="w-3.5 h-3.5 text-fuchsia-700 dark:text-fuchsia-400 shrink-0" />
+                  <span>FEEDBACK / OBSERVATION COMMENT</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Strong conceptual grasp, finished early"
+                  value={newExamData.comment}
+                  onChange={(e) => setNewExamData({ ...newExamData, comment: e.target.value })}
+                  className="w-full bg-white dark:bg-slate-950 border border-fuchsia-200/90 dark:border-slate-800 focus:border-fuchsia-600 dark:focus:border-fuchsia-400 focus:ring-1 focus:ring-fuchsia-200 dark:focus:ring-fuchsia-900 focus:outline-hidden rounded-xl px-2.5 py-1.5 text-xs text-fuchsia-950 dark:text-fuchsia-100 font-semibold placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-2xs transition-all"
+                />
+              </div>
+
+              {/* Glowing Gradient Submit Button */}
+              <div className="pt-1">
                 <button
                   type="submit"
                   disabled={isSubmittingAdd}
-                  className="px-4 py-2 bg-gradient-to-r from-purple-700 via-indigo-600 to-teal-600 hover:from-purple-800 hover:to-teal-700 text-white rounded-xl text-xs font-black shadow-md transition-all cursor-pointer disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-purple-700 via-indigo-600 to-amber-500 hover:from-purple-800 hover:to-amber-600 text-white font-black text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-md dark:shadow-[0_0_20px_rgba(99,102,241,0.4)] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98 border border-white/20 disabled:opacity-60"
                 >
-                  {isSubmittingAdd ? 'Saving...' : 'Save Exam Scorecard'}
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse shrink-0" />
+                  <span>{isSubmittingAdd ? 'Saving Scorecard...' : 'Save Exam Scorecard'}</span>
                 </button>
               </div>
+
             </form>
           </div>
         </div>
