@@ -20,9 +20,14 @@ import {
   XCircle,
   LayoutGrid,
   LayoutList,
+  User,
+  BookOpen,
+  GraduationCap,
+  MessageSquare,
 } from 'lucide-react';
 import { generateExamId, formatEid } from '@/utils/id';
 import { formatDateWithDay } from '@/utils/dateFormat';
+import RecordExamModal from './RecordExamModal';
 
 interface ExamsLedgerProps {
   student: Student;
@@ -30,6 +35,7 @@ interface ExamsLedgerProps {
   onAddExam: (exam: Exam) => void;
   onDeleteExam: (eid: string) => void;
   onUpdateExam: (exam: Exam) => void;
+  onOpenAddExam?: () => void;
 }
 
 export default function ExamsLedger({
@@ -38,6 +44,7 @@ export default function ExamsLedger({
   onAddExam,
   onDeleteExam,
   onUpdateExam,
+  onOpenAddExam,
 }: ExamsLedgerProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [editingEid, setEditingEid] = useState<string | null>(null);
@@ -218,11 +225,11 @@ export default function ExamsLedger({
             {/* Log Exam button */}
             <button
               type="button"
-              onClick={() => setIsAdding(!isAdding)}
+              onClick={() => (onOpenAddExam ? onOpenAddExam() : setIsAdding(true))}
               className="px-3 py-1.5 bg-gradient-to-r from-purple-700 via-indigo-600 to-teal-600 hover:from-purple-800 hover:to-teal-700 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-md shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer border border-white/40 shrink-0"
             >
-              {isAdding ? <X className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-              <span>{isAdding ? 'Cancel' : 'Log Exam'}</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>Log Exam</span>
             </button>
           </div>
         </div>
@@ -267,121 +274,13 @@ export default function ExamsLedger({
         </div>
       </div>
 
-      {/* Add Exam Form */}
-      {isAdding && (
-        <form
-          onSubmit={handleCreateExam}
-          className="p-3.5 bg-gradient-to-r from-purple-100/90 via-indigo-100/90 to-teal-100/90 dark:from-slate-900 dark:via-purple-950/40 dark:to-slate-900 border border-purple-300/90 dark:border-slate-800 rounded-xl space-y-3 shadow-2xs dark:shadow-[0_0_25px_rgba(168,85,247,0.2)] animate-fadeIn"
-        >
-          <div className="flex items-center gap-2 border-b border-purple-200/80 dark:border-slate-800 pb-1.5">
-            <ClipboardList className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
-            <h4 className="text-xs font-black text-purple-950 dark:text-purple-200">Record New Exam Result</h4>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-            <div>
-              <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Exam Date *</label>
-              <input
-                type="date"
-                required
-                value={newExam.date}
-                onChange={(e) => setNewExam({ ...newExam, date: e.target.value })}
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-purple-300 dark:border-slate-800 rounded-lg text-xs font-semibold text-slate-900 dark:text-slate-100"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Subject & Topic *</label>
-              <input
-                type="text"
-                required
-                value={newExam.subjectAndTopic}
-                onChange={(e) => setNewExam({ ...newExam, subjectAndTopic: e.target.value })}
-                placeholder="e.g. Physics - Dynamics Model Test"
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-purple-300 dark:border-slate-800 rounded-lg text-xs font-semibold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Attendance Status</label>
-              <select
-                value={newExam.status}
-                onChange={(e) =>
-                  setNewExam({
-                    ...newExam,
-                    status: e.target.value as 'Present' | 'Absent',
-                  })
-                }
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-purple-300 dark:border-slate-800 rounded-lg text-xs font-bold text-slate-900 dark:text-slate-100"
-              >
-                <option value="Present" className="dark:bg-slate-900">Present</option>
-                <option value="Absent" className="dark:bg-slate-900">Absent</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Total Marks *</label>
-              <input
-                type="number"
-                required
-                min={1}
-                value={newExam.totalMarks ?? 50}
-                onChange={(e) => setNewExam({ ...newExam, totalMarks: Number(e.target.value) })}
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-purple-300 dark:border-slate-800 rounded-lg text-xs font-mono font-bold text-slate-900 dark:text-slate-100"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Obtained Marks</label>
-              <input
-                type="number"
-                min={0}
-                value={newExam.obtainedMarks ?? ''}
-                onChange={(e) =>
-                  setNewExam({
-                    ...newExam,
-                    obtainedMarks: e.target.value ? Number(e.target.value) : undefined,
-                  })
-                }
-                disabled={newExam.status === 'Absent'}
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-purple-300 dark:border-slate-800 rounded-lg text-xs font-mono font-bold text-slate-900 dark:text-slate-100 disabled:bg-slate-100 dark:disabled:bg-slate-900"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Remarks Tag</label>
-              <input
-                type="text"
-                value={newExam.remarks || ''}
-                onChange={(e) => setNewExam({ ...newExam, remarks: e.target.value })}
-                placeholder="e.g. Excellent / Good / Needs Focus"
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-purple-300 dark:border-slate-800 rounded-lg text-xs font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600"
-              />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Feedback Comment</label>
-              <input
-                type="text"
-                value={newExam.comment || ''}
-                onChange={(e) => setNewExam({ ...newExam, comment: e.target.value })}
-                placeholder="e.g. Needs revision on Chapter 4"
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-purple-300 dark:border-slate-800 rounded-lg text-xs font-medium text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => setIsAdding(false)}
-              className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-purple-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-1.5 bg-gradient-to-r from-purple-700 via-indigo-600 to-teal-600 hover:from-purple-800 text-white rounded-lg text-xs font-black shadow-md dark:shadow-[0_0_15px_rgba(168,85,247,0.4)] cursor-pointer active:scale-95 transition-all"
-            >
-              Save Exam Result
-            </button>
-          </div>
-        </form>
-      )}
+      {/* Quick Add Exam Modal (colorful, compact, offset down from top navbar) */}
+      <RecordExamModal
+        isOpen={isAdding}
+        onClose={() => setIsAdding(false)}
+        student={student}
+        onAddExam={onAddExam}
+      />
 
       {/* 2. Filter & Search Toolbar (Exact Student Portal Match) */}
       <div className="bg-gradient-to-r from-purple-100/90 via-indigo-100/90 to-teal-100/90 dark:from-slate-900 dark:via-purple-950/40 dark:to-slate-900 border-2 border-purple-300/90 dark:border-purple-900/60 rounded-xl p-2.5 sm:p-3 shadow-2xs dark:shadow-[0_0_25px_-5px_rgba(168,85,247,0.15)] space-y-2.5 transition-all">
@@ -563,9 +462,14 @@ export default function ExamsLedger({
                                 <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 block">Status</label>
                                 <select
                                   value={editFormData.status}
-                                  onChange={(e) =>
-                                    setEditFormData({ ...editFormData, status: e.target.value as 'Present' | 'Absent' })
-                                  }
+                                  onChange={(e) => {
+                                    const newStatus = e.target.value as 'Present' | 'Absent';
+                                    setEditFormData({
+                                      ...editFormData,
+                                      status: newStatus,
+                                      obtainedMarks: newStatus === 'Absent' ? undefined : editFormData.obtainedMarks,
+                                    });
+                                  }}
                                   className="w-full px-2 py-1 bg-white dark:bg-slate-800 border border-purple-300 dark:border-slate-700 rounded text-xs text-slate-900 dark:text-slate-100"
                                 >
                                   <option value="Present" className="dark:bg-slate-800">Present</option>
@@ -762,12 +666,14 @@ export default function ExamsLedger({
                       <label className="text-[10px] font-bold text-purple-950 dark:text-purple-300 font-mono">Status</label>
                       <select
                         value={editFormData.status}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const newStatus = e.target.value as 'Present' | 'Absent';
                           setEditFormData({
                             ...editFormData,
-                            status: e.target.value as 'Present' | 'Absent',
-                          })
-                        }
+                            status: newStatus,
+                            obtainedMarks: newStatus === 'Absent' ? undefined : editFormData.obtainedMarks,
+                          });
+                        }}
                         className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-800 border border-purple-300 dark:border-slate-700 rounded-lg text-xs font-medium text-slate-900 dark:text-slate-100"
                       >
                         <option value="Present" className="dark:bg-slate-800">Present</option>
@@ -1019,6 +925,14 @@ export default function ExamsLedger({
               <p className="text-xs font-extrabold text-slate-900 dark:text-white">No Exam Logs Found</p>
               <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">No evaluation entries match your filter.</p>
             </div>
+            <button
+              type="button"
+              onClick={() => (onOpenAddExam ? onOpenAddExam() : setIsAdding(true))}
+              className="mt-2 px-3.5 py-1.5 bg-gradient-to-r from-purple-700 via-indigo-600 to-teal-600 hover:from-purple-800 hover:to-teal-700 text-white rounded-xl text-xs font-black inline-flex items-center gap-1 shadow-md shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer border border-white/40"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Record First Exam</span>
+            </button>
           </div>
         )}
       </div>

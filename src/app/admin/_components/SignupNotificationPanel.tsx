@@ -191,7 +191,7 @@ export default function SignupNotificationPanel() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-1.5 text-emerald-200 hover:text-white bg-emerald-900/80 hover:bg-emerald-800/90 rounded-xl border border-emerald-700/80 transition-all cursor-pointer relative shadow-2xs"
+        className="p-1.5 text-emerald-900 dark:text-emerald-100 hover:text-emerald-950 dark:hover:text-white bg-emerald-100/90 hover:bg-emerald-200 dark:bg-emerald-900/70 dark:hover:bg-emerald-800/80 rounded-xl border border-emerald-300/80 dark:border-emerald-700/70 hover:border-emerald-400 dark:hover:border-emerald-500/70 transition-all cursor-pointer relative shadow-2xs"
         title={`Pending Registrations (${count})`}
       >
         <Bell className="w-3.5 h-3.5" />

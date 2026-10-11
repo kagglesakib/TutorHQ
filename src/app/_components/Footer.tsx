@@ -27,15 +27,10 @@ export default function Footer() {
       id="app-footer" 
       className={`w-full text-[11px] font-sans relative z-10 overflow-hidden transition-colors duration-200 ${
         isAdmin
-          ? 'bg-gradient-to-r from-[#021024] via-[#061d3b] to-[#020d1c] text-blue-100 border-t border-blue-900/80 mt-auto py-2.5 sm:py-3 shadow-[0_-4px_30px_rgba(2,16,36,0.6)] backdrop-blur-2xl'
+          ? 'bg-gradient-to-r from-blue-100/95 via-sky-50/90 to-blue-100/90 dark:from-[#021024] dark:via-[#061d3b] dark:to-[#020d1c] text-blue-950 dark:text-blue-100 border-t border-blue-200/90 dark:border-blue-900/80 mt-auto py-2.5 sm:py-3 shadow-xs dark:shadow-[0_-4px_30px_rgba(2,16,36,0.6)] backdrop-blur-2xl'
           : 'bg-sky-100/95 dark:bg-slate-950 text-sky-950 dark:text-sky-200 border-t border-sky-300/80 dark:border-blue-900/70 mt-auto py-2.5 sm:py-3 pb-16 sm:pb-3 shadow-sm dark:shadow-[0_-4px_25px_rgba(30,58,138,0.25)]'
       }`}
     >
-      {/* Top Luminous Neon Blue Accent Line for Admin */}
-      {isAdmin && (
-        <div className="h-[2px] w-full bg-gradient-to-r from-blue-500 via-indigo-400 to-cyan-400 shadow-[0_0_12px_rgba(59,130,246,0.7)]" />
-      )}
-
       <div className="max-w-7xl mx-auto px-3 sm:px-5 space-y-2 relative z-10">
         
         {/* Main Compact Row */}
@@ -44,34 +39,34 @@ export default function Footer() {
           {/* Brand & Purpose Box (Columns 1-5) */}
           <div className={`md:col-span-5 flex flex-col sm:flex-row sm:items-center gap-2 p-2 sm:p-2.5 rounded-xl border shadow-2xs ${
             isAdmin
-              ? 'bg-[#051933]/90 border-blue-800/80 text-white shadow-[inset_0_1px_3px_rgba(255,255,255,0.05)]'
+              ? 'bg-white/90 dark:bg-[#051933]/90 border-blue-200/90 dark:border-blue-800/80 text-blue-950 dark:text-white shadow-2xs dark:shadow-[inset_0_1px_3px_rgba(255,255,255,0.05)]'
               : 'bg-sky-50/90 dark:bg-blue-950/70 border-sky-300/80 dark:border-blue-800/80'
           }`}>
             <div className="min-w-0 space-y-0.5">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className={`text-xs font-black font-display tracking-tight ${
-                  isAdmin ? 'text-white' : 'text-sky-950 dark:text-white'
+                  isAdmin ? 'text-blue-950 dark:text-white' : 'text-sky-950 dark:text-white'
                 }`}>
                   Academic Portal
                 </span>
                 <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold uppercase tracking-wider ${
                   isAdmin 
-                    ? 'bg-blue-900/90 text-blue-200 border border-blue-600/70' 
+                    ? 'bg-blue-200/90 dark:bg-blue-900/90 text-blue-950 dark:text-blue-200 border border-blue-300/80 dark:border-blue-600/70' 
                     : 'bg-sky-200/90 dark:bg-blue-900/60 text-sky-950 dark:text-sky-300 border border-sky-400/80 dark:border-blue-700/60'
                 }`}>
                   Official Ledger
                 </span>
                 <span className={`inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.2 rounded ${
                   isAdmin
-                    ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/70'
+                    ? 'bg-emerald-100/90 dark:bg-emerald-950/80 text-emerald-950 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-700/70'
                     : 'bg-emerald-200/80 dark:bg-emerald-950/60 text-emerald-950 dark:text-emerald-300 border border-emerald-400/70 dark:border-emerald-800/60'
                 }`}>
-                  <ShieldCheck className={`w-2.5 h-2.5 shrink-0 ${isAdmin ? 'text-emerald-400' : 'text-emerald-700 dark:text-emerald-400'}`} />
+                  <ShieldCheck className={`w-2.5 h-2.5 shrink-0 ${isAdmin ? 'text-emerald-700 dark:text-emerald-400' : 'text-emerald-700 dark:text-emerald-400'}`} />
                   <span>Verified</span>
                 </span>
               </div>
               <p className={`text-[10px] leading-tight truncate sm:whitespace-normal ${
-                isAdmin ? 'text-blue-300/90' : 'text-sky-800/90 dark:text-blue-300/90'
+                isAdmin ? 'text-blue-800/90 dark:text-blue-300/90' : 'text-sky-800/90 dark:text-blue-300/90'
               }`}>
                 Academic tracking, daily study logs, exam results &amp; payments.
               </p>
@@ -87,7 +82,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg border transition-all text-[10px] group shadow-2xs truncate ${
                 isAdmin
-                  ? 'bg-[#051c38]/90 hover:bg-[#0a2e5c] border-blue-800/70 hover:border-blue-500/70 text-white hover:shadow-[0_0_12px_rgba(59,130,246,0.3)]'
+                  ? 'bg-white/90 dark:bg-[#051c38]/90 hover:bg-blue-100/70 dark:hover:bg-[#0a2e5c] border-blue-200/90 dark:border-blue-800/70 hover:border-blue-400 dark:hover:border-blue-500/70 text-blue-950 dark:text-white shadow-2xs dark:hover:shadow-[0_0_12px_rgba(59,130,246,0.3)]'
                   : 'bg-white/90 dark:bg-blue-950/60 border-sky-300/80 dark:border-blue-800/70 hover:border-sky-400 hover:bg-sky-50 dark:hover:bg-blue-900/60 text-sky-950 dark:text-sky-200'
               }`}
               title="WhatsApp: 01516518418"
@@ -96,8 +91,8 @@ export default function Footer() {
                 <MessageSquare className="w-3 h-3" />
               </div>
               <div className="flex flex-col min-w-0 leading-tight">
-                <span className={`text-[8px] font-bold uppercase ${isAdmin ? 'text-blue-400' : 'text-sky-700 dark:text-blue-400'}`}>WhatsApp</span>
-                <span className={`font-bold text-[10px] truncate ${isAdmin ? 'text-white' : 'text-sky-950 dark:text-white'}`}>01516518418</span>
+                <span className={`text-[8px] font-bold uppercase ${isAdmin ? 'text-blue-700 dark:text-blue-400' : 'text-sky-700 dark:text-blue-400'}`}>WhatsApp</span>
+                <span className={`font-bold text-[10px] truncate ${isAdmin ? 'text-blue-950 dark:text-white' : 'text-sky-950 dark:text-white'}`}>01516518418</span>
               </div>
             </a>
 
@@ -106,7 +101,7 @@ export default function Footer() {
               href="mailto:sakibhasan.office@gmail.com"
               className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg border transition-all text-[10px] group shadow-2xs truncate ${
                 isAdmin
-                  ? 'bg-[#051c38]/90 hover:bg-[#0a2e5c] border-blue-800/70 hover:border-blue-500/70 text-white hover:shadow-[0_0_12px_rgba(59,130,246,0.3)]'
+                  ? 'bg-white/90 dark:bg-[#051c38]/90 hover:bg-blue-100/70 dark:hover:bg-[#0a2e5c] border-blue-200/90 dark:border-blue-800/70 hover:border-blue-400 dark:hover:border-blue-500/70 text-blue-950 dark:text-white shadow-2xs dark:hover:shadow-[0_0_12px_rgba(59,130,246,0.3)]'
                   : 'bg-white/90 dark:bg-blue-950/60 border-sky-300/80 dark:border-blue-800/70 hover:border-sky-400 hover:bg-sky-50 dark:hover:bg-blue-900/60 text-sky-950 dark:text-sky-200'
               }`}
               title="Email: sakibhasan.office@gmail.com"
@@ -115,8 +110,8 @@ export default function Footer() {
                 <Mail className="w-3 h-3" />
               </div>
               <div className="flex flex-col min-w-0 leading-tight">
-                <span className={`text-[8px] font-bold uppercase ${isAdmin ? 'text-blue-400' : 'text-sky-700 dark:text-blue-400'}`}>Email</span>
-                <span className={`font-bold text-[10px] truncate ${isAdmin ? 'text-white' : 'text-sky-950 dark:text-white'}`}>sakibhasan</span>
+                <span className={`text-[8px] font-bold uppercase ${isAdmin ? 'text-blue-700 dark:text-blue-400' : 'text-sky-700 dark:text-blue-400'}`}>Email</span>
+                <span className={`font-bold text-[10px] truncate ${isAdmin ? 'text-blue-950 dark:text-white' : 'text-sky-950 dark:text-white'}`}>sakibhasan</span>
               </div>
             </a>
           </div>
@@ -130,7 +125,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className={`flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg border transition-all text-[10px] font-semibold shadow-2xs ${
                 isAdmin
-                  ? 'bg-[#051c38]/90 hover:bg-[#0a2e5c] border-blue-800/70 hover:border-blue-500/70 text-white hover:shadow-[0_0_12px_rgba(59,130,246,0.3)]'
+                  ? 'bg-white/90 dark:bg-[#051c38]/90 hover:bg-blue-100/70 dark:hover:bg-[#0a2e5c] border-blue-200/90 dark:border-blue-800/70 hover:border-blue-400 dark:hover:border-blue-500/70 text-blue-950 dark:text-white shadow-2xs dark:hover:shadow-[0_0_12px_rgba(59,130,246,0.3)]'
                   : 'bg-white/90 dark:bg-blue-950/60 border-sky-300/80 dark:border-blue-800/70 hover:border-sky-400 hover:bg-sky-50 dark:hover:bg-blue-900/60 text-sky-950 dark:text-white'
               }`}
             >
@@ -138,9 +133,9 @@ export default function Footer() {
                 <div className="p-1 rounded-md bg-sky-600 text-white shrink-0 shadow-2xs">
                   <Facebook className="w-3 h-3" />
                 </div>
-                <span className={`font-bold text-[10px] truncate ${isAdmin ? 'text-white' : 'text-sky-950 dark:text-white'}`}>Facebook</span>
+                <span className={`font-bold text-[10px] truncate ${isAdmin ? 'text-blue-950 dark:text-white' : 'text-sky-950 dark:text-white'}`}>Facebook</span>
               </div>
-              <ExternalLink className={`w-2.5 h-2.5 shrink-0 ${isAdmin ? 'text-blue-300' : 'text-sky-600 dark:text-blue-400'}`} />
+              <ExternalLink className={`w-2.5 h-2.5 shrink-0 ${isAdmin ? 'text-blue-600 dark:text-blue-300' : 'text-sky-600 dark:text-blue-400'}`} />
             </a>
 
             {/* LinkedIn */}
@@ -150,7 +145,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               className={`flex items-center justify-between gap-1 px-2 py-1.5 rounded-lg border transition-all text-[10px] font-semibold shadow-2xs ${
                 isAdmin
-                  ? 'bg-[#051c38]/90 hover:bg-[#0a2e5c] border-blue-800/70 hover:border-blue-500/70 text-white hover:shadow-[0_0_12px_rgba(59,130,246,0.3)]'
+                  ? 'bg-white/90 dark:bg-[#051c38]/90 hover:bg-blue-100/70 dark:hover:bg-[#0a2e5c] border-blue-200/90 dark:border-blue-800/70 hover:border-blue-400 dark:hover:border-blue-500/70 text-blue-950 dark:text-white shadow-2xs dark:hover:shadow-[0_0_12px_rgba(59,130,246,0.3)]'
                   : 'bg-white/90 dark:bg-blue-950/60 border-sky-300/80 dark:border-blue-800/70 hover:border-sky-400 hover:bg-sky-50 dark:hover:bg-blue-900/60 text-sky-950 dark:text-white'
               }`}
             >
@@ -158,9 +153,9 @@ export default function Footer() {
                 <div className="p-1 rounded-md bg-blue-600 text-white shrink-0 shadow-2xs">
                   <Linkedin className="w-3 h-3" />
                 </div>
-                <span className={`font-bold text-[10px] truncate ${isAdmin ? 'text-white' : 'text-sky-950 dark:text-white'}`}>LinkedIn</span>
+                <span className={`font-bold text-[10px] truncate ${isAdmin ? 'text-blue-950 dark:text-white' : 'text-sky-950 dark:text-white'}`}>LinkedIn</span>
               </div>
-              <ExternalLink className={`w-2.5 h-2.5 shrink-0 ${isAdmin ? 'text-blue-300' : 'text-blue-600 dark:text-blue-400'}`} />
+              <ExternalLink className={`w-2.5 h-2.5 shrink-0 ${isAdmin ? 'text-blue-600 dark:text-blue-300' : 'text-blue-600 dark:text-blue-400'}`} />
             </a>
           </div>
 
@@ -169,13 +164,13 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className={`pt-1.5 border-t flex flex-col sm:flex-row items-center justify-between gap-1 text-[9px] sm:text-[10px] font-medium ${
           isAdmin 
-            ? 'border-blue-900/80 text-blue-300/80' 
+            ? 'border-blue-200/80 dark:border-blue-900/80 text-blue-800/90 dark:text-blue-300/80' 
             : 'border-sky-300/70 dark:border-blue-900/70 text-sky-800/90 dark:text-blue-300'
         }`}>
           <p>© {currentYear} Academic Management Portal. All rights reserved.</p>
-          <p className={`flex items-center gap-1 ${isAdmin ? 'text-blue-200' : 'text-sky-900 dark:text-blue-200'}`}>
+          <p className={`flex items-center gap-1 ${isAdmin ? 'text-blue-900 dark:text-blue-200' : 'text-sky-900 dark:text-blue-200'}`}>
             <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-              isAdmin ? 'bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]' : 'bg-emerald-500'
+              isAdmin ? 'bg-cyan-500 dark:bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]' : 'bg-emerald-500'
             }`} />
             <span>Built for Academic Excellence</span>
           </p>

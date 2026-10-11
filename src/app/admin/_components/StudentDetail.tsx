@@ -18,6 +18,8 @@ import LessonsTracker from './LessonsTracker';
 import ExamsLedger from './ExamsLedger';
 import PaymentsLedger from './PaymentsLedger';
 import DeleteStudentModal from './DeleteStudentModal';
+import RecordExamModal from './RecordExamModal';
+import RecordPaymentModal from './RecordPaymentModal';
 import { generatePdfReport } from '@/utils/pdfGenerator';
 import { formatBatch } from '@/utils/formatBatch';
 
@@ -61,6 +63,8 @@ export default function StudentDetail({
   // Tab control inside detail view: "lessons", "exams", or "payments"
   const [detailTab, setDetailTab] = useState<'lessons' | 'exams' | 'payments'>('lessons');
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAddExamModalOpen, setIsAddExamModalOpen] = useState(false);
+  const [isAddPaymentModalOpen, setIsAddPaymentModalOpen] = useState(false);
 
   // PDF Report Generation States
   const [reportMonth, setReportMonth] = useState(() => {
@@ -92,6 +96,8 @@ export default function StudentDetail({
         isGeneratingPdf={isGeneratingPdf}
         onGeneratePdf={handleGeneratePdf}
         onEditProfile={() => onEditStudent(student)}
+        onAddExam={() => setIsAddExamModalOpen(true)}
+        onAddPayment={() => setIsAddPaymentModalOpen(true)}
       />
 
       {/* Revoked Status Warning Banner */}
@@ -206,6 +212,7 @@ export default function StudentDetail({
             onAddExam={onAddExam}
             onDeleteExam={onDeleteExam}
             onUpdateExam={onUpdateExam}
+            onOpenAddExam={() => setIsAddExamModalOpen(true)}
           />
         )}
 
@@ -216,6 +223,7 @@ export default function StudentDetail({
             onAddPayment={onAddPayment}
             onDeletePayment={onDeletePayment}
             onUpdatePayment={onUpdatePayment}
+            onOpenAddPayment={() => setIsAddPaymentModalOpen(true)}
           />
         )}
       </div>
@@ -229,6 +237,22 @@ export default function StudentDetail({
         activitiesCount={studentActivities.length}
         examsCount={studentExams.length}
         paymentsCount={studentPayments.length}
+      />
+
+      {/* Colorful Quick Add Exam Modal for Student */}
+      <RecordExamModal
+        isOpen={isAddExamModalOpen}
+        onClose={() => setIsAddExamModalOpen(false)}
+        student={student}
+        onAddExam={onAddExam}
+      />
+
+      {/* Colorful Quick Add Payment Modal for Student */}
+      <RecordPaymentModal
+        isOpen={isAddPaymentModalOpen}
+        onClose={() => setIsAddPaymentModalOpen(false)}
+        student={student}
+        onAddPayment={onAddPayment}
       />
     </div>
   );

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { generatePaymentId, formatPid } from '@/utils/id';
 import { formatDateWithDay, formatBillingMonth, getBillingMonthParts } from '@/utils/dateFormat';
+import RecordPaymentModal from './RecordPaymentModal';
 
 interface PaymentsLedgerProps {
   student: Student;
@@ -31,6 +32,7 @@ interface PaymentsLedgerProps {
   onAddPayment: (payment: Payment) => void;
   onDeletePayment: (pid: string) => void;
   onUpdatePayment: (payment: Payment) => void;
+  onOpenAddPayment?: () => void;
 }
 
 export default function PaymentsLedger({
@@ -39,6 +41,7 @@ export default function PaymentsLedger({
   onAddPayment,
   onDeletePayment,
   onUpdatePayment,
+  onOpenAddPayment,
 }: PaymentsLedgerProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [editingPid, setEditingPid] = useState<string | null>(null);
@@ -53,13 +56,6 @@ export default function PaymentsLedger({
     const m = String(d.getMonth() + 1).padStart(2, '0');
     return `${y}-${m}`;
   };
-
-  const [newPayment, setNewPayment] = useState<Partial<Payment>>({
-    date: new Date().toISOString().slice(0, 10),
-    amount: 3000,
-    paymentMonth: getCurrentMonthStr(),
-    comment: 'Tuition Fee',
-  });
 
   const [editFormData, setEditFormData] = useState<Payment | null>(null);
 
@@ -117,26 +113,6 @@ export default function PaymentsLedger({
     return list;
   }, [payments, searchTerm, sortBy, sortOrder]);
 
-  const handleCreatePayment = (e: React.FormEvent) => {
-    e.preventDefault();
-    const pay: Payment = {
-      pid: generatePaymentId(),
-      studentSid: student.sid,
-      date: newPayment.date || new Date().toISOString().slice(0, 10),
-      amount: Number(newPayment.amount) || 0,
-      paymentMonth: newPayment.paymentMonth || getCurrentMonthStr(),
-      comment: newPayment.comment || '',
-    };
-    onAddPayment(pay);
-    setIsAdding(false);
-    setNewPayment({
-      date: new Date().toISOString().slice(0, 10),
-      amount: 3000,
-      paymentMonth: getCurrentMonthStr(),
-      comment: 'Tuition Fee',
-    });
-  };
-
   const handleStartEdit = (pay: Payment) => {
     setEditingPid(pay.pid);
     setEditFormData({ ...pay });
@@ -176,15 +152,11 @@ export default function PaymentsLedger({
 
           <button
             type="button"
-            onClick={() => setIsAdding(!isAdding)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 ${
-              isAdding
-                ? 'bg-rose-600 hover:bg-rose-700 text-white dark:shadow-[0_0_15px_rgba(244,63,94,0.3)]'
-                : 'bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white dark:shadow-[0_0_15px_rgba(16,185,129,0.35)]'
-            }`}
+            onClick={() => (onOpenAddPayment ? onOpenAddPayment() : setIsAdding(true))}
+            className="px-3.5 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white dark:shadow-[0_0_15px_rgba(16,185,129,0.35)]"
           >
-            {isAdding ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-            <span>{isAdding ? 'Cancel' : 'Log New Payment'}</span>
+            <Plus className="w-4 h-4" />
+            <span>Log New Payment</span>
           </button>
         </div>
 
@@ -240,95 +212,13 @@ export default function PaymentsLedger({
         </div>
       </div>
 
-      {/* Add Payment Form */}
-      {isAdding && (
-        <form
-          onSubmit={handleCreatePayment}
-          className="p-3.5 sm:p-4 bg-gradient-to-r from-emerald-100/95 via-teal-100/90 to-emerald-50 dark:from-slate-900 dark:via-emerald-950/40 dark:to-slate-900 border-2 border-emerald-400 dark:border-emerald-700/60 rounded-2xl space-y-3 shadow-md animate-fadeIn"
-        >
-          <div className="flex items-center justify-between border-b border-emerald-300 dark:border-emerald-700/50 pb-2">
-            <span className="text-xs font-black font-mono text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
-              <Plus className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
-              Log Tuition Payment Entry
-            </span>
-            <span className="text-[10px] text-emerald-800 dark:text-emerald-300 font-medium font-mono">
-              Auto-assigning PID
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
-            <div>
-              <label className="text-[10px] font-bold text-emerald-950 dark:text-emerald-300 block mb-1">
-                Payment Date *
-              </label>
-              <input
-                type="date"
-                required
-                value={newPayment.date}
-                onChange={(e) => setNewPayment({ ...newPayment, date: e.target.value })}
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-emerald-300 dark:border-slate-700 rounded-lg text-xs font-semibold text-emerald-950 dark:text-emerald-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-[10px] font-bold text-emerald-950 dark:text-emerald-300 block mb-1">
-                For Month (YYYY-MM) *
-              </label>
-              <input
-                type="month"
-                required
-                value={newPayment.paymentMonth}
-                onChange={(e) => setNewPayment({ ...newPayment, paymentMonth: e.target.value })}
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-emerald-300 dark:border-slate-700 rounded-lg text-xs font-bold text-emerald-950 dark:text-emerald-200 font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-[10px] font-bold text-emerald-950 dark:text-emerald-300 block mb-1">
-                Amount (৳ Taka) *
-              </label>
-              <input
-                type="number"
-                required
-                min={1}
-                value={newPayment.amount ?? ''}
-                onChange={(e) => setNewPayment({ ...newPayment, amount: Number(e.target.value) })}
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-emerald-300 dark:border-slate-700 rounded-lg text-xs font-black text-emerald-950 dark:text-emerald-200 font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-[10px] font-bold text-emerald-950 dark:text-emerald-300 block mb-1">
-                Payment Method / Remarks
-              </label>
-              <input
-                type="text"
-                value={newPayment.comment}
-                onChange={(e) => setNewPayment({ ...newPayment, comment: e.target.value })}
-                placeholder="e.g. bKash / Cash / Monthly Tuition"
-                className="w-full px-2.5 py-1.5 bg-white dark:bg-slate-950 border border-emerald-300 dark:border-slate-700 rounded-lg text-xs font-medium text-emerald-950 dark:text-emerald-200 placeholder-emerald-700/50 dark:placeholder-emerald-400/40 focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => setIsAdding(false)}
-              className="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-bold cursor-pointer transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-lg text-xs font-black shadow-xs cursor-pointer active:scale-95 transition-all flex items-center gap-1.5"
-            >
-              <Check className="w-3.5 h-3.5" />
-              Save Payment Record
-            </button>
-          </div>
-        </form>
-      )}
+      {/* Colourful Quick Add Payment Modal fallback if used locally */}
+      <RecordPaymentModal
+        isOpen={isAdding}
+        onClose={() => setIsAdding(false)}
+        student={student}
+        onAddPayment={onAddPayment}
+      />
 
       {/* 2. Search & Toolbar Controls */}
       <div className="bg-gradient-to-r from-emerald-100/90 via-teal-100/90 to-emerald-100/90 dark:from-slate-900 dark:via-slate-900/95 dark:to-emerald-950/40 border border-emerald-300/90 dark:border-slate-800 rounded-xl p-2.5 sm:p-3 shadow-2xs dark:shadow-[0_0_20px_rgba(16,185,129,0.15)] space-y-2.5">
@@ -781,6 +671,16 @@ export default function PaymentsLedger({
                 <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">
                   No payment entries match your current search or filter.
                 </p>
+              </div>
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => (onOpenAddPayment ? onOpenAddPayment() : setIsAdding(true))}
+                  className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white rounded-xl text-xs font-black inline-flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95 transition-all"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Log First Payment</span>
+                </button>
               </div>
             </div>
           )}

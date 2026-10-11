@@ -70,13 +70,13 @@ export default function AdminHeader() {
 
   // Uniform base styling for all nav items, with a single distinctive highlight for the selected one
   const activeClass = 'bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-500 text-white border-emerald-400/80 shadow-[0_0_20px_rgba(16,185,129,0.45)] font-black ring-2 ring-emerald-400/50';
-  const inactiveClass = 'bg-[#042017]/85 hover:bg-[#073829] text-emerald-100 hover:text-white border-emerald-800/70 hover:border-emerald-500/60 font-bold backdrop-blur-xs transition-all shadow-2xs hover:shadow-[0_0_12px_rgba(16,185,129,0.25)]';
+  const inactiveClass = 'bg-white/85 dark:bg-[#042017]/85 hover:bg-emerald-100/80 dark:hover:bg-[#073829] text-emerald-950 dark:text-emerald-100 hover:text-emerald-900 dark:hover:text-white border-emerald-300/80 dark:border-emerald-800/70 hover:border-emerald-400 dark:hover:border-emerald-500/60 font-bold backdrop-blur-xs transition-all shadow-2xs hover:shadow-xs dark:hover:shadow-[0_0_12px_rgba(16,185,129,0.25)]';
 
   return (
     <>
-      <header className="bg-gradient-to-r from-[#021b13] via-[#052b1e] to-[#021810] backdrop-blur-2xl border-b border-emerald-800/80 text-white sticky top-0 z-[100] shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.55)] relative transition-colors duration-300" id="admin-dashboard-header">
+      <header className="bg-gradient-to-r from-emerald-100/95 via-teal-50/90 to-emerald-100/90 dark:from-[#021b13] dark:via-[#052b1e] dark:to-[#021810] backdrop-blur-2xl border-b border-emerald-200/90 dark:border-emerald-800/80 text-slate-900 dark:text-white sticky top-0 z-[100] shrink-0 shadow-xs dark:shadow-[0_4px_30px_rgba(0,0,0,0.55)] relative transition-colors duration-300" id="admin-dashboard-header">
         {/* Top Gradient Accent Line */}
-        <div className="h-[2px] w-full bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 shadow-[0_0_12px_rgba(52,211,153,0.7)]" />
+        <div className="h-[2px] w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 dark:from-emerald-400 dark:via-teal-300 dark:to-emerald-500 shadow-xs dark:shadow-[0_0_12px_rgba(52,211,153,0.7)]" />
         
         {/* Top Header Row */}
         <div className="max-w-7xl mx-auto px-2.5 sm:px-4 py-1.5 flex items-center justify-between gap-2">
@@ -90,10 +90,10 @@ export default function AdminHeader() {
               <GraduationCap className="w-4 h-4" />
             </div>
             <div className="flex items-center gap-1.5">
-              <h1 className="text-sm sm:text-base font-display font-black text-white tracking-tight flex items-center">
-                Tutor<span className="text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.6)]">HQ</span>
+              <h1 className="text-sm sm:text-base font-display font-black text-slate-900 dark:text-white tracking-tight flex items-center">
+                Tutor<span className="text-emerald-700 dark:text-emerald-400 drop-shadow-xs dark:drop-shadow-[0_0_12px_rgba(52,211,153,0.6)]">HQ</span>
               </h1>
-              <span className="text-[9px] bg-emerald-900/90 border border-emerald-500/50 text-emerald-300 font-extrabold px-1.5 py-0.2 rounded-md font-mono shadow-2xs">
+              <span className="text-[9px] bg-emerald-200/90 dark:bg-emerald-900/90 border border-emerald-300/80 dark:border-emerald-500/50 text-emerald-950 dark:text-emerald-300 font-extrabold px-1.5 py-0.2 rounded-md font-mono shadow-2xs">
                 Admin
               </span>
             </div>
@@ -106,12 +106,12 @@ export default function AdminHeader() {
               href="/admin/profile"
               className={`p-1.5 rounded-xl border transition-all cursor-pointer shadow-2xs shrink-0 flex items-center gap-1 ${
                 pathname === '/admin/profile'
-                  ? 'bg-emerald-600 text-white border-emerald-400 font-black shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                  : 'text-emerald-100 hover:text-white bg-emerald-900/70 hover:bg-emerald-800/80 border-emerald-700/70 hover:border-emerald-500/70'
+                  ? 'bg-emerald-600 text-white border-emerald-400 font-black shadow-xs dark:shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                  : 'text-emerald-900 dark:text-emerald-100 hover:text-emerald-950 dark:hover:text-white bg-emerald-100/90 hover:bg-emerald-200 dark:bg-emerald-900/70 dark:hover:bg-emerald-800/80 border-emerald-300/80 dark:border-emerald-700/70 hover:border-emerald-400 dark:hover:border-emerald-500/70'
               }`}
               title="Admin Profile & Password Settings"
             >
-              <User className="w-3.5 h-3.5 text-emerald-300" />
+              <User className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300" />
               <span className="hidden min-[480px]:inline text-[10px] font-bold">Profile</span>
             </Link>
 
@@ -128,10 +128,10 @@ export default function AdminHeader() {
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => logout()}
-                className="px-2 sm:px-2.5 py-1.5 sm:py-1 bg-rose-950/70 hover:bg-rose-900/90 text-rose-200 hover:text-rose-100 border border-rose-800/70 hover:border-rose-700/80 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs shrink-0 active:scale-95"
+                className="px-2 sm:px-2.5 py-1.5 sm:py-1 bg-rose-100/90 dark:bg-rose-950/70 hover:bg-rose-200 dark:hover:bg-rose-900/90 text-rose-800 dark:text-rose-200 hover:text-rose-950 dark:hover:text-rose-100 border border-rose-300/80 dark:border-rose-800/70 hover:border-rose-400 dark:hover:border-rose-700/80 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs shrink-0 active:scale-95"
                 title="Sign Out Admin Account"
               >
-                <LogOut className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-rose-300" />
+                <LogOut className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-rose-600 dark:text-rose-300" />
                 <span className="hidden sm:inline">Sign Out</span>
               </motion.button>
             )}
@@ -142,17 +142,17 @@ export default function AdminHeader() {
               onClick={() => setIsNavOpen(!isNavOpen)}
               className={`p-1.5 rounded-xl border transition-all cursor-pointer shadow-2xs shrink-0 flex items-center justify-center ${
                 isNavOpen 
-                  ? 'bg-emerald-800/90 border-emerald-500 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]' 
-                  : 'bg-emerald-900/70 border-emerald-700/70 text-emerald-200 hover:text-white hover:bg-emerald-800/80 hover:border-emerald-600/70'
+                  ? 'bg-emerald-200 text-emerald-950 border-emerald-400 dark:bg-emerald-800/90 dark:text-white dark:border-emerald-500 shadow-xs dark:shadow-[0_0_12px_rgba(16,185,129,0.3)]' 
+                  : 'bg-emerald-100/90 hover:bg-emerald-200 text-emerald-900 hover:text-emerald-950 border-emerald-300/80 hover:border-emerald-400 dark:bg-emerald-900/70 dark:hover:bg-emerald-800/80 dark:text-emerald-200 dark:hover:text-white dark:border-emerald-700/70 dark:hover:border-emerald-600/70'
               }`}
               title={isNavOpen ? 'Hide Navigation Matrix' : 'Show Navigation Matrix'}
-              aria-label="Toggle Menu"
+              aria-label="Toggle Options Menu"
               id="admin-hamburger-menu-button"
             >
               {isNavOpen ? (
-                <X className="w-4 h-4 text-emerald-200 transition-transform duration-200" />
+                <X className="w-4 h-4 text-emerald-800 dark:text-emerald-200 transition-transform duration-200" />
               ) : (
-                <Menu className="w-4 h-4 text-emerald-200 transition-transform duration-200" />
+                <Menu className="w-4 h-4 text-emerald-800 dark:text-emerald-200 transition-transform duration-200" />
               )}
             </motion.button>
           </div>
@@ -166,7 +166,7 @@ export default function AdminHeader() {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="border-t border-emerald-800/80 bg-gradient-to-b from-[#052b1e] via-[#042419] to-[#021810] backdrop-blur-2xl shadow-[inset_0_2px_12px_rgba(0,0,0,0.5)] overflow-hidden" 
+              className="border-t border-emerald-200/90 dark:border-emerald-800/80 bg-gradient-to-b from-emerald-50/95 via-teal-50/90 to-emerald-100/80 dark:from-[#052b1e] dark:via-[#042419] dark:to-[#021810] backdrop-blur-2xl shadow-inner dark:shadow-[inset_0_2px_12px_rgba(0,0,0,0.5)] overflow-hidden" 
               id="admin-matrix-nav"
             >
               <div className="max-w-7xl mx-auto px-1.5 sm:px-3 py-2">
@@ -187,7 +187,9 @@ export default function AdminHeader() {
                         {/* Matrix Icon & Notification Badge */}
                         <div className="relative flex items-center justify-center">
                           <div className={`p-1 rounded-md shrink-0 transition-transform group-hover:scale-105 shadow-2xs ${
-                            isActive ? 'bg-white/25 text-white' : 'bg-emerald-900/90 text-emerald-300 group-hover:text-emerald-200 border border-emerald-700/60'
+                            isActive 
+                              ? 'bg-white/25 text-white' 
+                              : 'bg-emerald-100 group-hover:bg-emerald-200 text-emerald-800 group-hover:text-emerald-950 border border-emerald-300/80 dark:bg-emerald-900/90 dark:group-hover:bg-emerald-800/90 dark:text-emerald-300 dark:group-hover:text-emerald-200 dark:border-emerald-700/60'
                           }`}>
                             <Icon className="w-3 h-3" />
                           </div>
@@ -204,7 +206,7 @@ export default function AdminHeader() {
                             {item.label}
                           </p>
                           <p className={`text-[7.5px] font-medium leading-tight truncate mt-0.5 hidden min-[380px]:block ${
-                            isActive ? 'text-emerald-100' : 'text-emerald-300/80 group-hover:text-emerald-200'
+                            isActive ? 'text-emerald-100' : 'text-emerald-700/80 dark:text-emerald-300/80 group-hover:text-emerald-900 dark:group-hover:text-emerald-200'
                           }`}>
                             {item.desc}
                           </p>
